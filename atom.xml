@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[My Octopress Blog]]></title>
+  <link href="http://sleepomeno.github.io/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2014-02-05T20:59:54+01:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Your Name]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Hello World]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/02/05/again/"/>
+    <updated>2014-02-05T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/02/05/again</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+</feed>
