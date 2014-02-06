@@ -11,12 +11,12 @@ module Jekyll
   class ChuckNorris < Liquid::Tag
     def initialize(tag_name, markup, tokens)
       count = JSON.parse(Net::HTTP.get(URI.parse("http://api.icndb.com/jokes/count")))["value"]
-      @jokes = Net::HTTP.get(URI.parse("http://api.icndb.com/jokes/random/#{count}")).to_json
+      #@jokes = Net::HTTP.get(URI.parse("http://api.icndb.com/jokes/random/#{count}")).to_json
       # Other possible requests:
       # Get only some categories
       # @jokes = Net::HTTP.get(URI.parse("http://api.icndb.com/jokes/random/#{count}?limitTo=[nerdy]")).to_json
       # Get all categories except some
-      # @jokes = Net::HTTP.get(URI.parse("http://api.icndb.com/jokes/random/#{count}?exclude=[explicit]")).to_json
+			 @jokes = Net::HTTP.get(URI.parse("http://api.icndb.com/jokes/random/#{count}?exclude=[explicit]")).to_json
       # For more information, visit http://www.icndb.com/api/
     end
 
