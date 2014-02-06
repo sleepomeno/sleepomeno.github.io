@@ -1,0 +1,3 @@
+[submodule "lunr-js-search"]
+	path = lunr-js-search
+	url = https://github.com/yortz/octopress-lunr-js-search.git
