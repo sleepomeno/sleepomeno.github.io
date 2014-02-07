@@ -1,17 +1,32 @@
 [
   {
     "id": 0,
-    "title": "Hello World",
-    "category": null,
+    "title": "A fresh start",
+    "category": "stuff",
     "tags": [
-
+      "blog"
     ],
-    "url": "/blog/2014/02/05/again/",
-    "content": "",
+    "url": "/blog/2014/02/06/A-fresh-start/",
+    "content": "2014 has just started a month ago and I've painfully realized that I\ndidn't come up with any New Year's resolutions at that time. There is\nno resolution to violate, consequently, no reason to feel bad at all -\nso why not start a new blog which I could then feel bad about when I\npost nothing for months?! Well, to be serious, that's at least how all\nmy blogging attempts have ended so far. I definitely don't know if\nhistory will repeat itself again this time. Maybe this post will actually stay the\nonly post for two months? Any bets? ;-)\n\nAnyway, I better shortly summarize what I plan blogging about. Being a\nsoftware developer, tech topics will probably dominate. Still I can't\npromise not to rant about some random topic from time to time ;-) As\nan Emacs user I might blog about my **Elisp** learning progress or other\nstuff like the one and only **org-mode**. Using **Octopress** as my blogging\nengine it will be unavoidable to mention it as well, ranging from\nplugins and customizations to its philosophy. From time to time I'd also\nlike talking about my journeys to **Haskell** wonderland and\n**Clojure(Script)** development. Or mention some Android apps? There are\nenough topics for sure, we'll see if there is enough motivation to\ncarry on blogging as well ;-)\n\nLet's hope the best!\n",
     "date": {
       "year": "2014",
       "month": "February",
-      "day": "05"
+      "day": "06"
+    }
+  },
+  {
+    "id": 1,
+    "title": "Why Blogging Matters",
+    "category": "stuff",
+    "tags": [
+      "blog"
+    ],
+    "url": "/blog/2014/02/07/Why-Blogging-Matters/",
+    "content": "There is that fancy phrase \"pics or it didn't happen\". It's just\nclaiming evidence for a, more or less, hardly credible experience which has often to do\nwith some sort of drug abuse. Yes, experience shows it's\nsometimes cleverer to do without taking a photo, anyway, it crossed my mind that that phrase might be\napplicable not only to excess-like experiences but to... pretty much\neverything in life.\n<!-- more -->\n\nI'll come back later to what that actually means.. actually, I've just found a nice <a href=\"http://mdswanson.com/blog/2013/08/11/write-things-tell-people.html\" target=\"_blank\">blog post</a>\nabout the importance of running a blog as a developer which goes\nnicely with what I've been thinking. The author, Matt Swanson, says\n\"Do things, write about it\" and explains how sharing his learning on\nhis blog has been incredibly rewarding: Firstly, people told him how much they\nenjoy reading his posts (those compliments alone may be worth it!) and secondly, he gained reputation by\ndemonstrating his abilities and initiative. As a result, he somehow became some\nsort of a \"super hero\" in people's minds although his posts are not\nexactly rocket-science. Regular posts (content is still king!) and a\npretty straight-forward way of expressing things were enough to raise\nhis value... the question is: Did Matt just fool his readers? Isn't he a clever guy after all? \n\nOf course he is \"clever\". He is \"clever\" **because** he shares his\nprojects, learnings and insights on his blog. Being a Software\ndeveloper, blogging about your projects is the most efficient way of\ngaining an over-all reputation - a manager, who considers hiring you, won't read commit logs of Open Source\nProjects where your name might appear but he can enjoy a well-written blog! In fact,\nthe 'positive' effect on the manager's decision seems inevitable; and that's\nwhere the \"pics or it didn't happen\" attitude comes into play. In\norder to convey your abilities to the manager you need definite proof,\npretty similiar to the situation in court, actually: In the end, the\njudge reaches a verdict and **decides what is the truth**. Analogously,\nyou will always **be** exactly as \"clever\" as your vis-à-vis, respectively the\nreaders of your blog, think you are! It goes without saying that you\ncan replace the word \"clever\" with whatever other positive quality you'd\nlike to convey - \"competent\", \"open-minded\", \"innovative\", ..., you\nname it.\n\nFunnily enough, you will actually get cleverer when you blog regularly\n;-) Strange? Well, first let's get rid of the word \"clever\" once and\nfor all, it is somehow inaccurate - what I want to say is: You will\nget better at those topics you're blogging about. (And that not only\napplies to tech blogs!) The reason for that: The extra thinking\nnecessary for presenting your work in a nicely structured way on your\nblog will actually force you to nicely structure your projects as\nwell! In addition, your inner urge to at least blog once, twice or X\ntimes a week will actually force you to pursue your projects and\nlearnings 'cause otherwise you wouldn't have anything to blog about.\nAs a result, you'll inevitably get better at reasoning and get a\nbetter understanding of your blog posts' topics... briefly, you get\n\"cleverer\"! Isn't that ironic? ;-) \n\nAnyway, I haven't been able to post regularly in the past, for\nwhatever reasons. In the end that always led to abandonning my past blogs altogether, so I'm not\nquite sure the above argumentation is too believable coming from me,\nto be honest. However, for the moment, it is enough motivation for me to try a fresh\nstart with this blog. After all, it's all about motivation and inspiration.\n",
+    "date": {
+      "year": "2014",
+      "month": "February",
+      "day": "07"
     }
   }
 ]
