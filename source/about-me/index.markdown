@@ -3,6 +3,7 @@ layout: page
 title: "about me"
 comments: false
 sharing: false
+sidebar: collapse
 footer: true
 ---
 Hi! My name is Gregor Riegler in case you don't know. I'm in my twenties and I have studied Computer Science at the Technical University of Vienna. At the moment I'm finishing my Master's degree in Software Engineering and Internet Computing. 
