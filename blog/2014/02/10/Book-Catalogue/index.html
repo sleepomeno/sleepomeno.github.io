@@ -5,12 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>A fresh start - while true live</title>
+  <title>Book Catalogue - while true live</title>
   <meta name="author" content="Gregor Riegler">
 
   
-  <meta name="description" content="2014 has just started a month ago and I&rsquo;ve painfully realized that I
-didn&rsquo;t come up with any New Year&rsquo;s resolutions at that time. &hellip;">
+  <meta name="description" content="A week ago I&rsquo;ve downloaded the app
+Book Catalogue from the Android Play store. As its name suggests it&rsquo;s
+about creating a catalogue of &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +20,7 @@ didn&rsquo;t come up with any New Year&rsquo;s resolutions at that time. &hellip
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://sleepomeno.github.io/blog/2014/02/06/A-fresh-start/">
+  <link rel="canonical" href="http://sleepomeno.github.io/blog/2014/02/10/Book-Catalogue/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <!--<script src="/javascripts/modernizr-2.0.js"></script>-->
@@ -93,7 +94,7 @@ didn&rsquo;t come up with any New Year&rsquo;s resolutions at that time. &hellip
   <header>
     
       
-        <h1 class="entry-title">A Fresh Start</h1>
+        <h1 class="entry-title">Book Catalogue</h1>
       
     
     
@@ -110,35 +111,56 @@ didn&rsquo;t come up with any New Year&rsquo;s resolutions at that time. &hellip
   
 
 
-<time datetime="2014-02-06T00:00:00+01:00" pubdate data-updated="true">Feb 6<span>th</span>, 2014</time>
+<time datetime="2014-02-10T00:00:00+01:00" pubdate data-updated="true">Feb 10<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>2014 has just started a month ago and I&rsquo;ve painfully realized that I
-didn&rsquo;t come up with any New Year&rsquo;s resolutions at that time. There is
-no resolution to violate, consequently, no reason to feel bad at all &ndash;
-so why not start a new blog which I could then feel bad about when I
-post nothing for months?! Well, to be serious, that&rsquo;s at least how all
-my blogging attempts have ended so far. I definitely don&rsquo;t know if
-history will repeat itself again this time. Maybe this post will actually stay the
-only post for two months? Any bets? ;&ndash;)</p>
+<div class="entry-content"><p><img class="left" src="/images/book-catalogue.png" width="200"></p>
 
-<p>Anyway, I better shortly summarize what I plan blogging about. Being a
-software developer, tech topics will probably dominate. Still I can&rsquo;t
-promise not to rant about some random topic from time to time ;&ndash;) As
-an Emacs user I might blog about my <strong>Elisp</strong> learning progress or other
-stuff like the one and only <strong>org-mode</strong>. Using <strong>Octopress</strong> as my blogging
-engine it will be unavoidable to mention it as well, ranging from
-plugins and customizations to its philosophy. From time to time I&rsquo;d also
-like talking about my journeys to <strong>Haskell</strong> wonderland and
-<strong>Clojure(Script)</strong> development. Or mention some Android apps? There are
-enough topics for sure, we&rsquo;ll see if there is enough motivation to
-carry on blogging as well ;&ndash;)</p>
+<p>A week ago I&rsquo;ve downloaded the app
+<a href="https://play.google.com/store/apps/details?id=com.eleybourn.bookcatalogue&hl=de" target="_blank">Book Catalogue</a> from the Android Play store. As its name suggests it&rsquo;s
+about creating a catalogue of your books. My family and I thought it would be handy
+to know that as you easily lose track of what books we actually own
+and where we have stored them.</p>
 
-<p>Let&rsquo;s hope the best!</p>
+<p><strong>Book Catalogue</strong> makes it all possible: adding books by scanning the
+barcode, by ISBN, by searching author/title or by adding all
+information manually. Of course, every book is stored to be in exactly
+one bookshelf &ndash; you can create as many bookshelves as necessary and
+can name them as you want.</p>
+
+<p>In addition, <strong>Book Catalogue</strong> provides syncing to a <a href="http://www.goodreads.com/" target="_blank">GoodReads</a> account.
+I was really looking forward to this as it would make sharing the
+digital library with my family extremely easy&#x2026; but only in theory.
+It turned out that the GoodReads API only allows books to be added if
+the book already exists on GoodReads. Anyway, the app makes a good
+job to actually inform you which books couldn&rsquo;t be uploaded
+successfully. You could then add those books on the GoodReads web
+site, however, it&rsquo;s very cumbersome to do that for all missing books;
+so far, I have filed a few hundred books and about a fifth of them
+GoodReads does not know. So the GoodReads sync option is not <em>really</em>
+usable after all (especially if you have many old or rare books as
+they are then likely to be unknown to GoodReads). Luckily, a CSV
+import/export is provided as well so that I&rsquo;m not entirely dependent on
+GoodReads&rsquo;s good will ;&ndash;)</p>
+
+<p>Still the <strong>BookCatalogue</strong> is really great in my opinion (the imperfect GoodReads
+API is not its fault). Firstly, it&rsquo;s interface is really beautiful and
+provides nice ways to list the books in various ways. More
+importantly, the identification of books by barcode and ISBN really
+works well, including the downloading of meta information from several
+sources like Amazon, LibraryThing, GoodReads and Google Books without
+a blink!</p>
+
+<p>Well, it needs to be mentioned that <strong>BookCatalogue</strong> is an Open Source
+project and <a href="https://github.com/eleybourn/Book-Catalogue/wiki" target="_blank">can be found on GitHub</a>. So I might actually implement a
+working syncing option when I&rsquo;m really convinced it&rsquo;s worth the work.
+Until then I&rsquo;ll keep fiddling with CSV export files to keep
+everybody&rsquo;s installation up-to-date on our shared library. It&rsquo;s not
+perfect but it works&#x2026;</p>
 </div>
 
 
@@ -161,12 +183,12 @@ carry on blogging as well ;&ndash;)</p>
   
 
 
-<time datetime="2014-02-06T00:00:00+01:00" pubdate data-updated="true">Feb 6<span>th</span>, 2014</time>
+<time datetime="2014-02-10T00:00:00+01:00" pubdate data-updated="true">Feb 10<span>th</span>, 2014</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/stuff/'>stuff</a>
+    <a class='category' href='/blog/categories/tech/'>tech</a>
   
 </span>
 
@@ -175,7 +197,7 @@ carry on blogging as well ;&ndash;)</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sleepomeno.github.io/blog/2014/02/06/A-fresh-start/" data-via="" data-counturl="http://sleepomeno.github.io/blog/2014/02/06/A-fresh-start/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sleepomeno.github.io/blog/2014/02/10/Book-Catalogue/" data-via="" data-counturl="http://sleepomeno.github.io/blog/2014/02/10/Book-Catalogue/" >Tweet</a>
   
   
   
@@ -184,8 +206,8 @@ carry on blogging as well ;&ndash;)</p>
     
     <p class="meta">
       
+        <a class="basic-alignment left articlenav" href="/blog/2014/02/07/Why-Blogging-Matters/" title="Previous Post: Why Blogging Matters">&laquo; Why Blogging Matters</a>
       
-        <a class="basic-alignment right articlenav" href="/blog/2014/02/07/Why-Blogging-Matters/" title="Next Post: Why Blogging Matters">Why Blogging Matters &raquo;</a>
       
     </p>
   </footer>
@@ -249,8 +271,8 @@ carry on blogging as well ;&ndash;)</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://sleepomeno.github.io/blog/2014/02/06/A-fresh-start/';
-        var disqus_url = 'http://sleepomeno.github.io/blog/2014/02/06/A-fresh-start/';
+        var disqus_identifier = 'http://sleepomeno.github.io/blog/2014/02/10/Book-Catalogue/';
+        var disqus_url = 'http://sleepomeno.github.io/blog/2014/02/10/Book-Catalogue/';
         var disqus_script = 'embed.js';
       
     (function () {
