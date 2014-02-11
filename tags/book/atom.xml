@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: book | while true live]]></title>
   <link href="http://sleepomeno.github.io/tags/book/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-02-11T02:41:54+01:00</updated>
+  <updated>2014-02-11T14:59:36+01:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -23,7 +23,7 @@
 <p>A week ago I&rsquo;ve downloaded the app
 <a href="https://play.google.com/store/apps/details?id=com.eleybourn.bookcatalogue&hl=de" target="_blank">Book Catalogue</a> from the Android Play store. As its name suggests it&rsquo;s
 about creating a catalogue of your books. My family and I thought it would be handy
-to file our book as we easily lose track of what books we actually own
+to file our books as we easily lose track of what books we actually own
 and where we have stored them.</p>
 
 <p><strong>Book Catalogue</strong> makes it all possible: adding books by scanning the
@@ -31,6 +31,9 @@ barcode, by ISBN, by searching author/title or by adding all
 information manually. Of course, every book is stored to be in exactly
 one bookshelf &ndash; you can create as many bookshelves as necessary and
 can name them as you want.</p>
+
+<!-- more -->
+
 
 <p>In addition, <strong>Book Catalogue</strong> provides syncing to a <a href="http://www.goodreads.com/" target="_blank">GoodReads</a> account.
 I was really looking forward to this as it would make sharing the
@@ -47,15 +50,15 @@ they are then likely to be unknown to GoodReads). Luckily, a CSV
 import/export is provided as well so that I&rsquo;m not entirely dependent on
 GoodReads&rsquo;s good will ;&ndash;)</p>
 
-<p>Still the <strong>BookCatalogue</strong> is really great in my opinion (the imperfect GoodReads
-API is not its fault). Firstly, it&rsquo;s interface is really beautiful and
+<p>Still, <strong>Book Catalogue</strong> really is a great app in my opinion (the imperfect GoodReads
+API is not the app&rsquo;s fault). Firstly, it&rsquo;s interface is really beautiful and
 provides nice ways to list the books in various ways. More
 importantly, the identification of books by barcode and ISBN really
 works well, including the downloading of meta information from several
-sources like Amazon, LibraryThing, GoodReads and Google Books without
+sources like Amazon, LibraryThing, GoodReads and Google Books in
 a blink!</p>
 
-<p>Well, it needs to be mentioned that <strong>BookCatalogue</strong> is an Open Source
+<p>Well, it needs to be mentioned that <strong>Book Catalogue</strong> is an Open Source
 project and <a href="https://github.com/eleybourn/Book-Catalogue" target="_blank">can be found on GitHub</a>. So I might actually implement a
 working syncing option when I&rsquo;m really convinced it&rsquo;s worth the work.
 Until then I&rsquo;ll keep fiddling with CSV export files to keep
