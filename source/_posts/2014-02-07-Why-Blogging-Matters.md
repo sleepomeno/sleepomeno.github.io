@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Why Blogging Matters
-date: <2014-02-07 Fre> 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-02-07 Fre&gt;</span></span> 
 comments: true
 external-url:
 categories: [stuff]
@@ -11,8 +11,9 @@ There is that fancy phrase "pics or it didn't happen". It's just
 claiming evidence for a, more or less, hardly credible experience which has often to do
 with some sort of drug abuse. Yes, experience shows it's
 sometimes cleverer to do without taking a photo, anyway, it crossed my mind that that phrase might be
-applicable not only to excess-like experiences but to... pretty much
+applicable not only to excess-like experiences but to&#x2026; pretty much
 everything in life.
+
 <!-- more -->
 
 I'll come back later to what that actually means.. actually, I've just found a nice <a href="http://mdswanson.com/blog/2013/08/11/write-things-tell-people.html" target="_blank">blog post</a>
@@ -25,7 +26,7 @@ demonstrating his abilities and initiative. As a result, he somehow became some
 sort of a "super hero" in people's minds although his posts are not
 exactly rocket-science. Regular posts (content is still king!) and a
 pretty straight-forward way of expressing things were enough to raise
-his value... the question is: Did Matt just fool his readers? Isn't he a clever guy after all? 
+his value&#x2026; the question is: Did Matt just fool his readers? Isn't he a clever guy after all? 
 
 Of course he is "clever". He is "clever" **because** he shares his
 projects, learnings and insights on his blog. Being a Software
@@ -40,7 +41,7 @@ judge reaches a verdict and **decides what is the truth**. Analogously,
 you will always **be** exactly as "clever" as your vis-à-vis, respectively the
 readers of your blog, think you are! It goes without saying that you
 can replace the word "clever" with whatever other positive quality you'd
-like to convey - "competent", "open-minded", "innovative", ..., you
+like to convey - "competent", "open-minded", "innovative", &#x2026;, you
 name it.
 
 Funnily enough, you will actually get cleverer when you blog regularly
@@ -54,7 +55,7 @@ well! In addition, your inner urge to at least blog once, twice or X
 times a week will actually force you to pursue your projects and
 learnings 'cause otherwise you wouldn't have anything to blog about.
 As a result, you'll inevitably get better at reasoning and get a
-better understanding of your blog posts' topics... briefly, you get
+better understanding of your blog posts' topics&#x2026; briefly, you get
 "cleverer"! Isn't that ironic? ;-) 
 
 Anyway, I haven't been able to post regularly in the past, for

@@ -11,7 +11,7 @@ with some sort of drug abuse. Yes, experience shows it's
 sometimes cleverer to do without taking a photo, anyway, it crossed my mind that that phrase might be
 applicable not only to excess-like experiences but to... pretty much
 everything in life.
-<!-- more -->
+#+HTML: <!-- more -->
 
 I'll come back later to what that actually means.. actually, I've just found a nice [[http://mdswanson.com/blog/2013/08/11/write-things-tell-people.html][blog post]]
 about the importance of running a blog as a developer which goes
