@@ -4,7 +4,7 @@
   <title><![CDATA[Category: tech | while true live]]></title>
   <link href="http://sleepomeno.github.io/blog/categories/tech/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-02-11T02:38:30+01:00</updated>
+  <updated>2014-02-11T02:41:04+01:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -18,12 +18,12 @@
     <link href="http://sleepomeno.github.io/blog/2014/02/10/Book-Catalogue/"/>
     <updated>2014-02-10T00:00:00+01:00</updated>
     <id>http://sleepomeno.github.io/blog/2014/02/10/Book-Catalogue</id>
-    <content type="html"><![CDATA[<p>{% img left /images/book-catalogue.png 200px  %}</p>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/book-catalogue.png" width="200"></p>
 
 <p>A week ago I&rsquo;ve downloaded the app
 <a href="https://play.google.com/store/apps/details?id=com.eleybourn.bookcatalogue&hl=de" target="_blank">Book Catalogue</a> from the Android Play store. As its name suggests it&rsquo;s
 about creating a catalogue of your books. My family and I thought it would be handy
-to know that as you easily lose track of what books we actually own
+to file our book as we easily lose track of what books we actually own
 and where we have stored them.</p>
 
 <p><strong>Book Catalogue</strong> makes it all possible: adding books by scanning the
