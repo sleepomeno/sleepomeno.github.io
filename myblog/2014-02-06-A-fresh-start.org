@@ -1,5 +1,7 @@
 #+TAGS: blog
 #+CATEGORIES: stuff
+#+SIDEBAR: collapse
+#+PUBLISH: true
 #+TITLE: A fresh start
 #+AUTHOR: Gregor Riegler
 #+EMAIL: gregor.riegler@gmail.com

@@ -6,6 +6,8 @@ comments: true
 external-url:
 categories: [stuff]
 tags: [blog]
+published: true
+sidebar: collapse
 ---
 2014 has just started a month ago and I've painfully realized that I
 didn't come up with any New Year's resolutions at that time. There is

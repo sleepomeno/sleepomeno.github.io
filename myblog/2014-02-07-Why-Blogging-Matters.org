@@ -1,5 +1,7 @@
 #+TAGS: blog
 #+CATEGORIES: stuff
+#+SIDEBAR: collapse
+#+PUBLISH: true
 #+TITLE: Why Blogging Matters
 #+AUTHOR: Gregor Riegler
 #+EMAIL: gregor.riegler@gmail.com

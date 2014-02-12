@@ -6,6 +6,8 @@ comments: true
 external-url:
 categories: [stuff]
 tags: [blog]
+published: true
+sidebar: collapse
 ---
 There is that fancy phrase "pics or it didn't happen". It's just
 claiming evidence for a, more or less, hardly credible experience which has often to do
