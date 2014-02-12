@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: ghc | while true live]]></title>
   <link href="http://sleepomeno.github.io/tags/ghc/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-02-12T18:08:08+01:00</updated>
+  <updated>2014-02-12T20:17:29+01:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -74,7 +74,7 @@ apply intLength [1,2,3]
 <p>The <code>apply</code> function just applies a function that takes a list and
 returns an <code>Int</code> (like <code>length</code> does) to a value.
 Nothing fancy nor useful at all, obviously. Still, let&rsquo;s note that under the hood
-the type of <code>apply</code> is <code>forall a. ([a] -&gt; Int) -&gt; [a]</code>. So far, so
+the type of <code>apply</code> is <code>forall a. ([a] -&gt; Int) -&gt; [Int]</code>. So far, so
 good, the type checker is happy. Now let&rsquo;s a write a function
 <code>applyToTuple</code> that applies a function like <code>length</code> to a tuple of
 lists so that the lists of the tuple can be of different types.</p>
@@ -159,7 +159,7 @@ section. Thus, under the hood we get the types as follows:</p>
 &mdash; length :: forall a. [a] &ndash;> Int
 let intLength :: [Int] &ndash;> Int; intLength = length</p>
 
-<p>&mdash; wrong applyToTuple:
+<p>&mdash;  applyToTuple:
 let applyToTuple :: forall a b c. ([a] &ndash;> Int) &ndash;> ([b], [c]) &ndash;> (Int, Int); applyToTuple f (x,y) = (f x, f y)
 &mdash; correct applyToTuple:
 let applyToTuple :: forall b c. (forall a. [a] &ndash;> Int) &ndash;> ([b], [c]) &ndash;> (Int, Int); applyToTuple f (x,y) = (f x, f y)
