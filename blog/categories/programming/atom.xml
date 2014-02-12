@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | while true live]]></title>
   <link href="http://sleepomeno.github.io/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-02-12T17:54:35+01:00</updated>
+  <updated>2014-02-12T18:00:55+01:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -203,7 +203,7 @@ it when you reference it as a parameter.</p>
 <code>RankNTypes</code> in the Haskell standard library. It will be about the
 <code>ST</code> monad which provides a <em>safe</em> environment for <strong>mutation</strong> in
 Haskell with the help of <code>RankNTypes</code>. Mutation and Haskell?! Yes,
-<code>RankNTypes</code> can do it!</p>
+you can do it thanks to <code>RankNTypes</code>!</p>
 
 <p><em>PS: There is a nice</em>
 <a href="http://stackoverflow.com/questions/3071136/what-does-the-forall-keyword-in-haskell-ghc-do" target="_blank">stackoverflow thread</a> <em>which investigates the use of &ldquo;forall&rdquo; in other
