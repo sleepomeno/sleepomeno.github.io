@@ -2,7 +2,7 @@
   table td.code { width: 100%; }
   .line-numbers {
     text-align: right;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.45em;
     @if $solarized == light {
       border-right: 1px solid darken($base02, 2) !important;
@@ -75,7 +75,7 @@ pre {
   @extend .mono;
   border: 1px solid $pre-border;
   line-height: 1.45em;
-  font-size: 13px;
+  font-size: 15px;
   margin-bottom: 2.1em;
   padding: .8em 1em;
   color: $pre-color;
