@@ -201,7 +201,7 @@ a scope just like its first-order logic equivalent.</p>
 <p>The <code>apply</code> function just applies a function that takes a list and
 returns an <code>Int</code> (like <code>length</code> does) to a value.
 Nothing fancy nor useful at all, obviously. Still, let&rsquo;s note that under the hood
-the type of <code>apply</code> is <code>forall a. ([a] -&gt; Int) -&gt; [Int]</code>. So far, so
+the type of <code>apply</code> is <code>forall a. ([a] -&gt; Int) -&gt; [a] -&gt; Int</code>. So far, so
 good, the type checker is happy. Now let&rsquo;s a write a function
 <code>applyToTuple</code> that applies a function like <code>length</code> to a tuple of
 lists so that the lists of the tuple can be of different types.</p>
