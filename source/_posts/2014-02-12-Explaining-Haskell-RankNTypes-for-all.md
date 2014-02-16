@@ -62,7 +62,7 @@ apply intLength [1,2,3]
 The `apply` function just applies a function that takes a list and
 returns an `Int` (like `length` does) to a value.
 Nothing fancy nor useful at all, obviously. Still, let's note that under the hood
-the type of `apply` is `forall a. ([a] -> Int) -> [a]`. So far, so
+the type of `apply` is `forall a. ([a] -> Int) -> [a] -> Int`. So far, so
 good, the type checker is happy. Now let's a write a function
 `applyToTuple` that applies a function like `length` to a tuple of
 lists so that the lists of the tuple can be of different types.
@@ -144,7 +144,7 @@ section. Thus, under the hood we get the types as follows:
 -- length :: forall a. [a] -> Int 
 let intLength :: [Int] -> Int; intLength = length 
 
--- wrong applyToTuple:
+--  applyToTuple:
 let applyToTuple :: forall a b c. ([a] -> Int) -> ([b], [c]) -> (Int, Int); applyToTuple f (x,y) = (f x, f y) 
 -- correct applyToTuple:
 let applyToTuple :: forall b c. (forall a. [a] -> Int) -> ([b], [c]) -> (Int, Int); applyToTuple f (x,y) = (f x, f y)
