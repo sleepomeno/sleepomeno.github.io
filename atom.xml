@@ -4,7 +4,7 @@
   <title><![CDATA[while true live]]></title>
   <link href="http://sleepomeno.github.io/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-02-16T21:33:03+01:00</updated>
+  <updated>2014-02-16T21:45:48+01:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -14,10 +14,10 @@
 
   
   <entry>
-    <title type="html"><![CDATA[The Power of Plain Text]]></title>
-    <link href="http://sleepomeno.github.io/blog/2014/02/16/The-Power-of-Plain-Text/"/>
+    <title type="html"><![CDATA[This is not an org-mode tutorial]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/02/16/This-is-not-an-org-mode-Tutorial/"/>
     <updated>2014-02-16T00:00:00+01:00</updated>
-    <id>http://sleepomeno.github.io/blog/2014/02/16/The-Power-of-Plain-Text</id>
+    <id>http://sleepomeno.github.io/blog/2014/02/16/This-is-not-an-org-mode-Tutorial</id>
     <content type="html"><![CDATA[<p>I guess it was about a year ago when I decided to give <code>org-mode</code>
 another go; I had used it before but hadn&rsquo;t been able to quite wrap my head
 around it. This time I managed to get through the hard first
@@ -70,7 +70,7 @@ rise of efficiency you&rsquo;ll achieve in mastering
 <code>org-mode</code> you would have needed an equal rise of efficiency in all 20
 applications in the first place! <em>And:</em> you <strong>own</strong> all your information in plain
 text. I&rsquo;ll explain in a second the benefits of &lsquo;owning&rsquo;; first, let&rsquo;s address
-another objection, though.</p>
+another objection which will lead us there.</p>
 
 <h2>We are slaves of interfaces</h2>
 
@@ -113,7 +113,11 @@ degree of which we moved away from plain text! Anways, we are lucky, there is a
 possible escape: Use <code>org-mode</code>&rsquo;s plain text as the <em>data source</em> and
 the beautiful iPad app as its <em>view</em> only! For instance, that works well
 for my <code>org-mode</code> calendar data which I can sync with Google Calendar.
-I will post several customizations of how I tailored <code>org-mode</code> to my
+Another example is this blog post: I&rsquo;m actually writing this in
+<code>org-mode</code> and export it in a Markdown format which the Octopress
+blogging framework understands.</p>
+
+<p>Anyway, I will perhaps post several customizations of how I tailored <code>org-mode</code> to my
 needs in future posts.</p>
 
 <h2>Conclusion</h2>

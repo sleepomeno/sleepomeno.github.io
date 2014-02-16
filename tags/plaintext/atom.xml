@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: org-mode | while true live]]></title>
-  <link href="http://sleepomeno.github.io/blog/categories/org-mode/atom.xml" rel="self"/>
+  <title><![CDATA[Tag: plaintext | while true live]]></title>
+  <link href="http://sleepomeno.github.io/tags/plaintext/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
   <updated>2014-02-16T21:45:48+01:00</updated>
   <id>http://sleepomeno.github.io/</id>
