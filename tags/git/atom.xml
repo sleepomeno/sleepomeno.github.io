@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: git | while true live]]></title>
   <link href="http://sleepomeno.github.io/tags/git/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-02-24T23:18:52+01:00</updated>
+  <updated>2014-02-24T23:21:46+01:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -25,6 +25,9 @@ enough benefits which are worth the hassle of migrating? If yes, how
 would you convince a SVN user? <strong>Have you experienced that you couldn&rsquo;t comprehensively convince an SVN advocate of Git&rsquo;s
 superiority although you&rsquo;re absolutely sure of it?</strong> Or more generally:
 How to best convince anybody to use another technology?</p>
+
+<!-- more -->
+
 
 <h2>&ldquo;git svn differences&rdquo;</h2>
 
@@ -59,9 +62,6 @@ shutdown your working SVN infrastructure in favor of Git, in view
 of the complexity of migrating all repos, the need of learning Git
 commands and your coworkers' anger when you tell them that they now
 need to learn Git because some commands run <em>faster</em>?</p>
-
-<!-- more -->
-
 
 <h2>Wrong ways of advertising Git</h2>
 
