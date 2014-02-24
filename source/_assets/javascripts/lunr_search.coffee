@@ -38,7 +38,7 @@ class @LunrSearch
       url: raw.url
       body: raw.content
       date: "#{raw.date.month}/#{raw.date.day}/#{raw.date.year}" if raw.date
-      tags: raw.tags.join(",") if raw.tags
+      tags: raw.tags
       category: raw.category
     )
 
