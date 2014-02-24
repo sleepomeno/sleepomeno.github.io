@@ -29,7 +29,7 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="/assets/app-0371a8f4e1a1a19c01813c1f050ffad8.js"></script>
+<script type="text/javascript" src="/assets/app-9c511e1fb1f10490c876cc2701e1aa5e.js"></script>
 
 <script id="search-results-template" type="text/x-handlebars-template">
   {{#entries}}
@@ -37,7 +37,8 @@
       <h3>
          <small><time datetime="{{date}}" pubdate>{{date}}</time></small>
          <a href="{{url}}">{{title}}</a>
-         <p>tagged: {{ tags }} | category: <a href="/categories/{{category }}">{{category}}</a></p>
+         <!--<p>tagged: {{ tags }} | category: <a href="blog/categories/{{category }}">{{category}}</a></p>-->
+				 <p>tagged: {{{ tags }}} | category: {{{category}}}</p>
       </h3>
     </article>
   {{/entries}}
@@ -166,6 +167,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/24/git-diff-svn/">Why Git Is Better Than SVN... Or Is It?</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/02/16/This-is-not-an-org-mode-Tutorial/">This Is Not an Org-mode Tutorial</a>
       </li>
     
@@ -181,10 +186,6 @@
         <a href="/blog/2014/02/07/Why-Blogging-Matters/">Why Blogging Matters</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2014/02/06/A-fresh-start/">A Fresh Start</a>
-      </li>
-    
   </ul>
 </section>
 <section>
@@ -195,10 +196,13 @@
 <a style="font-size: 16px" href="/tags/book/">book</a>  
 <a style="font-size: 16px" href="/tags/extension/">extension</a>  
 <a style="font-size: 16px" href="/tags/ghc/">ghc</a>  
+<a style="font-size: 16px" href="/tags/git/">git</a>  
 <a style="font-size: 16px" href="/tags/haskell/">haskell</a>  
 <a style="font-size: 16px" href="/tags/plaintext/">plaintext</a>  
 <a style="font-size: 16px" href="/tags/productivity/">productivity</a>  
-<a style="font-size: 16px" href="/tags/rankntypes/">rankntypes</a>
+<a style="font-size: 16px" href="/tags/rankntypes/">rankntypes</a>  
+<a style="font-size: 16px" href="/tags/scm/">scm</a>  
+<a style="font-size: 16px" href="/tags/svn/">svn</a>
 </div>
 </section>
 

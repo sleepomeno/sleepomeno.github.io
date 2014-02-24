@@ -2441,7 +2441,7 @@ this._string),this._dom_element[this._dom_attribute]=this._string;else if(!0===b
           url: raw.url,
           body: raw.content,
           date: raw.date ? "" + raw.date.month + "/" + raw.date.day + "/" + raw.date.year : void 0,
-          tags: raw.tags ? raw.tags.join(",") : void 0,
+          tags: raw.tags,
           category: raw.category
         };
       });

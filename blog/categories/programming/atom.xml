@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | while true live]]></title>
   <link href="http://sleepomeno.github.io/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-02-16T21:45:48+01:00</updated>
+  <updated>2014-02-24T23:18:52+01:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -12,6 +12,126 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Why Git is better than SVN... or is it?]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/02/24/git-diff-svn/"/>
+    <updated>2014-02-24T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/02/24/git-diff-svn</id>
+    <content type="html"><![CDATA[<p>I don&rsquo;t know the numbers of SVN users vs. Git users but in any case there are
+still many companies out there using SVN (probably more than using
+Git?!) The question is: Why shouldn&rsquo;t they? Does Git actually provide
+enough benefits which are worth the hassle of migrating? If yes, how
+would you convince a SVN user? <strong>Have you experienced that you couldn&rsquo;t comprehensively convince an SVN advocate of Git&rsquo;s
+superiority although you&rsquo;re absolutely sure of it?</strong> Or more generally:
+How to best convince anybody to use another technology?</p>
+
+<h2>&ldquo;git svn differences&rdquo;</h2>
+
+<p>It&rsquo;s interesting to actually google &ldquo;<em>git svn differences</em>&rdquo; and to
+skim the results you get. The links I got led to some texts which rather &lsquo;objectively&rsquo;
+enumerate the core differences, however, there are also some which
+clearly try to persuade the reader of Git&rsquo;s benefits. Anyway, in
+both types of text the core differences tend to be the following:</p>
+
+<ul><li>
+
+Git is faster
+
+</li><li>
+
+Branching is cheaper
+
+</li><li>
+
+Git is distributed, SVN is centralized
+
+</li></ul>
+
+
+<p>Funnily enough, quite often I stumbled across what I call the tale of the &lsquo;Hermit
+Programmer&rsquo; scenario: The programmer has no connection to the SVN
+server and can&rsquo;t commit therefore (imagine yourself miles away from
+civilization and your life depends on the ability to commit just
+<em>now</em>&#x2026; for whatever reason?!), whereas the programmer could commit to their local repository if they used Git.
+Hooray! <em>Hooray!</em> Well, seriously&#x2026; it&rsquo;s a nice story but would it make you
+shutdown your working SVN infrastructure in favor of Git, in view
+of the complexity of migrating all repos, the need of learning Git
+commands and your coworkers' anger when you tell them that they now
+need to learn Git because some commands run <em>faster</em>?</p>
+
+<!-- more -->
+
+
+<h2>Wrong ways of advertising Git</h2>
+
+<p>Obviously, all the above arguments are valid but they are not really
+convincing enough to persuade anyone to replace SVN with Git. Imagine a conversation between
+a Git fan and a SVN user:</p>
+
+<p><strong>Git fan</strong>: Hey! You know, Git is really better, it works much
+faster!</p>
+
+<p><strong>SVN user</strong>: Ah, I don&rsquo;t care. SVN is fast enough for me. I commit
+once a day, that takes a few seconds, so no problem at all&#x2026;</p>
+
+<p><strong>Git fan</strong>: Anyway, it&rsquo;s not only faster, it also takes less disk
+space, especially branches!</p>
+
+<p><strong>SVN user</strong>: Branches?! Ah, I don&rsquo;t even remember the last time I
+created a branch. I know, theoretically you could create &ldquo;feature branches&rdquo; but
+we don&rsquo;t do this at work. Why should we? Anyway, we have enough
+storage in any case.</p>
+
+<p><strong>Git fan</strong>: Well, you know, <em>[dramatic pause as now comes his &lsquo;killer
+argument&rsquo;]</em>, Git is distributed, so everybody has a local repository
+and the whole project history. So it can&rsquo;t get lost when a <em>central</em>
+server crashes!</p>
+
+<p><strong>SVN User</strong>: No problem, we create daily backups of all our
+repositories.</p>
+
+<h2>The alternative</h2>
+
+<p>When I express my favorite Git features (and I&rsquo;m somehow convinced that those actually
+represent the <em>quintessence</em> of Git&rsquo;s benefits over SVN in daily use) it sounds like that:</p>
+
+<ul><li>
+
+You can rewrite your history with Git!
+
+</li><li>
+
+You have "pull requests" for Open Source projects collaboration!
+
+</li><li>
+
+A branch is just a reference to a commit!
+
+</li><li>
+
+Instead of merging you can 'rebase' a branch on another!
+
+</li></ul>
+
+
+<p>This time the above SVN User just wouldn&rsquo;t understand the meaning of
+my arguments! I would need to first explain all that concepts in
+detail and I&rsquo;d need to introduce the workflows which are easily possible using Git
+and impossible or a pain in SVN&#x2026; that lengthy talk doesn&rsquo;t go nicely with our
+initial goal of convincing
+our vis-à-vis with some quick bullet point arguments, obviously. So it
+seems like we can&rsquo;t have it all. Unless you have some ideas.</p>
+
+<h2>Conclusion</h2>
+
+<p>If you really want to convey Git&rsquo;s benefits to a fellow SVN coworker you need to take your
+time. You need to <strong>show</strong> the features, you should give <strong>examples</strong>
+and everyday <strong>scenarios</strong> where Git&rsquo;s capabilities make work at lot
+easier. Believe me, such insights weigh a lot more than purely
+rational arguments like <em>Git is faster</em>!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Explaining Haskell RankNTypes for all]]></title>
