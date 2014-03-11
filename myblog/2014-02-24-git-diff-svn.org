@@ -14,6 +14,7 @@ enough benefits which are worth the hassle of migrating? If yes, how
 would you convince a SVN user? *Have you experienced that you couldn't comprehensively convince an SVN advocate of Git's
 superiority although you're absolutely sure of it?* Or more generally:
 How to best convince anybody to use another technology?
+#+HTML: <!-- more -->
 
 ** "git svn differences"
 
@@ -41,7 +42,6 @@ shutdown your working SVN infrastructure in favor of Git, in view
 of the complexity of migrating all repos, the need of learning Git
 commands and your coworkers' anger when you tell them that they now
 need to learn Git because some commands run /faster/?
-#+HTML: <!-- more -->
 
 ** Wrong ways of advertising Git
 Obviously, all the above arguments are valid but they are not really

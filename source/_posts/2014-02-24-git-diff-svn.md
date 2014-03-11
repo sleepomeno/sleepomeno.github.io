@@ -17,6 +17,8 @@ would you convince a SVN user? **Have you experienced that you couldn't comprehe
 superiority although you're absolutely sure of it?** Or more generally:
 How to best convince anybody to use another technology?
 
+<!-- more -->
+
 ## "git svn differences"
 It's interesting to actually google "*git svn differences*" and to
 skim the results you get. The links I got led to some texts which rather 'objectively'
@@ -48,8 +50,6 @@ shutdown your working SVN infrastructure in favor of Git, in view
 of the complexity of migrating all repos, the need of learning Git
 commands and your coworkers' anger when you tell them that they now
 need to learn Git because some commands run *faster*?
-
-<!-- more -->
 
 ## Wrong ways of advertising Git
 Obviously, all the above arguments are valid but they are not really
