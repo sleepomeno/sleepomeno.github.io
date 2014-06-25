@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: haskell | while true live]]></title>
   <link href="http://sleepomeno.github.io/tags/haskell/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-03-11T17:50:35+01:00</updated>
+  <updated>2014-06-26T00:39:33+02:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -12,6 +12,145 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Explaining the Magic]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/06/25/Explaining-the-Magic/"/>
+    <updated>2014-06-25T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/06/25/Explaining-the-Magic</id>
+    <content type="html"><![CDATA[<p>Yesterday I came across a <a href="http://www.reddit.com/r/haskell/comments/28zx87/whats_your_favorite_response_to_the_show_me_the/" target="_blank">post</a> on the haskell reddit where somebody
+posted the following application of <em>replicateM</em>:</p>
+
+<p><code>haskell
+:m +Control.Monad
+replicateM 3 "01"
+-- ["000","001","010","011","100","101","110","111"]
+</code></p>
+
+<h2>Dark Magic</h2>
+
+<p>It obviously results in all three-character combinations of zeros and
+ones and in general, <em>replicateM x &ldquo;01&rdquo;</em> generates all x-character
+combinations of zeros and ones accordingly.</p>
+
+<p><em>replicateM</em> is a standard library function and its haddock
+documentation says: &ldquo;<em>replicateM n act</em> performs the action n times,
+gathering the results&rdquo; and its type actually is <code>replicateM :: Monad m
+=&gt; Int -&gt; m a -&gt; m [a]</code>. So <em>replicateM</em> is <strong>not</strong> a function
+explicitly crafted for the purpose of a &ldquo;get me all x-ary combinations
+of my string&rdquo; task, it is actually defined for all monads. Just
+imagine a more obvious application using the IO monad, which <em>performs the action of
+printing hello 3 times and gathers the result</em>.</p>
+
+<p><code>haskell
+replicateM 3 (putStrLn "hello")
+-- hello
+-- hello
+-- hello
+-- [(),(),()]
+</code></p>
+
+<p>It is typical Haskell practice to use a function with such a <em>general</em> look
+to solve a rather <em>special</em> problem as our original one &ndash; to such a
+degree that it seems like <strong>magic</strong> to programmers with a different
+background. Actually, it might look like &ldquo;dark&rdquo; magic when you don&rsquo;t
+grasp how/why the hell that result comes about in spite of looking at
+the source of <em>replicateM</em>, and you might start getting annoyed with
+Haskell altogether if that happens several times&#x2026; anyway, there is no
+such thing as (dark) magic ;) so let&rsquo;s demystify that interesting example!</p>
+
+<!-- more -->
+
+
+<h2>Why it works</h2>
+
+<p>Before looking at the source &ndash; and getting to the operational side of
+<em>replicateM</em> &ndash; let&rsquo;s ask ourselves <em>why</em> we get that result.</p>
+
+<p>By taking the documentation into account we can paraphrase <em>replicateM 3 &ldquo;01&rdquo;</em> by saying:
+<em>It performs &ldquo;01&rdquo; 3 times and gathers the results</em>. But what sort of action is <code>&ldquo;01&rdquo;</code>.
+As a string is a list of characters, it&rsquo;s equal to <code>[&lsquo;0&rsquo;,&lsquo;1&rsquo;]</code> which denotes a &lsquo;non-deterministic&rsquo; character value.
+Imagine it as a two-faced character which doesn&rsquo;t know if it really is a &lsquo;0&rsquo; or a &lsquo;1&rsquo;! So what does <em>performing &ldquo;01&rdquo;</em> really mean?
+I picture it as creating two parallel universes where that value dissolves into &lsquo;0&rsquo; in the first and into &lsquo;1&rsquo; in the second universe.
+Performing another &ldquo;01&rdquo; branches those two universes again so that we get 4 universes. Doing that a third time, those 4
+universes branch again in choosing the third value of either &lsquo;0&rsquo; or &lsquo;1&rsquo;. As a result, we get 8 universes which really are 8 lists of characters.
+When you gather them you obviously get <em>[&ldquo;000&rdquo;,&ldquo;001&rdquo;,&ldquo;010&rdquo;,&ldquo;011&rdquo;,&ldquo;100&rdquo;,&ldquo;101&rdquo;,&ldquo;110&rdquo;,&ldquo;111&rdquo;]</em>! Confused? Maybe you like the &lsquo;How&rsquo; better!</p>
+
+<h2>How it works</h2>
+
+<p><a href="http://www.haskell.org/hoogle/" target="_blank">Hoogle</a> is my tool of choice to quickly get to base library haskell
+source. So <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/src/Control-Monad.html#replicateM" target="_blank">this</a> tells how <em>replicateM</em> is defined:</p>
+
+<p><code>haskell
+replicateM n x = sequence (replicate n x)
+:t replicateM
+-- replicateM :: Monad m =&gt; Int -&gt; m a -&gt; m [a]
+</code></p>
+
+<p>By hoogling for <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/src/GHC-List.html#replicate" target="_blank">replicate</a> and <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/src/Control-Monad.html#sequence" target="_blank">sequence</a> we get the whole picture:</p>
+
+<p>``` haskell</p>
+
+<p>sequence ms = let k m m' = do { x &lt;&ndash; m; xs &lt;&ndash; m'; return (x:xs) } in foldr k (return []) ms
+replicate n x           =  take n (repeat x)</p>
+
+<p>:t sequence     <br/>
+&mdash;sequence :: Monad m => [m a] &ndash;> m [a]
+:t replicate
+&mdash;replicate :: Int &ndash;> a &ndash;> [a]
+```</p>
+
+<p><em>replicate</em> surely is the easiest function to grasp: <code>replicate n x</code>
+results in a list with <em>n</em> elements of value <em>x</em>. For instance:</p>
+
+<p><code>haskell
+replicate 3 "01"
+--["01","01","01"]
+</code></p>
+
+<p>So we can actually get the following equations:</p>
+
+<p><code>haskell
+replicateM 3 "01" == sequence ["01","01","01"] ==
+["000","001","010","011","100","101","110","111"]
+</code></p>
+
+<p>So the magic somehow lies in the <em>sequence</em> method or rather in the
+List monad!</p>
+
+<h3>Sequence</h3>
+
+<p>As in our application <em>sequence</em> operates in the list monad you can
+picture it using a list comprehension if you are more familiar with it:</p>
+
+<p><code>haskell
+sequence ms = let k m m' = [x:xs | x &lt;- m, xs &lt;- m'] in foldr k (return []) ms
+-- m is a string, x is a character
+-- m' is a list of strings (= the accumulator), xs is a string
+:t sequence
+-- sequence :: [[a]] -&gt; [[a]]
+</code></p>
+
+<p>Let&rsquo;s have a closer look at the last call of <em>k</em> in <em>sequence</em>.</p>
+
+<p><code>haskell
+replicateM 3 "01"
+-- == k "01" ["00","01","10","11"] ==
+[x:xs | x &lt;- "01", xs &lt;- ["00","01","10","11"]]
+-- == ["000","001","010","011"] ++ ["100","101","110","111"]
+-- == ["000","001","010","011","100","101","110","111"]
+</code></p>
+
+<p>At first <em>x</em> is selected to be &lsquo;0&rsquo; and prepended to all strings of
+<em>xs</em>, the resulting list of strings is then concatenated with <em>x</em>
+being &lsquo;1&rsquo; prepended to all strings of <em>xs</em> again. As a result, we will
+always get a lexicographically correct ordering of all <em>n</em>-ary combinations of
+&ldquo;01&rdquo; no matter what <em>n</em> we choose in <strong>replicateM n [&lsquo;0&rsquo;,&lsquo;1&rsquo;]</strong>.</p>
+
+<p>We have seen how an innocent-looking function like <em>replicateM</em> can &ndash;
+when it is used with the List monad &ndash; produce a &ldquo;magical&rdquo; result, only to then discover that there is no magic involved ;)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Migrating a mutating algorithm from C to Haskell]]></title>

@@ -2,33 +2,37 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/06/A-fresh-start/</loc>
-        <lastmod>2014-03-11T17:50:30+01:00</lastmod>
+        <lastmod>2014-06-26T00:31:29+02:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/07/Why-Blogging-Matters/</loc>
-        <lastmod>2014-03-11T17:50:30+01:00</lastmod>
+        <lastmod>2014-06-26T00:31:29+02:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/10/Book-Catalogue/</loc>
-        <lastmod>2014-03-11T17:50:29+01:00</lastmod>
+        <lastmod>2014-06-26T00:31:28+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://sleepomeno.github.io/blog/2014/02/12/Explaining-Haskell-RankNTypes-for-all/
         </loc>
-        <lastmod>2014-03-11T17:50:29+01:00</lastmod>
+        <lastmod>2014-06-26T00:31:28+02:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/16/This-is-not-an-org-mode-Tutorial/</loc>
-        <lastmod>2014-03-11T17:50:29+01:00</lastmod>
+        <lastmod>2014-06-26T00:31:28+02:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/24/git-diff-svn/</loc>
-        <lastmod>2014-03-11T17:50:29+01:00</lastmod>
+        <lastmod>2014-06-26T00:31:28+02:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell/</loc>
-        <lastmod>2014-03-11T17:50:29+01:00</lastmod>
+        <lastmod>2014-06-26T00:31:28+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://sleepomeno.github.io/blog/2014/06/25/Explaining-the-Magic/</loc>
+        <lastmod>2014-06-26T00:31:27+02:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/about-me/</loc>
@@ -36,11 +40,11 @@
     </url>
     <url>
         <loc>http://sleepomeno.github.io/</loc>
-        <lastmod>2014-03-11T17:50:30+01:00</lastmod>
+        <lastmod>2014-06-26T00:31:29+02:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/archives/</loc>
-        <lastmod>2014-03-11T17:50:30+01:00</lastmod>
+        <lastmod>2014-06-26T00:31:29+02:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/search/</loc>
