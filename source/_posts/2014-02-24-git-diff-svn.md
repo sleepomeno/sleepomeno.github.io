@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Why Git is better than SVN... or is it?
-date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-02-24 Mon&gt;</span></span> 
+date: 2014-02-24 
 comments: true
 external-url:
 categories: [programming]

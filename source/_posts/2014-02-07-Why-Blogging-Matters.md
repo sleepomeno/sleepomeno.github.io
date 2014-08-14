@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Why Blogging Matters
-date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-02-07 Fre&gt;</span></span> 
+date: 2014-02-07 
 comments: true
 external-url:
 categories: [stuff]

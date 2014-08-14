@@ -1,7 +1,7 @@
 ---
 layout: post
 title: This is not an org-mode tutorial
-date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-02-16 Son&gt;</span></span> 
+date: 2014-02-16 
 comments: true
 external-url:
 categories: [org-mode]

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Migrating a mutating algorithm from C to Haskell
-date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-03-11 Die&gt;</span></span> 
+date: 2014-03-11 
 comments: true
 external-url:
 categories: [programming]

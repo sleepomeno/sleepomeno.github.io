@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Explaining the Magic
-date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-06-25 Mit&gt;</span></span> 
+date: 2014-06-25 
 comments: true
 external-url:
 categories: [programming]

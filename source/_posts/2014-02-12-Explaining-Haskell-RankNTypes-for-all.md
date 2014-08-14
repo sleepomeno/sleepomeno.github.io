@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Explaining Haskell RankNTypes for all
-date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-02-12 Wed&gt;</span></span> 
+date: 2014-02-12 
 comments: true
 external-url:
 categories: [programming]
