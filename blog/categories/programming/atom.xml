@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | while true live]]></title>
   <link href="http://sleepomeno.github.io/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-08-14T11:30:39+02:00</updated>
+  <updated>2014-08-14T13:28:13+02:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -12,6 +12,158 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The notoriously point-free "((x.).)" trick]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions/"/>
+    <updated>2014-08-14T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions</id>
+    <content type="html"><![CDATA[<p><a href="http://www.haskell.org/haskellwiki/Pointfree" target="_blank">Point-free</a> code is ubiquitous in every well-polished Hackage library.
+It&rsquo;s more concise than its pointed counterparts and feels more
+&ldquo;hygienic&rdquo; as function composition immediately translates to its
+mathematical background.</p>
+
+<p><code>haskell
+let pointFree = (+1) . read
+let notPointFree x = (+1) (read x)
+-- notPointFree 'mentions' its argument "x"
+</code></p>
+
+<p>So far, so good. However, you get a problem in your chain of function
+composition when your right-most function &ldquo;takes two parameters&rdquo;.</p>
+
+<p>``` haskell
+let plusOne = (+1) :: Int &ndash;> Int
+let readTwoArgs = (\x y &ndash;> read x + read y) :: String &ndash;> String &ndash;> Int</p>
+
+<p>let coolSolution = plusOne . readTwoArgs :: String &ndash;> String &ndash;> Int
+&mdash; Type checker doesn&rsquo;t like coolSolution</p>
+
+<p>let boringSolution x y = plusOne (readTwoArgs x y)
+&mdash; it&rsquo;s boring since it&rsquo;s not point-free
+```</p>
+
+<p>Unfortunately, <code>coolSolution</code> is not well-typed; this might drive you
+nuts for some time: It&rsquo;s obvious that composing those functions must
+somehow work. You&rsquo;d think: &ldquo;Even GHCI must have understood what I
+mean!&rdquo; However, Haskell doesn&rsquo;t care for what you mean as much as it
+cares for type-safety ;) ! So you might fall back on <code>boringSolution</code>
+which is only half the fun as it&rsquo;s not point-free&#x2026; anyway, there IS
+a way to compose those functions!</p>
+
+<!-- more -->
+
+
+<p>In the following I will use
+<a href="http://www.haskell.org/haskellwiki/GHC/TypedHoles" target="_blank">Typed holes</a>. They are a nice tool to look into the type checker&rsquo;s
+&ldquo;thoughts&rdquo;.
+Well, first have a look at why <code>coolSolution</code> did not type-check at all.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>Couldn't match type ‘Int’ with ‘String -&gt; Int’
+</span><span class='line'>Expected type: Int -&gt; String -&gt; Int
+</span><span class='line'>  Actual type: Int -&gt; Int
+</span><span class='line'>In the first argument of ‘(.)’, namely ‘plusOne’
+</span><span class='line'>In the expression: plusOne . readTwoArgs :: String -&gt; String -&gt; Int
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Essentially, this tells us that <code>plusOne</code> does not have the right type
+to be used together with <code>(. readTwoArgs)</code>. Now let&rsquo;s ask this
+question to the type checker: What do I need to apply to <code>plusOne</code> so
+that you are happy?</p>
+
+<p><code>haskell
+((_ plusOne) . readTwoArgs) "3" "2" :: Int
+</code></p>
+
+<p>The answer we get is:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>Found hole ‘_’
+</span><span class='line'>  with type: (Int -&gt; Int) -&gt; (String -&gt; Int) -&gt; [Char] -&gt; Int
+</span><span class='line'>Relevant bindings include it :: Int (bound at &lt;interactive&gt;:88:1)
+</span><span class='line'>In the expression: _
+</span><span class='line'>In the first argument of ‘(.)’, namely ‘(_ plusOne)’
+</span><span class='line'>In the expression: (_ plusOne) . readTwoArgs
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Okay, this help us. Our &ldquo;hole function&rdquo;&rsquo;s type is <code>(Int -&gt; Int) -&gt;
+(String -&gt; Int) -&gt; [Char] -&gt; Int</code>. Now we just write that
+function &ndash; actually, the type signature and our knowledge of what
+should be the result of the whole expression give rise to that <em>unique</em> <code>holeFunction</code>:</p>
+
+<p><code>haskell
+let holeFunction plusOne' stringToInt string = plusOne' (stringToInt string)
+let holeFunction plusOne' stringToInt string = plusOne' . stringToInt $ string
+let holeFunction plusOne' stringToInt = plusOne' . stringToInt
+let holeFunction plusOne' stringToInt = (.) plusOne' stringToInt
+let holeFunction plusOne' = (.) plusOne'
+let holeFunction = (.)
+</code></p>
+
+<p>By (re)writing it in a point-free style and by applying eta-reductions we
+get a very simple definition. It turns out that our <code>holeFunction</code> is
+just ordinary function composition^^. Anyway, let&rsquo;s have a look if that works.</p>
+
+<p><code>haskell
+let coolSolution = ((.) plusOne). readTwoArgs
+let coolSolution = (plusOne .). readTwoArgs
+-- (coolSolution "3" "4") == 8
+</code></p>
+
+<p>Yes, it does! That &ldquo;.).&rdquo; looks funny and will surely confuse everybody
+whose doesn&rsquo;t know that &ldquo;trick&rdquo; (and does not have a type-checker in
+their brain). However, it gets even funnier. When your right-most
+function expects even more arguments you just add &lsquo;a couple of&rsquo; &ldquo;.)"s
+in between!</p>
+
+<p><code>haskell
+let wasteFourArgs = (\a b c d -&gt; read a + read b) :: String -&gt; String -&gt; String -&gt; String -&gt; Int
+let coolSolution' = (((plusOne .) .) .). wasteFourArgs
+</code></p>
+
+<h2>Conclusion</h2>
+
+<p>Thus, we have found a way to use the (point-free) function
+composition even when you need to feed more than a single argument
+into it!</p>
+
+<p>As point-free code is more concise it can be clearer about what you
+want to do, however, it can obfuscate your intentions as well! (Look
+at those <a href="http://www.haskell.org/haskellwiki/Pointfree#Combinator_discoveries" target="_blank">combinators</a>). In the
+case of this <em>((x.).)</em> trick, I think it can still be beneficial if
+and only if everybody in your team &ldquo;knows the trick&rdquo; and does not have
+to think about it. The nice reason is: As soon as you delete that &ldquo;.)&rdquo;
+chain mentally you immediately grasp the meaning of the resulting function!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Explaining the Magic]]></title>
