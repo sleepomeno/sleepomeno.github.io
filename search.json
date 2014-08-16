@@ -115,5 +115,18 @@
       "month": "August",
       "day": "14"
     }
+  },
+  {
+    "id": 9,
+    "title": "Using Google Universal Analytics with Octopress",
+    "category": "<a class='category' href='/blog/categories/octopress/'>octopress</a>",
+    "tags": "<a class='tag' href='/tags/analytics/'>analytics</a>, <a class='tag' href='/tags/blog/'>blog</a>",
+    "url": "/blog/2014/08/16/Using-Google-Universal-Analytics-with-Octopress/",
+    "content": "When I first set up my Github pages Octopress blog I followed <a href=\"http://stefanalfbo.github.io/blog/2013/04/17/octopress-google-analytics-github-pages/\" target=\"_blank\">those\ninstructions</a> to set Google Analytics tracking up - and it worked. However, in May Google\nAnalytics somehow decided to move my account to *Universal\nAnalytics* - maybe I had approved it without really knowing what it\nmeant&#x2026;\n\nWell, what is *Universal Analytics*? I have no idea! The\nimportant thing to notice is, though, that you need to change your\nJavaScript **tracking code** if you make that transition; obviously, I\ndidn't know that. Otherwise tracking wouldn't work any longer; would\nit? As a matter of fact, it *somehow* did.\n\n{% blockquote Wolfgang Pauli %}\nIt is not only not right, it is not even wrong.\n{% endblockquote %}\n\nActually, my Analytics dashboard **did** show some visits and hits, that's\nwhy I didn't notice the problem for a long time, however, I guess it\nonly mentioned 10% of them! Anyway, after a long\ndebugging session with <a href=\"https://www.google.at/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCAQFjAA&url=https%3A%2F%2Fchrome.google.com%2Fwebstore%2Fdetail%2Ftag-assistant-by-google%2Fkejbdjndbnbjgmefkgdddjlbokphdefk&ei=xivvU6rFCoTE7AbJ54GgBw&usg=AFQjCNHiOEtvqJl1-RFk6_Q6oVWZTGRFPw&sig2=cuQ2UpUVHzSDJBg77fP0hw&bvm=bv.73231344,d.ZGU\" target=\"_blank\">Google Tag Assistant</a> and <a href=\"https://www.google.at/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCAQFjAA&url=https%3A%2F%2Fchrome.google.com%2Fwebstore%2Fdetail%2Fgoogle-analytics-debugger%2Fjnkmfdileelhofjcijamephohjechhna&ei=NizvU-u2Nef17AaSp4CIAg&usg=AFQjCNHR1yQN0Rdzn4xwMA1bTPZkNEGK_Q&sig2=CEZMIArRE6i7HVQLoSVTiQ&bvm=bv.73231344,d.ZGU\" target=\"_blank\">Google Analytics Debugger</a> I figured out the necessity to change the code, finally.\n\nShortly, you just need to change your\n`source/_includes/google_analytics.html` to this code:  \n\n{% codeblock %}\n{% raw %}\n{% if site.google_analytics_tracking_id %}\n  <script type=\"text/javascript\">\n    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\nm=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n})(window,document,'script','//www.google-analytics.com/analytics.js','ga');\n\nga('create', '{{ site.google_analytics_tracking_id }}', 'auto');\nga('send', 'pageview');\n  </script>\n{% endif %}\n{% endraw %} \n{% endcodeblock %}\n\nConcerning Github pages, it's not necessary to include a call to set your domain to\n**github.io** any longer. It just works out of the box - what a\nprogress! It is not only right, it is not even wrong now!\n",
+    "date": {
+      "year": "2014",
+      "month": "August",
+      "day": "16"
+    }
   }
 ]
