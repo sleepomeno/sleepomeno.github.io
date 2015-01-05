@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: maybe | while true live]]></title>
+  <link href="http://sleepomeno.github.io/tags/maybe/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2015-01-05T23:21:14+01:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Gregor Riegler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[else return null]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/01/05/else-return-null/"/>
+    <updated>2015-01-05T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/01/05/else-return-null</id>
+    <content type="html"><![CDATA[<p>I guess everybody has a story or two in store about Nullpointer
+exceptions in Java (or in any language with nullable values). Sooner or later you will make the acquaintance of the dreaded stacktrace line
+denoting that you did something terribly wrong, demanding a value
+where none exists, and you just wonder <em>why, how the hell can that
+object be null?!</em> during an hour of painful debugging&#x2026; you know
+that? Good. Well, I won&rsquo;t ponder over how to avoid it, how to apply
+proper error handling etc. (that&rsquo;s way too complicated, I&rsquo;m tired) but I&rsquo;d just like to point out my personal
+favourite, the
+famous <code>else return null</code> idiom.</p>
+
+<!-- more -->
+
+
+<p>Anyway, the below snippet shows what I actually mean by that.</p>
+
+<p>``` java
+// Version 1
+if (password == &ldquo;12345&rdquo;)
+   return valuableTreasure;
+else
+   return null;</p>
+
+<p>// or, equivalently
+// Version 2
+if (password == &ldquo;12345&rdquo;)
+   return valuableTreasure;
+return null;
+```</p>
+
+<p>To make things more familiar, in Version 2 you could imagine multiple <code>return null</code> lines hidden in
+various control structures in an endless method and you surely get an idea
+how people feel when they try to reason about an object being <em>null</em>
+or not.
+Anyway, spotting an <code>else return null</code> I always get a bad gut feeling
+saying that things are not what they are supposed to be. I&rsquo;m aware
+that this obviously touches upon the question if you should avoid
+<em>null</em> values altogether. Anyway, I can&rsquo;t help my bad gut feeling
+whenever I see it ;)</p>
+
+<p>The funny thing is that I recently wrote similar code myself; that
+alone would not be a surprise yet, but I actually wrote it in
+Haskell which does not have that notion of <em>null</em> values and the
+corresponding Nullpointer exception. In Haskell, there is the <a href="https://www.haskell.org/haskellwiki/Maybe" target="_blank">Maybe monad</a> which facilitates chaining &ldquo;partial&rdquo; computations together without
+the risk of a Nullpointer exception. Here is the snippet of that code
+(obviously, only the <code>else Nothing</code> is &lsquo;important&rsquo;).</p>
+
+<p><code>haskell
+newState =
+  if not shouldBeCompiled &amp;&amp; w' == view T.word W.immediate' then
+   (oldState ^. lastColonDefinition ) &gt;&gt;=
+   (\x -&gt; return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True))
+  else
+   Nothing
+</code></p>
+
+<p>Anyway, believe me, if you ever write such an <code>else Nothing</code> in Haskell, that should
+be the trigger &ndash; take a deep breath, take a coffee and think about your
+problem again. At the least, you are overcomplicating things as using
+the <em>Monad</em> or <em>MonadPlus</em> nature of <em>Maybe</em> would make life easier
+but probably it&rsquo;s an indication that your thoughts are about to go
+astray and you get lost in old <code>else return null</code> habits or worse &ndash; so better
+stop it and take a break!</p>
+
+<p>How would the <em>MonadPlus</em> and <em>Monad</em> instances make life better? Look
+at the below version. In any case, it&rsquo;s functionally equivalent, so
+how would it be &lsquo;better&rsquo;? In my opinion, it conveys much
+more the impression that the programmer actually knows what they are doing.</p>
+
+<p>``` haskell
+newState = do
+  guard $ not shouldBeCompiled &amp;&amp; w' == (view T.word W.immediate')</p>
+
+<p>  x &lt;&ndash; oldState ^. lastColonDefinition
+  return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True)
+```</p>
+
+<p>Essentially, the <code>guard</code> function does the trick. <code>guard</code>, which has the type
+<em>guard :: MonadPlus m => Bool &ndash;> m ()</em>, makes the containing <em>do</em>
+block evaluate to <code>Nothing</code> if the <code>Bool</code> argument evaluates to
+<code>False</code>. In that sense, the <code>guard</code> expression actually looks like an
+assertion! The whole <em>MonadPlus</em> magic can be further explored <a href="http://en.wikibooks.org/wiki/Haskell/MonadPlus" target="_blank">here</a>.</p>
+
+<p>In my case, I finally ended up removing those lines altogether. As suspected, the
+good old <code>else Nothing</code> was the symptom that I had lost track of
+what I was coding at all &ndash; completely lost in nothingness &ndash; and I really needed a
+break.</p>
+
+<p>So what is your typical &lsquo;silly code&rsquo; that you typically start writing when
+you should rather take a break?</p>
+]]></content>
+  </entry>
+  
+</feed>

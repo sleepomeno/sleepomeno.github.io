@@ -1,0 +1,418 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>else return null - while true live</title>
+  <meta name="author" content="Gregor Riegler">
+
+  
+  <meta name="description" content="I guess everybody has a story or two in store about Nullpointer
+exceptions in Java (or in any language with nullable values). Sooner or later you &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sleepomeno.github.io/blog/2015/01/05/else-return-null/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <!--<script src="/javascripts/modernizr-2.0.js"></script>-->
+  <!--<script src="/javascripts/ender.js"></script>-->
+  <!--<script src="/javascripts/octopress.js" type="text/javascript"></script>-->
+  <link href="/atom.xml" rel="alternate" title="while true live" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/assets/app-c0f18cf1eab0ab482c858c55c0da5377.js"></script>
+
+<script id="search-results-template" type="text/x-handlebars-template">
+  {{#entries}}
+    <article>
+      <h3>
+         <small><time datetime="{{date}}" pubdate>{{date}}</time></small>
+         <a href="{{url}}">{{title}}</a>
+         <!--<p>tagged: {{ tags }} | category: <a href="blog/categories/{{category }}">{{category}}</a></p>-->
+				 <p>tagged: {{{ tags }}} | category: {{{category}}}</p>
+      </h3>
+    </article>
+  {{/entries}}
+</script>
+
+
+
+  
+  <script type="text/javascript">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-47975624-1', 'auto');  // Replace with your property ID.
+ga('send', 'pageview');
+  </script>
+
+
+
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">sleepomeno</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">while true live</a></h1>
+  
+    <h2>Musings on the fatality of infinite loops and other stuff.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+
+  <form action="/search" method="get">
+  <fieldset role ="search">
+    <input type="text" id="search-query" name="q" placeholder="Search" autocomplete="off" class="search" />
+  </fieldset>
+</form>
+
+
+<ul class="main-navigation">
+  <li><a href="/about-me/">About me</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Else Return Null</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-05T00:00:00+01:00" pubdate data-updated="true">Jan 5<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I guess everybody has a story or two in store about Nullpointer
+exceptions in Java (or in any language with nullable values). Sooner or later you will make the acquaintance of the dreaded stacktrace line
+denoting that you did something terribly wrong, demanding a value
+where none exists, and you just wonder <em>why, how the hell can that
+object be null?!</em> during an hour of painful debugging&#x2026; you know
+that? Good. Well, I won&rsquo;t ponder over how to avoid it, how to apply
+proper error handling etc. (that&rsquo;s way too complicated, I&rsquo;m tired) but I&rsquo;d just like to point out my personal
+favourite, the
+famous <code>else return null</code> idiom.</p>
+
+<!-- more -->
+
+
+<p>Anyway, the below snippet shows what I actually mean by that.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// Version 1</span>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">password</span> <span class="o">==</span> <span class="s">&quot;12345&quot;</span><span class="o">)</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">valuableTreasure</span><span class="o">;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>   <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// or, equivalently</span>
+</span><span class='line'><span class="c1">// Version 2</span>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">password</span> <span class="o">==</span> <span class="s">&quot;12345&quot;</span><span class="o">)</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">valuableTreasure</span><span class="o">;</span>
+</span><span class='line'><span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To make things more familiar, in Version 2 you could imagine multiple <code>return null</code> lines hidden in
+various control structures in an endless method and you surely get an idea
+how people feel when they try to reason about an object being <em>null</em>
+or not.
+Anyway, spotting an <code>else return null</code> I always get a bad gut feeling
+saying that things are not what they are supposed to be. I&rsquo;m aware
+that this obviously touches upon the question if you should avoid
+<em>null</em> values altogether. Anyway, I can&rsquo;t help my bad gut feeling
+whenever I see it ;)</p>
+
+<p>The funny thing is that I recently wrote similar code myself; that
+alone would not be a surprise yet, but I actually wrote it in
+Haskell which does not have that notion of <em>null</em> values and the
+corresponding Nullpointer exception. In Haskell, there is the <a href="https://www.haskell.org/haskellwiki/Maybe" target="_blank">Maybe monad</a> which facilitates chaining &ldquo;partial&rdquo; computations together without
+the risk of a Nullpointer exception. Here is the snippet of that code
+(obviously, only the <code>else Nothing</code> is &lsquo;important&rsquo;).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">newState</span> <span class="ow">=</span>
+</span><span class='line'>  <span class="kr">if</span> <span class="n">not</span> <span class="n">shouldBeCompiled</span> <span class="o">&amp;&amp;</span> <span class="n">w&#39;</span> <span class="o">==</span> <span class="n">view</span> <span class="kt">T</span><span class="o">.</span><span class="n">word</span> <span class="kt">W</span><span class="o">.</span><span class="n">immediate&#39;</span> <span class="kr">then</span>
+</span><span class='line'>   <span class="p">(</span><span class="n">oldState</span> <span class="o">^.</span> <span class="n">lastColonDefinition</span> <span class="p">)</span> <span class="o">&gt;&gt;=</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">\</span><span class="n">x</span> <span class="ow">-&gt;</span> <span class="n">return</span> <span class="o">$</span> <span class="n">oldState</span> <span class="o">&amp;</span> <span class="n">definedWords</span> <span class="o">%~</span> <span class="p">(</span><span class="n">ix</span> <span class="n">x</span> <span class="o">%~</span> <span class="n">set</span> <span class="n">isImmediate</span> <span class="kt">True</span><span class="p">))</span>
+</span><span class='line'>  <span class="kr">else</span>
+</span><span class='line'>   <span class="kt">Nothing</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Anyway, believe me, if you ever write such an <code>else Nothing</code> in Haskell, that should
+be the trigger &ndash; take a deep breath, take a coffee and think about your
+problem again. At the least, you are overcomplicating things as using
+the <em>Monad</em> or <em>MonadPlus</em> nature of <em>Maybe</em> would make life easier
+but probably it&rsquo;s an indication that your thoughts are about to go
+astray and you get lost in old <code>else return null</code> habits or worse &ndash; so better
+stop it and take a break!</p>
+
+<p>How would the <em>MonadPlus</em> and <em>Monad</em> instances make life better? Look
+at the below version. In any case, it&rsquo;s functionally equivalent, so
+how would it be &lsquo;better&rsquo;? In my opinion, it conveys much
+more the impression that the programmer actually knows what they are doing.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">newState</span> <span class="ow">=</span> <span class="kr">do</span>
+</span><span class='line'>  <span class="n">guard</span> <span class="o">$</span> <span class="n">not</span> <span class="n">shouldBeCompiled</span> <span class="o">&amp;&amp;</span> <span class="n">w&#39;</span> <span class="o">==</span> <span class="p">(</span><span class="n">view</span> <span class="kt">T</span><span class="o">.</span><span class="n">word</span> <span class="kt">W</span><span class="o">.</span><span class="n">immediate&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">x</span> <span class="ow">&lt;-</span> <span class="n">oldState</span> <span class="o">^.</span> <span class="n">lastColonDefinition</span>
+</span><span class='line'>  <span class="n">return</span> <span class="o">$</span> <span class="n">oldState</span> <span class="o">&amp;</span> <span class="n">definedWords</span> <span class="o">%~</span> <span class="p">(</span><span class="n">ix</span> <span class="n">x</span> <span class="o">%~</span> <span class="n">set</span> <span class="n">isImmediate</span> <span class="kt">True</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Essentially, the <code>guard</code> function does the trick. <code>guard</code>, which has the type
+<em>guard :: MonadPlus m => Bool &ndash;> m ()</em>, makes the containing <em>do</em>
+block evaluate to <code>Nothing</code> if the <code>Bool</code> argument evaluates to
+<code>False</code>. In that sense, the <code>guard</code> expression actually looks like an
+assertion! The whole <em>MonadPlus</em> magic can be further explored <a href="http://en.wikibooks.org/wiki/Haskell/MonadPlus" target="_blank">here</a>.</p>
+
+<p>In my case, I finally ended up removing those lines altogether. As suspected, the
+good old <code>else Nothing</code> was the symptom that I had lost track of
+what I was coding at all &ndash; completely lost in nothingness &ndash; and I really needed a
+break.</p>
+
+<p>So what is your typical &lsquo;silly code&rsquo; that you typically start writing when
+you should rather take a break?</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gregor Riegler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-05T00:00:00+01:00" pubdate data-updated="true">Jan 5<span>th</span>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sleepomeno.github.io/blog/2015/01/05/else-return-null/" data-via="" data-counturl="http://sleepomeno.github.io/blog/2015/01/05/else-return-null/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2014/11/07/Using-XMonad-with-a-projector/" title="Previous Post: Using XMonad with a projector">&laquo; Using XMonad with a projector</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/05/else-return-null/">Else Return Null</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/11/07/Using-XMonad-with-a-projector/">Using XMonad With a Projector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/16/Using-Google-Universal-Analytics-with-Octopress/">Using Google Universal Analytics With Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/14/Composing-two-argument-functions/">The Notoriously Point-free "((X.).)" Trick</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/25/Explaining-the-Magic/">Explaining the Magic</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+	<div id="tagcloud"><a style="font-size: 16px" href="/tags/c/">C</a>  
+<a style="font-size: 16px" href="/tags/st/">ST</a>  
+<a style="font-size: 16px" href="/tags/analytics/">analytics</a>  
+<a style="font-size: 16px" href="/tags/android/">android</a>  
+<a style="font-size: 16px" href="/tags/app/">app</a>  
+<a style="font-size: 23px" href="/tags/blog/">blog</a>  
+<a style="font-size: 16px" href="/tags/book/">book</a>  
+<a style="font-size: 16px" href="/tags/extension/">extension</a>  
+<a style="font-size: 16px" href="/tags/ghc/">ghc</a>  
+<a style="font-size: 16px" href="/tags/git/">git</a>  
+<a style="font-size: 28px" href="/tags/haskell/">haskell</a>  
+<a style="font-size: 16px" href="/tags/laziness/">laziness</a>  
+<a style="font-size: 16px" href="/tags/maybe/">maybe</a>  
+<a style="font-size: 16px" href="/tags/monadplus/">monadplus</a>  
+<a style="font-size: 16px" href="/tags/mutation/">mutation</a>  
+<a style="font-size: 16px" href="/tags/performance/">performance</a>  
+<a style="font-size: 16px" href="/tags/plaintext/">plaintext</a>  
+<a style="font-size: 16px" href="/tags/productivity/">productivity</a>  
+<a style="font-size: 16px" href="/tags/rankntypes/">rankntypes</a>  
+<a style="font-size: 16px" href="/tags/scm/">scm</a>  
+<a style="font-size: 16px" href="/tags/svn/">svn</a>  
+<a style="font-size: 16px" href="/tags/xmonad/">xmonad</a>
+</div>
+</section>
+<section>
+  <h1>Recent Comments</h1>
+  <div id="dsq-recentcomments" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/sleepomeno/recent_comments_widget.js?hide_avatars=1&num_items=3"></script></div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Gregor Riegler -
+	<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+	<span class="followTwitter"><a href="https://twitter.com/GregorRiegler" class="twitter-follow-button" data-show-count="false">Follow @GregorRiegler</a></span>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'sleepomeno';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sleepomeno.github.io/blog/2015/01/05/else-return-null/';
+        var disqus_url = 'http://sleepomeno.github.io/blog/2015/01/05/else-return-null/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

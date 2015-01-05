@@ -4,7 +4,7 @@
   <title><![CDATA[while true live]]></title>
   <link href="http://sleepomeno.github.io/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2014-11-07T14:58:19+01:00</updated>
+  <updated>2015-01-05T23:21:14+01:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -12,6 +12,125 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[else return null]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/01/05/else-return-null/"/>
+    <updated>2015-01-05T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/01/05/else-return-null</id>
+    <content type="html"><![CDATA[<p>I guess everybody has a story or two in store about Nullpointer
+exceptions in Java (or in any language with nullable values). Sooner or later you will make the acquaintance of the dreaded stacktrace line
+denoting that you did something terribly wrong, demanding a value
+where none exists, and you just wonder <em>why, how the hell can that
+object be null?!</em> during an hour of painful debugging&#x2026; you know
+that? Good. Well, I won&rsquo;t ponder over how to avoid it, how to apply
+proper error handling etc. (that&rsquo;s way too complicated, I&rsquo;m tired) but I&rsquo;d just like to point out my personal
+favourite, the
+famous <code>else return null</code> idiom.</p>
+
+<!-- more -->
+
+
+<p>Anyway, the below snippet shows what I actually mean by that.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// Version 1</span>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">password</span> <span class="o">==</span> <span class="s">&quot;12345&quot;</span><span class="o">)</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">valuableTreasure</span><span class="o">;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>   <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// or, equivalently</span>
+</span><span class='line'><span class="c1">// Version 2</span>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">password</span> <span class="o">==</span> <span class="s">&quot;12345&quot;</span><span class="o">)</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">valuableTreasure</span><span class="o">;</span>
+</span><span class='line'><span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To make things more familiar, in Version 2 you could imagine multiple <code>return null</code> lines hidden in
+various control structures in an endless method and you surely get an idea
+how people feel when they try to reason about an object being <em>null</em>
+or not.
+Anyway, spotting an <code>else return null</code> I always get a bad gut feeling
+saying that things are not what they are supposed to be. I&rsquo;m aware
+that this obviously touches upon the question if you should avoid
+<em>null</em> values altogether. Anyway, I can&rsquo;t help my bad gut feeling
+whenever I see it ;)</p>
+
+<p>The funny thing is that I recently wrote similar code myself; that
+alone would not be a surprise yet, but I actually wrote it in
+Haskell which does not have that notion of <em>null</em> values and the
+corresponding Nullpointer exception. In Haskell, there is the <a href="https://www.haskell.org/haskellwiki/Maybe" target="_blank">Maybe monad</a> which facilitates chaining &ldquo;partial&rdquo; computations together without
+the risk of a Nullpointer exception. Here is the snippet of that code
+(obviously, only the <code>else Nothing</code> is &lsquo;important&rsquo;).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">newState</span> <span class="ow">=</span>
+</span><span class='line'>  <span class="kr">if</span> <span class="n">not</span> <span class="n">shouldBeCompiled</span> <span class="o">&amp;&amp;</span> <span class="n">w&#39;</span> <span class="o">==</span> <span class="n">view</span> <span class="kt">T</span><span class="o">.</span><span class="n">word</span> <span class="kt">W</span><span class="o">.</span><span class="n">immediate&#39;</span> <span class="kr">then</span>
+</span><span class='line'>   <span class="p">(</span><span class="n">oldState</span> <span class="o">^.</span> <span class="n">lastColonDefinition</span> <span class="p">)</span> <span class="o">&gt;&gt;=</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">\</span><span class="n">x</span> <span class="ow">-&gt;</span> <span class="n">return</span> <span class="o">$</span> <span class="n">oldState</span> <span class="o">&amp;</span> <span class="n">definedWords</span> <span class="o">%~</span> <span class="p">(</span><span class="n">ix</span> <span class="n">x</span> <span class="o">%~</span> <span class="n">set</span> <span class="n">isImmediate</span> <span class="kt">True</span><span class="p">))</span>
+</span><span class='line'>  <span class="kr">else</span>
+</span><span class='line'>   <span class="kt">Nothing</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Anyway, believe me, if you ever write such an <code>else Nothing</code> in Haskell, that should
+be the trigger &ndash; take a deep breath, take a coffee and think about your
+problem again. At the least, you are overcomplicating things as using
+the <em>Monad</em> or <em>MonadPlus</em> nature of <em>Maybe</em> would make life easier
+but probably it&rsquo;s an indication that your thoughts are about to go
+astray and you get lost in old <code>else return null</code> habits or worse &ndash; so better
+stop it and take a break!</p>
+
+<p>How would the <em>MonadPlus</em> and <em>Monad</em> instances make life better? Look
+at the below version. In any case, it&rsquo;s functionally equivalent, so
+how would it be &lsquo;better&rsquo;? In my opinion, it conveys much
+more the impression that the programmer actually knows what they are doing.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">newState</span> <span class="ow">=</span> <span class="kr">do</span>
+</span><span class='line'>  <span class="n">guard</span> <span class="o">$</span> <span class="n">not</span> <span class="n">shouldBeCompiled</span> <span class="o">&amp;&amp;</span> <span class="n">w&#39;</span> <span class="o">==</span> <span class="p">(</span><span class="n">view</span> <span class="kt">T</span><span class="o">.</span><span class="n">word</span> <span class="kt">W</span><span class="o">.</span><span class="n">immediate&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">x</span> <span class="ow">&lt;-</span> <span class="n">oldState</span> <span class="o">^.</span> <span class="n">lastColonDefinition</span>
+</span><span class='line'>  <span class="n">return</span> <span class="o">$</span> <span class="n">oldState</span> <span class="o">&amp;</span> <span class="n">definedWords</span> <span class="o">%~</span> <span class="p">(</span><span class="n">ix</span> <span class="n">x</span> <span class="o">%~</span> <span class="n">set</span> <span class="n">isImmediate</span> <span class="kt">True</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Essentially, the <code>guard</code> function does the trick. <code>guard</code>, which has the type
+<em>guard :: MonadPlus m => Bool &ndash;> m ()</em>, makes the containing <em>do</em>
+block evaluate to <code>Nothing</code> if the <code>Bool</code> argument evaluates to
+<code>False</code>. In that sense, the <code>guard</code> expression actually looks like an
+assertion! The whole <em>MonadPlus</em> magic can be further explored <a href="http://en.wikibooks.org/wiki/Haskell/MonadPlus" target="_blank">here</a>.</p>
+
+<p>In my case, I finally ended up removing those lines altogether. As suspected, the
+good old <code>else Nothing</code> was the symptom that I had lost track of
+what I was coding at all &ndash; completely lost in nothingness &ndash; and I really needed a
+break.</p>
+
+<p>So what is your typical &lsquo;silly code&rsquo; that you typically start writing when
+you should rather take a break?</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using XMonad with a projector]]></title>
