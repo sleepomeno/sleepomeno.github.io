@@ -2,55 +2,61 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/06/A-fresh-start/</loc>
-        <lastmod>2015-01-05T23:18:08+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:28+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/07/Why-Blogging-Matters/</loc>
-        <lastmod>2015-01-05T23:18:08+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:27+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/10/Book-Catalogue/</loc>
-        <lastmod>2015-01-05T23:18:07+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:27+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://sleepomeno.github.io/blog/2014/02/12/Explaining-Haskell-RankNTypes-for-all/
         </loc>
-        <lastmod>2015-01-05T23:18:07+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:27+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/16/This-is-not-an-org-mode-Tutorial/</loc>
-        <lastmod>2015-01-05T23:18:07+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:27+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/02/24/git-diff-svn/</loc>
-        <lastmod>2015-01-05T23:18:07+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:26+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell/</loc>
-        <lastmod>2015-01-05T23:18:07+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:26+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/06/25/Explaining-the-Magic/</loc>
-        <lastmod>2015-01-05T23:18:05+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:26+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions/</loc>
-        <lastmod>2015-01-05T23:18:05+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:26+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://sleepomeno.github.io/blog/2014/08/16/Using-Google-Universal-Analytics-with-Octopress/
         </loc>
-        <lastmod>2015-01-05T23:18:04+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:25+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2014/11/07/Using-XMonad-with-a-projector/</loc>
-        <lastmod>2015-01-05T23:18:04+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:25+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/2015/01/05/else-return-null/</loc>
-        <lastmod>2015-01-05T23:18:04+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:25+01:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://sleepomeno.github.io/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/
+        </loc>
+        <lastmod>2015-01-19T01:27:25+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/about-me/</loc>
@@ -58,11 +64,11 @@
     </url>
     <url>
         <loc>http://sleepomeno.github.io/</loc>
-        <lastmod>2015-01-05T23:18:08+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:28+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/blog/archives/</loc>
-        <lastmod>2015-01-05T23:18:08+01:00</lastmod>
+        <lastmod>2015-01-19T01:27:28+01:00</lastmod>
     </url>
     <url>
         <loc>http://sleepomeno.github.io/search/</loc>

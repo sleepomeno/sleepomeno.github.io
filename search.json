@@ -154,5 +154,18 @@
       "month": "January",
       "day": "05"
     }
+  },
+  {
+    "id": 12,
+    "title": "Preview your Github Markdown before committing!",
+    "category": "<a class='category' href='/blog/categories/emacs/'>emacs</a>",
+    "tags": "<a class='tag' href='/tags/github/'>github</a>, <a class='tag' href='/tags/markdown/'>markdown</a>",
+    "url": "/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/",
+    "content": "Writing software documentation can be a pretty dull task and is\nneglected too often (at least by me). But what purpose does the best program\nserve if nobody knows how to use it? None.\n\nLooking at Github, the Markdown formatted **README.md** is the front\n page of every repository and the first (and mostly only) source of\n documentation. \nUntil recently, I have treated my **README.md** files rather shabbily; I\n would have thought that this lack of motivation originates from a\n general dislike of writing documentation, however, I might have\n changed my opinion. This <a href=\"http://increasinglyfunctional.com/2014/12/18/github-flavored-markdown-previews-emacs/\" target=\"_blank\">blog post</a> has opened my eyes to an\n alternative explanation: writing Github Markdown documentation is not\n trivial when you don't have a chance to preview the resulting\n markdown before committing! In that case the output will look\n not as expected more often than not - which makes the committer angry\n as s/he needs to push another commit just for improving the Markdown.\n Anyway, I remember feeling annoyed quite frequently by that procedure in\n retrospective. It does not need a stretch of imagination to foresee\n the negative influence that annoyance has on my willingness to\n provide **README.md** documentation&#x2026; ;)\n\nThe solution is obvious but not that trivial. Obviously, there surely\nare plugins for various IDEs which can parse Markdown and output HTML\nmarkup. I remember having once installed such an Eclipse plugin. But things get trickier as Github does not use vanilla\nMarkdown but its own brand of Markdown - it is not that easy to find a\nway to display Github Markdown with good confidence in its conformity;\nin addition it shouldn't force me to use any special IDE as I do most\nstuff in Emacs.\n\nThe script that I use now was mentioned in the referenced blog post\nabove: <a href=\"https://gist.github.com/joshuamiller/6d58f8bd239df56cabe8\" target=\"_blank\">flavor.rb</a>. It is a ruby script which actually asks the Github API (!) to do the hard\nwork, namely providing the HTML output! That looks stupid at first\nglance but it is actually the only way to be really sure of the\npreview's congruence with the actual display on the Github page&#x2026;\n",
+    "date": {
+      "year": "2015",
+      "month": "January",
+      "day": "19"
+    }
   }
 ]
