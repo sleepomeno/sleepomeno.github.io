@@ -1,0 +1,438 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Partial matching in R - while true live</title>
+  <meta name="author" content="Gregor Riegler">
+
+  
+  <meta name="description" content="I&rsquo;ve not been too exposed to statistics programming in the last few
+year, however, sometimes it couldn&rsquo;t be avoided &ndash; and R couldn& &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sleepomeno.github.io/blog/2015/02/20/Partial-matching-in-R/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <!--<script src="/javascripts/modernizr-2.0.js"></script>-->
+  <!--<script src="/javascripts/ender.js"></script>-->
+  <!--<script src="/javascripts/octopress.js" type="text/javascript"></script>-->
+  <link href="/atom.xml" rel="alternate" title="while true live" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/assets/app-c0f18cf1eab0ab482c858c55c0da5377.js"></script>
+
+<script id="search-results-template" type="text/x-handlebars-template">
+  {{#entries}}
+    <article>
+      <h3>
+         <small><time datetime="{{date}}" pubdate>{{date}}</time></small>
+         <a href="{{url}}">{{title}}</a>
+         <!--<p>tagged: {{ tags }} | category: <a href="blog/categories/{{category }}">{{category}}</a></p>-->
+				 <p>tagged: {{{ tags }}} | category: {{{category}}}</p>
+      </h3>
+    </article>
+  {{/entries}}
+</script>
+
+
+
+  
+  <script type="text/javascript">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-47975624-1', 'auto');  // Replace with your property ID.
+ga('send', 'pageview');
+  </script>
+
+
+
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">sleepomeno</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">while true live</a></h1>
+  
+    <h2>Musings on the fatality of infinite loops and other stuff.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+
+  <form action="/search" method="get">
+  <fieldset role ="search">
+    <input type="text" id="search-query" name="q" placeholder="Search" autocomplete="off" class="search" />
+  </fieldset>
+</form>
+
+
+<ul class="main-navigation">
+  <li><a href="/about-me/">About me</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Partial Matching in R</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-20T00:00:00+01:00" pubdate data-updated="true">Feb 20<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I&rsquo;ve not been too exposed to statistics programming in the last few
+year, however, sometimes it couldn&rsquo;t be avoided &ndash; and R couldn&rsquo;t be
+avoided! (I still have too much self-esteem to think about
+falling back to Excel, even for the simplest things.)</p>
+
+<p>I don&rsquo;t hate R and I don&rsquo;t like R; it just strikes me as very
+<strong>strange</strong>. Often, the syntax strikes me as odd and above all, the
+multitude of ways to express the same thing reminds of my little Perl
+experience. Anyway, I have subscribed to the Coursera R course for fun
+and in hope to somehow &ldquo;get the better of R&rdquo;, to grok in on a deep
+level or to at least get a more profound idea as to why I don&rsquo;t like it ;)</p>
+
+<p>Anyway, here is a language construct which is very <strong>strange</strong> and a
+little bit absurd, no whatever how often I think about it. It&rsquo;s called
+<span class="underline">partial matching</span>. To put it bluntly, partial matching makes it
+possible to avoid spelling out the whole name of an element of a list
+in oder to access it. Let&rsquo;s have a look.</p>
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='r'><span class='line'>x <span class="o">&lt;-</span> list<span class="p">(</span>a_is_the_first_letter <span class="o">=</span> <span class="m">1</span> <span class="o">:</span> <span class="m">5</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now let&rsquo;s access <code>a_is_the_first_letter</code>! That&rsquo;s the normal way:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='r'><span class='line'>x<span class="o">$</span>a_is_the_first_letter
+</span><span class='line'><span class="c1"># 1 2 3 4 5</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>However, you could make your life a lot &ldquo;easier&rdquo;:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='r'><span class='line'>x<span class="o">$</span>a
+</span><span class='line'><span class="c1"># 1 2 3 4 5</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Well, the crucial question is: what happens if the prefix of your
+partial matching is not unique?</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='r'><span class='line'>x <span class="o">&lt;-</span> list<span class="p">(</span>a_is_the_first_letter <span class="o">=</span> <span class="m">1</span> <span class="o">:</span> <span class="m">5</span><span class="p">,</span>
+</span><span class='line'>          a_is_my_first_letter_too <span class="o">=</span> <span class="m">6</span> <span class="o">:</span> <span class="m">10</span><span class="p">)</span>
+</span><span class='line'>x<span class="o">$</span>a
+</span><span class='line'><span class="c1"># NULL</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The result is <code>NULL</code>!</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='r'><span class='line'>x <span class="o">&lt;-</span> list<span class="p">(</span>a_is_the_first_letter <span class="o">=</span> <span class="m">1</span> <span class="o">:</span> <span class="m">5</span><span class="p">,</span>
+</span><span class='line'>          a_is_my_first_letter_too <span class="o">=</span> <span class="m">6</span> <span class="o">:</span> <span class="m">10</span><span class="p">)</span>
+</span><span class='line'>x<span class="o">$</span>a_is_m
+</span><span class='line'><span class="c1"># 6 7 8 9 10</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here the prefix is unique again. Hooray!</p>
+
+<p>Funny, isn&rsquo;t it? I don&rsquo;t like it, though. Why? Because it&rsquo;s not &lsquo;obvious&rsquo;.
+You need to know that feature beforehand, otherwise the fact that an
+accidentally misspelled field is handled the same way as a non-unique
+field prefix (both returning <code>NULL</code>) is awkward, to say the least.
+It&rsquo;s nearly as though I said to the R interpreter: &lsquo;Give me field
+xy or any field that is somehow similar&#x2026; or just do what you fucking
+want (= return NULL)!&rsquo; Anyway, it introduces complexity and indeterminism into the code.</p>
+
+<p>There is another twist to partial matching. Of course, there is more
+than one way to access a field of a list. Making use of the double bracket
+syntax, that feature of partial matching is handled differently.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='r'><span class='line'>x <span class="o">&lt;-</span> list<span class="p">(</span>a_is_the_first_letter <span class="o">=</span> <span class="m">1</span> <span class="o">:</span> <span class="m">5</span><span class="p">)</span>
+</span><span class='line'>x<span class="p">[[</span><span class="s">&quot;a&quot;</span><span class="p">]]</span>
+</span><span class='line'><span class="c1"># NULL</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using the double bracket field accessing method, partial matching is
+not the default. But R is perly so you still have a way to get that
+behavior in a different way:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='r'><span class='line'>x<span class="p">[[</span><span class="s">&quot;a&quot;</span><span class="p">,</span> exact <span class="o">=</span> <span class="kc">FALSE</span><span class="p">]]</span>
+</span><span class='line'><span class="c1"># 1 2 3 4 5</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At least I now have a better idea why I don&rsquo;t really like R. It
+introduces a sort of laisser-faire programming which I consider too
+&ldquo;inexact&rdquo;. I mean, would you really want something like the following to be the
+future of programming:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">interface</span> <span class="nc">God</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">killMankind</span><span class="o">();</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">keepUpTheGoodWork</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ...</span>
+</span><span class='line'><span class="n">god</span><span class="o">.</span><span class="na">k</span><span class="o">()</span> <span class="c1">// What the hell happens? Who cares.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gregor Riegler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-20T00:00:00+01:00" pubdate data-updated="true">Feb 20<span>th</span>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sleepomeno.github.io/blog/2015/02/20/Partial-matching-in-R/" data-via="" data-counturl="http://sleepomeno.github.io/blog/2015/02/20/Partial-matching-in-R/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/" title="Previous Post: Preview your Github Markdown before committing!">&laquo; Preview your Github Markdown before committing!</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/02/20/Partial-matching-in-R/">Partial Matching in R</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/">Preview Your Github Markdown Before Committing!</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/05/else-return-null/">Else Return Null</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/11/07/Using-XMonad-with-a-projector/">Using XMonad With a Projector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/16/Using-Google-Universal-Analytics-with-Octopress/">Using Google Universal Analytics With Octopress</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+	<div id="tagcloud"><a style="font-size: 16px" href="/tags/c/">C</a>  
+<a style="font-size: 16px" href="/tags/st/">ST</a>  
+<a style="font-size: 16px" href="/tags/analytics/">analytics</a>  
+<a style="font-size: 16px" href="/tags/android/">android</a>  
+<a style="font-size: 16px" href="/tags/app/">app</a>  
+<a style="font-size: 23px" href="/tags/blog/">blog</a>  
+<a style="font-size: 16px" href="/tags/book/">book</a>  
+<a style="font-size: 16px" href="/tags/extension/">extension</a>  
+<a style="font-size: 16px" href="/tags/ghc/">ghc</a>  
+<a style="font-size: 16px" href="/tags/git/">git</a>  
+<a style="font-size: 16px" href="/tags/github/">github</a>  
+<a style="font-size: 28px" href="/tags/haskell/">haskell</a>  
+<a style="font-size: 16px" href="/tags/laziness/">laziness</a>  
+<a style="font-size: 16px" href="/tags/markdown/">markdown</a>  
+<a style="font-size: 16px" href="/tags/maybe/">maybe</a>  
+<a style="font-size: 16px" href="/tags/monadplus/">monadplus</a>  
+<a style="font-size: 16px" href="/tags/mutation/">mutation</a>  
+<a style="font-size: 16px" href="/tags/performance/">performance</a>  
+<a style="font-size: 16px" href="/tags/plaintext/">plaintext</a>  
+<a style="font-size: 16px" href="/tags/productivity/">productivity</a>  
+<a style="font-size: 16px" href="/tags/r/">r</a>  
+<a style="font-size: 16px" href="/tags/rankntypes/">rankntypes</a>  
+<a style="font-size: 16px" href="/tags/scm/">scm</a>  
+<a style="font-size: 16px" href="/tags/svn/">svn</a>  
+<a style="font-size: 16px" href="/tags/xmonad/">xmonad</a>
+</div>
+</section>
+<section>
+  <h1>Recent Comments</h1>
+  <div id="dsq-recentcomments" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/sleepomeno/recent_comments_widget.js?hide_avatars=1&num_items=3"></script></div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Gregor Riegler -
+	<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+	<span class="followTwitter"><a href="https://twitter.com/GregorRiegler" class="twitter-follow-button" data-show-count="false">Follow @GregorRiegler</a></span>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'sleepomeno';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sleepomeno.github.io/blog/2015/02/20/Partial-matching-in-R/';
+        var disqus_url = 'http://sleepomeno.github.io/blog/2015/02/20/Partial-matching-in-R/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
