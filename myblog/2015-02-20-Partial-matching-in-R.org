@@ -1,6 +1,6 @@
 #+SIDEBAR: nocollapse
 #+PUBLISH: true
-#+TAGS: r, syntax, statistics
+#+TAGS: r syntax statistics
 #+CATEGORIES: programming
 #+TITLE: Partial matching in R
 #+AUTHOR: Gregor Riegler

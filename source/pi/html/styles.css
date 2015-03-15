@@ -1,0 +1,29 @@
+#slider-range-min {
+
+}
+
+#wrapper { 
+	width: 420px;
+	margin: auto;
+	display: block; 
+	font-size:20px;
+}
+
+#canvas {
+	border: 1px black solid;
+}
+
+#corners {
+	font-weight: bold;
+}
+
+#vertices {
+	border: none;
+	font-weight: bold;
+	font-size:20px;
+}
+
+#slider-panel {
+	padding: 10px 0;
+	border-top: 1px black solid;
+}

@@ -5,7 +5,7 @@ date: 2015-02-20
 comments: true
 external-url:
 categories: [programming]
-tags: [r,,syntax,,statistics]
+tags: [r,syntax,statistics]
 published: true
 sidebar: nocollapse
 ---
