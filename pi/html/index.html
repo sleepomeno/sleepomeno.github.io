@@ -1,0 +1,53 @@
+<!DOCTYPE html> 
+<html>
+	<head><title>Approximate Pi</title>
+<script type="text/javascript" src="/pi/bower_components/jquery/dist/jquery.js"></script> 
+<script type="text/javascript" src="/pi/bower_components/jquery-ui/jquery-ui.js"></script> 
+<script type="text/javascript" src="/pi/bower_components/rxjs/dist/rx.all.js"></script> 
+<script type="text/javascript" src="/pi/bower_components/rxjs-jquery/rx.jquery.js"></script> 
+<link rel="stylesheet" href="/pi/bower_components/jquery-ui/themes/sunny/jquery-ui.min.css" />
+<link rel="stylesheet" href="/pi/html/styles.css" />
+ <script>
+$(function() {
+$( "#slider-range-min" ).slider({
+range: "min",
+min: 3,
+max: 1000,
+value: 3,
+slide: function( event, ui ) {
+$( "#vertices" ).val( ui.value );
+$( "#vertices").focus();
+}
+});
+$( "#vertices" ).val( $( "#slider-range-min" ).slider( "value" ) );
+});
+</script>
+	</head>
+	<body>
+<div id="wrapper">
+    <canvas id="canvas" width="420" height="420"></canvas>
+
+		<p>
+		  Polygon Area: <span id="polygonArea"></span>
+	  </p>
+		<p>
+		  Pi Approximation: <span id="pi"></span>
+		</p>
+
+<div id="slider-panel">
+<p>
+<label for="vertices" id="verticesLabel">Polygon vertices: </label>
+<input type="text" id="vertices" readonly>
+</p>
+<div id="slider-range-min"></div>
+<p>
+<label for="triangles">Show triangles: </label>
+<input type="checkbox" id="triangles" >
+</p>
+</div>
+</div>
+
+		<script type="text/javascript" src="/pi/html/Main.js"></script>
+
+	</body>
+</html>

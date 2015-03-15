@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: syntax | while true live]]></title>
+  <link href="http://sleepomeno.github.io/tags/syntax/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2015-03-15T01:19:13+01:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Gregor Riegler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Partial matching in R]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/02/20/Partial-matching-in-R/"/>
+    <updated>2015-02-20T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/02/20/Partial-matching-in-R</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve not been too exposed to statistics programming in the last few
+year, however, sometimes it couldn&rsquo;t be avoided &ndash; and R couldn&rsquo;t be
+avoided! (I still have too much self-esteem to think about
+falling back to Excel, even for the simplest things.)</p>
+
+<p>I don&rsquo;t hate R and I don&rsquo;t like R; it just strikes me as very
+<strong>strange</strong>. Often, the syntax strikes me as odd and above all, the
+multitude of ways to express the same thing reminds of my little Perl
+experience. Anyway, I have subscribed to the Coursera R course for fun
+and in hope to somehow &ldquo;get the better of R&rdquo;, to grok in on a deep
+level or to at least get a more profound idea as to why I don&rsquo;t like it ;)</p>
+
+<p>Anyway, here is a language construct which is very <strong>strange</strong> and a
+little bit absurd, no whatever how often I think about it. It&rsquo;s called
+<span class="underline">partial matching</span>. To put it bluntly, partial matching makes it
+possible to avoid spelling out the whole name of an element of a list
+in oder to access it. Let&rsquo;s have a look.</p>
+
+<!-- more -->
+
+
+<p><code>r
+x &lt;- list(a_is_the_first_letter = 1 : 5)
+</code></p>
+
+<p>Now let&rsquo;s access <code>a_is_the_first_letter</code>! That&rsquo;s the normal way:</p>
+
+<p>``` r
+x$a_is_the_first_letter</p>
+
+<h1>1 2 3 4 5</h1>
+
+<p>```</p>
+
+<p>However, you could make your life a lot &ldquo;easier&rdquo;:</p>
+
+<p>``` r
+x$a</p>
+
+<h1>1 2 3 4 5</h1>
+
+<p>```</p>
+
+<p>Well, the crucial question is: what happens if the prefix of your
+partial matching is not unique?</p>
+
+<p>``` r
+x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
+
+<pre><code>      a_is_my_first_letter_too = 6 : 10)
+</code></pre>
+
+<p>x$a</p>
+
+<h1>NULL</h1>
+
+<p>```</p>
+
+<p>The result is <code>NULL</code>!</p>
+
+<p>``` r
+x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
+
+<pre><code>      a_is_my_first_letter_too = 6 : 10)
+</code></pre>
+
+<p>x$a_is_m</p>
+
+<h1>6 7 8 9 10</h1>
+
+<p>```</p>
+
+<p>Here the prefix is unique again. Hooray!</p>
+
+<p>Funny, isn&rsquo;t it? I don&rsquo;t like it, though. Why? Because it&rsquo;s not &lsquo;obvious&rsquo;.
+You need to know that feature beforehand, otherwise the fact that an
+accidentally misspelled field is handled the same way as a non-unique
+field prefix (both returning <code>NULL</code>) is awkward, to say the least.
+It&rsquo;s nearly as though I said to the R interpreter: &lsquo;Give me field
+xy or any field that is somehow similar&#x2026; or just do what you fucking
+want (= return NULL)!&rsquo; Anyway, it introduces complexity and indeterminism into the code.</p>
+
+<p>There is another twist to partial matching. Of course, there is more
+than one way to access a field of a list. Making use of the double bracket
+syntax, that feature of partial matching is handled differently.</p>
+
+<p>``` r
+x &lt;&ndash; list(a_is_the_first_letter = 1 : 5)
+x[[&ldquo;a&rdquo;]]</p>
+
+<h1>NULL</h1>
+
+<p>```</p>
+
+<p>Using the double bracket field accessing method, partial matching is
+not the default. But R is perly so you still have a way to get that
+behavior in a different way:</p>
+
+<p>``` r
+x[[&ldquo;a&rdquo;, exact = FALSE]]</p>
+
+<h1>1 2 3 4 5</h1>
+
+<p>```</p>
+
+<p>At least I now have a better idea why I don&rsquo;t really like R. It
+introduces a sort of laisser-faire programming which I consider too
+&ldquo;inexact&rdquo;. I mean, would you really want something like the following to be the
+future of programming:</p>
+
+<p>``` java
+interface God {</p>
+
+<pre><code>void killMankind();
+void keepUpTheGoodWork();
+</code></pre>
+
+<p>}</p>
+
+<p>// &hellip;
+god.k() // What the hell happens? Who cares.
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

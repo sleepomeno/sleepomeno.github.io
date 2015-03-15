@@ -1,0 +1,41 @@
+{
+  "name": "purescript-foreign",
+  "homepage": "https://github.com/purescript/purescript-foreign",
+  "authors": [
+    "Gary Burgess <gary.burgess@gmail.com>"
+  ],
+  "description": "PureScript library for dealing with foreign data (JSON and JavaScript objects)",
+  "keywords": [
+    "purescript"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "examples",
+    "node_modules",
+    "output",
+    "tests",
+    "tmp",
+    "bower.json",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "purescript-arrays": "*",
+    "purescript-either": "*",
+    "purescript-maybe": "*",
+    "purescript-tuples": "*",
+    "purescript-foldable-traversable": "*"
+  },
+  "version": "0.2.3",
+  "_release": "0.2.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.2.3",
+    "commit": "d7146ab0743e5b36dd76e135a4059d98bc39c9c6"
+  },
+  "_source": "git://github.com/purescript/purescript-foreign.git",
+  "_target": "~0.2.0",
+  "_originalSource": "purescript-foreign"
+}

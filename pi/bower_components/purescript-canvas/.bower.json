@@ -1,0 +1,29 @@
+{
+  "name": "purescript-canvas",
+  "version": "0.1.6",
+  "authors": [
+    "Phil Freeman <paf31@cantab.net>"
+  ],
+  "description": "Canvas bindings",
+  "keywords": [
+    "purescript"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "homepage": "https://github.com/purescript/purescript-canvas",
+  "_release": "0.1.6",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.1.6",
+    "commit": "817e0463dbc3395e43b2504afd6d263fa66e1720"
+  },
+  "_source": "git://github.com/purescript/purescript-canvas.git",
+  "_target": "~0.1.6",
+  "_originalSource": "purescript-canvas"
+}
