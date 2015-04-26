@@ -36,7 +36,7 @@ it a try and implement something similar to the above Wolfram
 demonstration! So this is the result I accomplished after one day's
 work on a <a href="/pi/html/index.html" target="_blank">PureScript clone</a>:
 
-<iframe src="/pi/html/index.html" width="500" height="700" style="margin:auto;display:block"></iframe>
+<iframe src="/pi/html/index.html" width="500" height="720" style="margin:auto;display:block"></iframe>
 
 ### PureScript learning resources
 First of all these are the best resources on PureScript development that I found:
@@ -168,3 +168,5 @@ Angular or React would be crucial for getting easy web development
 adoption, though. Meta programming integration of JavaScript code would
 also prove very nice as would be Source Map support&#x2026; anyway, I'm
 looking forward to using it again and might get into improving it myself.
+
+PS: You find the code for the PureScript application on <a href="https://github.com/sleepomeno/InscribePolygons" target="_blank">my GitHub</a>.
