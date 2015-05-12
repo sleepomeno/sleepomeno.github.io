@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Gregor Riegler" />
+  <title>PureScript</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href=".//css/reveal.css"/>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href=".//css/theme/moon.css" id="theme">
+  <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+  <script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = './/css/print/pdf.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+  </script>
+  <!--[if lt IE 9]>
+  <script src=".//lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">PureScript</h1>
+    <h2 class="author">Gregor Riegler</h2>
+    <h3 class="date">Lambdaheads Vienna -- May 13, 2015</h3>
+</section>
+
+<section id="purescript" class="slide level1">
+<h1>PureScript</h1>
+<ul>
+<li>Compiles to JavaScript
+<ul>
+<li>to use in your browser</li>
+<li>to use on Node.js</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<p><span class="math"> ⇒ </span> <em>write Web Applications!</em></p>
+</div>
+</section>
+<section id="purescript-1" class="slide level1">
+<h1>PureScript</h1>
+<ul>
+<li><p>Statically typed and similar to <em>Haskell</em></p></li>
+<li>Another language to target JavaScript as
+<ul>
+<li>TypeScript</li>
+<li>Dart</li>
+<li>CoffeeScript</li>
+<li>... and others</li>
+</ul></li>
+</ul>
+</section>
+<section id="purescript-motivation" class="slide level1">
+<h1>PureScript Motivation</h1>
+<blockquote>
+<p>Solutions at the time included various attempts to compile Haskell to JavaScript while preserving its semantics (Fay, Haste, GHCJS), but I was interested to see how successful I could be by approaching the problem from the other side - attempting to keep the semantics of JavaScript, while enjoying the syntax and type system of a language like Haskell. -- <a href="https://leanpub.com/purescript/read">Phil Freeman</a></p>
+</blockquote>
+</section>
+<section id="purescript-haskell" class="slide level1">
+<h1>PureScript ?= Haskell</h1>
+<blockquote>
+<p>In the case of purescript, it really does seem to be turning into a gateway drug to get folks into the Haskell community, much the way Scala used to be (and still is to a lesser extent), but closer in spirit.</p>
+</blockquote>
+<p><a href="http://www.reddit.com/r/haskell/comments/342rvp/google_summer_of_code_18_projects_accepted/">edwardkmett, 04/30/2015</a></p>
+</section>
+<section id="purescript-haskell-1" class="slide level1">
+<h1>PureScript /= Haskell</h1>
+<ul>
+<li>Strict evaluation <span class="math"> → </span> no &quot;lazyness&quot;</li>
+<li>Fine-grained &quot;IO&quot; monad called the <a href="https://github.com/purescript/purescript/wiki/Handling-Native-Effects-with-the-Eff-Monad">&quot;Eff&quot; monad</a></li>
+<li>Literal syntax for arrays instead of lists</li>
+<li>&quot;Row types&quot; - Records similar to JavaScript records</li>
+<li>Foreign Function Interface for JavaScript interoperation</li>
+<li>... and some others <a href="https://github.com/purescript/purescript/wiki/Differences-from-Haskell">in the wiki</a></li>
+</ul>
+</section>
+<section id="try-purescript" class="slide level1">
+<h1>Try PureScript</h1>
+<p><a href="http://try.purescript.org/">TryPureScript.org</a></p>
+</section>
+<section id="install-tools" class="slide level1">
+<h1>Install tools</h1>
+<ul>
+<li><em>psc</em> - PureScript compiler
+<ul>
+<li>cabal install purescript</li>
+</ul></li>
+<li><em>npm</em> - <a href="https://nodejs.org/">Node Package Manager</a></li>
+<li><em>grunt</em>
+<ul>
+<li>Build Automation Tool</li>
+<li>npm install -g grunt-cli</li>
+</ul></li>
+<li><em>bower</em> - for PureScript dependencies
+<ul>
+<li>npm install -g bower</li>
+</ul></li>
+</ul>
+</section>
+<section id="useful-resources" class="slide level1">
+<h1>Useful resources</h1>
+<ul>
+<li><a href="http://pursuit.purescript.org/">Pursuit</a>
+<ul>
+<li>Search types like Hoogle</li>
+</ul></li>
+<li><a href="http://bower.io/search/">Bower Search</a>
+<ul>
+<li>Searching with prefix &quot;purescript-&quot; finds libraries</li>
+<li>from the command-line: &quot;bower search purescript&quot;</li>
+</ul></li>
+<li><a href="https://github.com/purescript/purescript/wiki/Recommended-Libraries">Wiki Page Recommended Libraries</a></li>
+</ul>
+</section>
+<section id="live-demo" class="slide level1">
+<h1>Live Demo</h1>
+<figure>
+<img src="ps_logo.png" />
+</figure>
+</section>
+<section id="learn-purescript-1" class="slide level1">
+<h1>Learn PureScript 1</h1>
+<h2 id="best-learning-resource">Best Learning Resource</h2>
+<ul>
+<li><a href="https://leanpub.com/purescript/read">PureScript By Example</a>
+<ul>
+<li>can be read online, free donations</li>
+<li>a very thorough and yet exciting read!</li>
+<li>written by the PureScript creator Phil Freeman</li>
+</ul></li>
+</ul>
+</section>
+<section id="learn-purescript-2" class="slide level1">
+<h1>Learn PureScript 2</h1>
+<h2 id="other-resources">Other Resources</h2>
+<ul>
+<li><a href="https://github.com/purescript/purescript/wiki">PureScript Wiki</a></li>
+<li><a href="https://gist.github.com/paf31/8e9177b20ee920480fbc">24 days of PureScript</a></li>
+<li><a href="http://try.purescript.org/">TryPureScript.org</a></li>
+<li><a href="">#purescript IRC Freenode</a></li>
+</ul>
+</section>
+<section id="purescript-rocks" class="slide level1">
+<h1>PureScript rocks?!</h1>
+<figure>
+<img src="ps_logo.png" alt="Thanks for your attention!" /><figcaption>Thanks for your attention!</figcaption>
+</figure>
+</section>
+    </div>
+  </div>
+
+
+  <script src=".//lib/js/head.min.js"></script>
+  <script src=".//js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: false,         // Display controls in the bottom right corner
+        progress: true,         // Display a presentation progress bar
+        history: true,          // Push each slide change to the browser history
+        center: true,                       // Vertical centering of slides
+        maxScale: 1.5,                  // Bounds for smallest/largest possible content scale
+        slideNumber: false,                // Display the page number of the current slide
+        theme: 'moon', // available themes are in /css/theme
+        transition: 'none', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: './/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: './/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: './/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+//          { src: './/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; }, }
+//          { src: './/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+]});
+    </script>
+    </body>
+</html>
