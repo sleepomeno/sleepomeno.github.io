@@ -18408,7 +18408,6 @@ var Halogen_HTML = require("Halogen.HTML");
 var Halogen_HTML_Events_Forms = require("Halogen.HTML.Events.Forms");
 var Halogen_HTML_Events = require("Halogen.HTML.Events");
 var Data_Array = require("Data.Array");
-var Data_Int = require("Data.Int");
 var Data_Date_UTC = require("Data.Date.UTC");
 var Data_Maybe_Unsafe = require("Data.Maybe.Unsafe");
 var Halogen_Signal = require("Halogen.Signal");
@@ -18424,6 +18423,7 @@ var Control_Bind = require("Control.Bind");
 var Control_Monad_Eff = require("Control.Monad.Eff");
 var DOM = require("DOM");
 var Data_Time = require("Data.Time");
+var Data_Int = require("Data.Int");
 var Data_Traversable = require("Data.Traversable");
 var Data_DOM_Simple_Document = require("Data.DOM.Simple.Document");
 var Data_DOM_Simple_Types = require("Data.DOM.Simple.Types");
@@ -18473,10 +18473,10 @@ var showDayOfMonth = new Prelude.Show(function (_14) {
     return Prelude.show(Prelude.showInt)(_14);
 });
 var padded = function (n) {
-    if (n < 10.0) {
-        return "0" + Prelude.show(Prelude.showNumber)(n);
+    if (n < 10) {
+        return "0" + Prelude.show(Prelude.showInt)(n);
     };
-    return Prelude.show(Prelude.showNumber)(n);
+    return Prelude.show(Prelude.showInt)(n);
 };
 var eqMyDate = new Prelude.Eq(function (_12) {
     return function (_13) {
@@ -18505,10 +18505,10 @@ var ui = function (__dict_Applicative_0) {
         };
         var showTime = function (m) {
             var pad2 = function (_10) {
-                return Prelude["<<<"](Prelude.semigroupoidFn)(padded)(Data_Int.toNumber)(_10);
+                return padded(_10);
             };
             var pad1 = function (_11) {
-                return Prelude["<<<"](Prelude.semigroupoidFn)(padded)(Data_Int.toNumber)(_11);
+                return padded(_11);
             };
             var d = toDate(m);
             return pad1(Data_Date_UTC.hourOfDay(d)) + (":" + pad2(Data_Date_UTC.minuteOfHour(d)));
@@ -18518,10 +18518,10 @@ var ui = function (__dict_Applicative_0) {
         };
         var niceDate = function (d) {
             var shY = function (_9) {
-                return Prelude["<<<"](Prelude.semigroupoidFn)(padded)(Data_Int.toNumber)(_9);
+                return padded(_9);
             };
             var shD = function (_8) {
-                return Prelude["<<<"](Prelude.semigroupoidFn)(padded)(Data_Int.toNumber)(_8);
+                return padded(_8);
             };
             return shD(d.da) + (". " + (Prelude.show(Data_Date.showMonth)(d.mo) + (" " + shY(d.ye))));
         };
@@ -18534,7 +18534,7 @@ var ui = function (__dict_Applicative_0) {
                 if (!_30) {
                     return Halogen_HTML.text(player);
                 };
-                throw new Error("Failed pattern match at Main line 93, column 1 - line 94, column 1: " + [ _30.constructor.name ]);
+                throw new Error("Failed pattern match at Main line 95, column 1 - line 96, column 1: " + [ _30.constructor.name ]);
             };
         };
         var firstState = Data_Array_Unsafe.head(Data_List.fromList(Data_Unfoldable.unfoldableArray)(Data_Map.toList(stats)));
@@ -18557,7 +18557,7 @@ var ui = function (__dict_Applicative_0) {
         var render = function (_5) {
             return Halogen_HTML.div_([ Halogen_HTML.div([ class$prime("playerInfo") ])([ Halogen_HTML.select([ Halogen_HTML_Events_Forms.onValueChanged(__dict_Alternative_1)(Data_Foreign_Class.stringIsForeign)(Halogen_HTML_Events.input(__dict_Applicative_0)(Select.create)) ])(Prelude.flip(Prelude["<$>"](Prelude.functorArray))(Data_List.fromList(Data_Unfoldable.unfoldableArray)(Data_Map.toList(stats)))(function (_3) {
                 return Halogen_HTML.option([ Halogen_HTML_Attributes.name(_3.value0) ])([ Halogen_HTML.text(_3.value0) ]);
-            })), stat("Matches: ")(Prelude.show(Prelude.showInt)(_5.value0.matches)), stat("Win %: ")(_5.value0.winPercentage), stat("Average Duration: ")(_5.value0.avgDuration), stat("Max Break:")(_5.value0.maxBreak), stat("Average Max:")(_5.value0.avgMax), stat("Ranking")(_5.value0.ranking), stat("Ranking difference")(_5.value0.rankDiff) ]), Halogen_HTML.table([ class$prime("breaksTable") ])([ Halogen_HTML.thead_([ Halogen_HTML.tr_([ Halogen_HTML.th_([ Halogen_HTML.text("Break >=") ]), Halogen_HTML.th_([ Halogen_HTML.text("Prozent") ]), Halogen_HTML.th_([ Halogen_HTML.text("Absolut") ]), Halogen_HTML.th_([ Halogen_HTML.text("Win %") ]) ]) ]), Halogen_HTML.tbody_(Prelude["<$>"](Prelude.functorArray)(renderBreak)(_5.value0.breakStats)) ]), Halogen_HTML.div([ class$prime("rankingBox") ])([ Halogen_HTML.img([ Halogen_HTML_Attributes.src(_5.value1 + ("-" + ($foreign.playerName + ".png"))) ])([  ]) ]), Halogen_HTML.div([ class$prime("matchesBox") ])([ Halogen_HTML.table([ class$prime("matchesTable") ])([ Halogen_HTML.tbody_(renderMatches(Data_Array.take(_5.value0.matches)($foreign.matchesOfPlayer))) ]) ]) ]);
+            })), stat("Matches: ")(Prelude.show(Prelude.showInt)(_5.value0.matches)), stat("Win %: ")(_5.value0.winPercentage), stat("Average Duration: ")(_5.value0.avgDuration), stat("Max Break:")(_5.value0.maxBreak), stat("Average Max:")(_5.value0.avgMax), stat("Ranking")(_5.value0.ranking), stat("Ranking difference")(_5.value0.rankDiff), stat("Best Run")(_5.value0.bestRun), stat("Worst Run")(_5.value0.worstRun) ]), Halogen_HTML.table([ class$prime("breaksTable") ])([ Halogen_HTML.thead_([ Halogen_HTML.tr_([ Halogen_HTML.th_([ Halogen_HTML.text("Break >=") ]), Halogen_HTML.th_([ Halogen_HTML.text("Prozent") ]), Halogen_HTML.th_([ Halogen_HTML.text("Absolut") ]), Halogen_HTML.th_([ Halogen_HTML.text("Win %") ]) ]) ]), Halogen_HTML.tbody_(Prelude["<$>"](Prelude.functorArray)(renderBreak)(_5.value0.breakStats)) ]), Halogen_HTML.div([ class$prime("rankingBox") ])([ Halogen_HTML.img([ Halogen_HTML_Attributes.src(_5.value1 + ("-" + ($foreign.playerName + ".png"))) ])([  ]) ]), Halogen_HTML.div([ class$prime("matchesBox") ])([ Halogen_HTML.table([ class$prime("matchesTable") ])([ Halogen_HTML.tbody_(renderMatches(Data_Array.take(_5.value0.matches)($foreign.matchesOfPlayer))) ]) ]) ]);
         };
         return Prelude["<$>"](Halogen_Signal.functorSF1)(render)(Halogen_Signal.stateful(new State(Data_Tuple.snd(firstState), Data_Tuple.fst(firstState)))(update));
     };
