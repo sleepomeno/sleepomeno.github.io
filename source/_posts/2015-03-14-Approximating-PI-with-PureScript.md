@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Approximating PI with PureScript
-date: 2015-03-14 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2015-03-14 Sam&gt;</span></span> 
 comments: true
 external-url:
 categories: [programming,web]
