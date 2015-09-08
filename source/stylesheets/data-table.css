@@ -1,0 +1,34 @@
+* + table.stat {
+  border-style:solid;
+  border-width:1px;
+  border-color:#e7e3e7;
+	float: left;
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
+* + table.stat th, * + table.stat td {
+  border-style:dashed;
+  border-width:1px;
+  border-color:#e7e3e7;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+* + table.stat th {
+  border-style:solid;
+  font-weight:bold;
+  background: url("/images/noise.png?1330434582") repeat scroll left top #F7F3F7;
+}
+
+* + table.stat th[align="left"], * + table.stat td[align="left"] {
+  text-align:left;
+}
+
+* + table.stat th[align="right"], * + table.stat td[align="right"] {
+  text-align:right;
+}
+
+* + table.stat th[align="center"], * + table.stat td[align="center"] {
+  text-align:center;
+}
