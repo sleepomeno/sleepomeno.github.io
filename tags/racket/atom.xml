@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: racket | while true live]]></title>
+  <link href="http://sleepomeno.github.io/tags/racket/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2015-09-13T21:57:56+02:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Gregor Riegler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Toying with Racket]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket/"/>
+    <updated>2015-09-13T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket</id>
+    <content type="html"><![CDATA[<p>2 hours to go&#x2026; I&rsquo;ve been waiting for the men&rsquo;s tennis US Open final
+to start. What should I do? In the end, I&rsquo;ve been killing time listening to <a href="http://www.functionalgeekery.com/episode-24-matthew-flatt/" target="_blank">that</a> Functional Geekery podcast episode
+which features Matthew Flatt talking about the <a href="http://racket-lang.org/" target="_blank">Racket</a> programming
+language. Realizing the irony, my thoughts went something like: &ldquo;Racket, tennis?! Can&rsquo;t be a coincidence! Still
+some time to burn, so I will programm something tennis-like in
+Racket!&rdquo; So let&rsquo;s open the Racket <a href="http://docs.racket-lang.org/quick/" target="_blank">quickstart</a> to somehow learn Racket
+and get an idea what the tennis-like thing should be.</p>
+
+<!-- more -->
+
+
+<p><img class="left" src="/images/court.png" width="200"></p>
+
+<p>The idea came instantly when I saw that Racket offers quite
+newbie-friendly picture drawing examples in its tutorial. Now, it&rsquo;s
+obvious what I would do, isn&rsquo;t it? Exactly, I would draw a tennis
+court! So I <a href="http://download.racket-lang.org/" target="_blank">downloaded</a> Racket and found the executable
+for the Racket IDE DrRacket in the <strong>bin</strong> folder of the resulting
+directory. Given the examples of the <a href="http://docs.racket-lang.org/quick/" target="_blank">quickstart</a> tutorial I could come
+up with that code which got the job done. And it even has (kind of) the blue
+color of the US Open hard court ;)</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(let* ([color &ldquo;blue&rdquo;]&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>  [blue (lambda (pict) (colorize pict color))]
+</span><span class='line'>  [double (blue (filled-rectangle 203 30))]
+</span><span class='line'>  [base (blue (filled-rectangle 90 133))]
+</span><span class='line'>  [margin 3]
+</span><span class='line'>  [doubles (hc-append margin double double)]
+</span><span class='line'>  [service (blue (filled-rectangle 110 65))]
+</span><span class='line'>  [services (vc-append margin service service)]
+</span><span class='line'>  [middle1 (hc-append margin base services)]
+</span><span class='line'>  [middle2 (hc-append margin services base)]
+</span><span class='line'>  [middles (hc-append margin middle1 middle2)])
+</span><span class='line'>(frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The code can also be found in that <a href="https://gist.github.com/sleepomeno/f8f0af59b19324166619" target="_blank">gist</a>.</p>
+
+<p>Anyway, now the final is about to start, so only a few impressions of
+using Racket for the first time: DrRacket proved easy to use and the
+<a href="http://docs.racket-lang.org/pict/Basic_Pict_Constructors.html" target="_blank">documentation</a> made it easy to find the right functions for drawing. It
+was quite pleasant to see that I could get things done in Racket even
+under severe time pressure ;)</p>
+
+<p>Go, Federer!</p>
+]]></content>
+  </entry>
+  
+</feed>

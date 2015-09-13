@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Tag: analytics - while true live</title>
+  <title>Toying with Racket - while true live</title>
   <meta name="author" content="Gregor Riegler">
 
   
-  <meta name="description" content="Tag: analytics">
+  <meta name="description" content="2 hours to go&#x2026; I&rsquo;ve been waiting for the men&rsquo;s tennis US Open final
+to start. What should I do? In the end, I&rsquo;ve been &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://sleepomeno.github.iotags/analytics/">
+  <link rel="canonical" href="http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 	<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
@@ -104,42 +105,149 @@ ga('send', 'pageview');
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Tag: Analytics</h1>
+    
+      
+        <h1 class="entry-title">Toying With Racket</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-13T00:00:00+02:00" pubdate data-updated="true">Sep 13<span>th</span>, 2015</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="tag">
 
 
+<div class="entry-content"><p>2 hours to go&#x2026; I&rsquo;ve been waiting for the men&rsquo;s tennis US Open final
+to start. What should I do? In the end, I&rsquo;ve been killing time listening to <a href="http://www.functionalgeekery.com/episode-24-matthew-flatt/" target="_blank">that</a> Functional Geekery podcast episode
+which features Matthew Flatt talking about the <a href="http://racket-lang.org/" target="_blank">Racket</a> programming
+language. Realizing the irony, my thoughts went something like: &ldquo;Racket, tennis?! Can&rsquo;t be a coincidence! Still
+some time to burn, so I will programm something tennis-like in
+Racket!&rdquo; So let&rsquo;s open the Racket <a href="http://docs.racket-lang.org/quick/" target="_blank">quickstart</a> to somehow learn Racket
+and get an idea what the tennis-like thing should be.</p>
 
-  
-  <h2>2014</h2>
-
-<article>
-  
-
-<h1><a href="/blog/2014/08/16/Using-Google-Universal-Analytics-with-Octopress/">Using Google Universal Analytics with Octopress</a></h1>
-<time datetime="2014-08-16T00:00:00+02:00" pubdate><span class='month'>Aug</span> <span class='day'>16</span> <span class='year'>2014</span></time>
-
-<footer>
-
-  <span class="categories">posted in <a class='category' href='/blog/categories/octopress/'>octopress</a></span>
+<!-- more -->
 
 
-  <span class="tags">tagged with <a class='tag' href='/tags/analytics/'>analytics</a>, <a class='tag' href='/tags/blog/'>blog</a></span>
+<p><img class="left" src="/images/court.png" width="200"></p>
 
-</footer>
+<p>The idea came instantly when I saw that Racket offers quite
+newbie-friendly picture drawing examples in its tutorial. Now, it&rsquo;s
+obvious what I would do, isn&rsquo;t it? Exactly, I would draw a tennis
+court! So I <a href="http://download.racket-lang.org/" target="_blank">downloaded</a> Racket and found the executable
+for the Racket IDE DrRacket in the <strong>bin</strong> folder of the resulting
+directory. Given the examples of the <a href="http://docs.racket-lang.org/quick/" target="_blank">quickstart</a> tutorial I could come
+up with that code which got the job done. And it even has (kind of) the blue
+color of the US Open hard court ;)</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(let* ([color "blue"]
+</span><span class='line'>      [blue (lambda (pict) (colorize pict color))]
+</span><span class='line'>      [double (blue (filled-rectangle 203 30))]
+</span><span class='line'>      [base (blue (filled-rectangle 90 133))]
+</span><span class='line'>      [margin 3]
+</span><span class='line'>      [doubles (hc-append margin double double)]
+</span><span class='line'>      [service (blue (filled-rectangle 110 65))]
+</span><span class='line'>      [services (vc-append margin service service)]
+</span><span class='line'>      [middle1 (hc-append margin base services)]
+</span><span class='line'>      [middle2 (hc-append margin services base)]
+</span><span class='line'>      [middles (hc-append margin middle1 middle2)])
+</span><span class='line'>    (frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))</span></code></pre></td></tr></table></div></figure>
 
 
-</article>
+<p>The code can also be found in that <a href="https://gist.github.com/sleepomeno/f8f0af59b19324166619" target="_blank">gist</a>.</p>
 
+<p>Anyway, now the final is about to start, so only a few impressions of
+using Racket for the first time: DrRacket proved easy to use and the
+<a href="http://docs.racket-lang.org/pict/Basic_Pict_Constructors.html" target="_blank">documentation</a> made it easy to find the right functions for drawing. It
+was quite pleasant to see that I could get things done in Racket even
+under severe time pressure ;)</p>
+
+<p>Go, Federer!</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Gregor Riegler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-13T00:00:00+02:00" pubdate data-updated="true">Sep 13<span>th</span>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>programming</a>, <a class='category' href='/blog/categories/tennis/'>tennis</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket/" data-via="" data-counturl="http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2015/09/08/Historical-ELO-Tennis-Rating/" title="Previous Post: Historical Elo Tennis Rating">&laquo; Historical Elo Tennis Rating</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -208,6 +316,10 @@ ga('send', 'pageview');
 <a style="font-size: 16px" href="/tags/xmonad/">xmonad</a>
 </div>
 </section>
+<section>
+  <h1>Recent Comments</h1>
+  <div id="dsq-recentcomments" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/sleepomeno/recent_comments_widget.js?hide_avatars=1&num_items=3"></script></div>
+</section>
 
   
 </aside>
@@ -229,7 +341,10 @@ ga('send', 'pageview');
       var disqus_shortname = 'sleepomeno';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket/';
+        var disqus_url = 'http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

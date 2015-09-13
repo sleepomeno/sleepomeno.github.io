@@ -206,5 +206,18 @@
       "month": "September",
       "day": "08"
     }
+  },
+  {
+    "id": 16,
+    "title": "Toying with Racket",
+    "category": "<a class='category' href='/blog/categories/programming/'>programming</a>, <a class='category' href='/blog/categories/tennis/'>tennis</a>",
+    "tags": "<a class='tag' href='/tags/graphics/'>graphics</a>, <a class='tag' href='/tags/racket/'>racket</a>",
+    "url": "/blog/2015/09/13/Toying-with-Racket/",
+    "content": "2 hours to go&#x2026; I've been waiting for the men's tennis US Open final\nto start. What should I do? In the end, I've been killing time listening to <a href=\"http://www.functionalgeekery.com/episode-24-matthew-flatt/\" target=\"_blank\">that</a> Functional Geekery podcast episode\nwhich features Matthew Flatt talking about the <a href=\"http://racket-lang.org/\" target=\"_blank\">Racket</a> programming\nlanguage. Realizing the irony, my thoughts went something like: \"Racket, tennis?! Can't be a coincidence! Still\nsome time to burn, so I will programm something tennis-like in\nRacket!\" So let's open the Racket <a href=\"http://docs.racket-lang.org/quick/\" target=\"_blank\">quickstart</a> to somehow learn Racket\nand get an idea what the tennis-like thing should be.\n\n<!-- more -->\n\n{% img left /images/court.png 200px  %}\n\nThe idea came instantly when I saw that Racket offers quite\nnewbie-friendly picture drawing examples in its tutorial. Now, it's\nobvious what I would do, isn't it? Exactly, I would draw a tennis\ncourt! So I <a href=\"http://download.racket-lang.org/\" target=\"_blank\">downloaded</a> Racket and found the executable\nfor the Racket IDE DrRacket in the **bin** folder of the resulting\ndirectory. Given the examples of the <a href=\"http://docs.racket-lang.org/quick/\" target=\"_blank\">quickstart</a> tutorial I could come\nup with that code which got the job done. And it even has (kind of) the blue\ncolor of the US Open hard court ;)\n\n{% codeblock %}\n(let* ([color \"blue\"]\n      [blue (lambda (pict) (colorize pict color))]\n      [double (blue (filled-rectangle 203 30))]\n      [base (blue (filled-rectangle 90 133))]\n      [margin 3]\n      [doubles (hc-append margin double double)]\n      [service (blue (filled-rectangle 110 65))]\n      [services (vc-append margin service service)]\n      [middle1 (hc-append margin base services)]\n      [middle2 (hc-append margin services base)]\n      [middles (hc-append margin middle1 middle2)])\n    (frame (frame (vc-append margin doubles middles doubles) #:color \"white\" #:line-width 18) #:color color #:line-width 12))\n{% endcodeblock %}\n\nThe code can also be found in that <a href=\"https://gist.github.com/sleepomeno/f8f0af59b19324166619\" target=\"_blank\">gist</a>.\n\nAnyway, now the final is about to start, so only a few impressions of\nusing Racket for the first time: DrRacket proved easy to use and the\n<a href=\"http://docs.racket-lang.org/pict/Basic_Pict_Constructors.html\" target=\"_blank\">documentation</a> made it easy to find the right functions for drawing. It\nwas quite pleasant to see that I could get things done in Racket even\nunder severe time pressure ;)\n\nGo, Federer!\n",
+    "date": {
+      "year": "2015",
+      "month": "September",
+      "day": "13"
+    }
   }
 ]
