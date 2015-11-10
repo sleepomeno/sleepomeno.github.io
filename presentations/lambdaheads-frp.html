@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Gregor Riegler" />
+  <title>Haskell FRP in the browser</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href=".//css/reveal.css"/>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href=".//css/theme/moon.css" id="theme">
+  <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+  <script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = './/css/print/pdf.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+  </script>
+  <!--[if lt IE 9]>
+  <script src=".//lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Haskell FRP in the browser</h1>
+    <h2 class="author">Gregor Riegler</h2>
+    <h3 class="date">Lambdaheads -- Nov 11, 2015</h3>
+</section>
+
+<section><section id="functional-reactive-programming" class="titleslide slide level1"><h1>Functional Reactive Programming</h1></section><section id="frp-is..." class="slide level2">
+<h1>FRP is...</h1>
+<ul>
+<li><p>'spread-sheet'-like programming</p></li>
+<li><p>used for GUIs, robotics, music...</p></li>
+<li>about datatypes that represent 'a value over time'
+<ul>
+<li>'somehow compose them' to wire your GUI components</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<p><span class="math"> ⇒ </span> <em>no need for mutation, handlers, callbacks</em></p>
+</div>
+</section><section id="event" class="slide level2">
+<h1>Event</h1>
+<figure>
+<img src="imgs/event.png" />
+</figure>
+<div class="fragment">
+<p>e.g. a Mouse click :: Event ()</p>
+</div>
+</section><section id="behavior" class="slide level2">
+<h1>Behavior</h1>
+<figure>
+<img src="imgs/behavior.png" />
+</figure>
+<div class="fragment">
+<p>e.g. the content of an input field :: Behavior String</p>
+</div>
+</section><section id="frp-frameworks-12" class="slide level2">
+<h1>FRP Frameworks 1/2</h1>
+<ul>
+<li>GHC: Threepenny-gui
+<ul>
+<li>uses FRP library 'reactive-banana'</li>
+<li>uses the web browser as a display <span class="math"> ⇒ </span> all 'logic' is done in the server process</li>
+<li>alternative to desktop applications built with native toolkits</li>
+</ul></li>
+</ul>
+</section><section id="frp-frameworks-22" class="slide level2">
+<h1>FRP Frameworks 2/2</h1>
+<ul>
+<li>GHCJS: Reflex-DOM
+<ul>
+<li>GUI 'logic' is compiled to JavaScript</li>
+<li>= web binding for FRP library 'reflex'</li>
+<li>alternative to typical JavaScript MVC Frameworks</li>
+</ul></li>
+</ul>
+</section></section>
+<section><section id="threepenny-gui" class="titleslide slide level1"><h1>Threepenny-gui</h1></section><section id="no-frp-example" class="slide level2">
+<h1>No-FRP Example</h1>
+<pre><code>document.getElementById(&quot;displayInput&quot;).value = &quot;Not set&quot;;
+
+function buttonClicked() {
+   var content = document.getElementById(&quot;sourceInput&quot;).value;
+   document.getElementById(&quot;displayInput&quot;).value = content;
+}</code></pre>
+<pre><code>&lt;input id=&quot;sourceInput&quot; type=&quot;text&quot; /&gt;
+&lt;button onclick=&quot;buttonClicked()&quot;&gt;Click me&lt;/button&gt;
+&lt;input id=&quot;displayInput&quot; type=&quot;text&quot; /&gt;</code></pre>
+<input id="name" type="text" />
+<button onclick="buttonClicked()">
+Click me
+</button>
+<p><input id="value" type="text" /></p>
+<script language="javascript">
+document.getElementById("value").value = "Not set";
+function buttonClicked() {
+   var content = document.getElementById("name").value;
+   document.getElementById("value").value = content;
+}
+</script>
+</section><section id="frp-thinking-13" class="slide level2">
+<h1>FRP Thinking 1/3</h1>
+<ul>
+<li><code>bSource :: Behavior String</code>
+<ul>
+<li>the content of the sourceInput</li>
+</ul></li>
+<li><code>eClick :: Event ()</code>
+<ul>
+<li>the button gets clicked</li>
+</ul></li>
+<li><code>bDisplay :: Behavior String</code>
+<ul>
+<li>must be composed from the above</li>
+</ul></li>
+</ul>
+</section><section id="frp-thinking-23" class="slide level2">
+<h1>FRP Thinking 2/3</h1>
+<ul>
+<li><code>bSource :: Behavior String, eClick :: Event ()</code></li>
+<li><code>bDisplay :: Behavior String</code>
+<ul>
+<li>It should contain &quot;Not Set&quot; at first</li>
+<li>When <em>eClick</em> occurs it should have the value of <em>bSource</em></li>
+</ul></li>
+<li><span class="math"> ⇒ </span> find the appropriate combinators for expression that in <a href="http://hackage.haskell.org/package/threepenny-gui-0.6.0.3/docs/Reactive-Threepenny.html">the documentation</a></li>
+</ul>
+</section><section id="frp-thinking-33" class="slide level2">
+<h1>FRP Thinking 3/3</h1>
+<pre><code>bSource :: Behavior String
+eClick :: Event ()</code></pre>
+<pre><code>-- Combinators we find in Reactive.Threepenny
+stepper :: MonadIO m =&gt; a -&gt; Event a -&gt; m (Behavior a)
+(&lt;@) :: Behavior a -&gt; Event b -&gt; Event a</code></pre>
+<pre><code>-- Our solution
+bDisplay = stepper &quot;Not Set&quot; (bSource &lt;@ eClick)
+
+-- Make displayInput show bDisplay</code></pre>
+</section><section id="threepenny-example" class="slide level2">
+<h1>Threepenny Example</h1>
+<pre><code>app :: Window -&gt; UI ()
+app w = void $ do
+  rec sourceInput &lt;- UI.input
+      displayInput &lt;- UI.input
+      clickBtn   &lt;- UI.button #+ [ string &quot;Click Me&quot; ]
+
+      let eClick :: Event () = UI.click clickBtn
+      sourceB  &lt;- stepper &quot;&quot;  . UI.valueChange $ sourceInput
+      displayB &lt;- stepper &quot;Not Set&quot; (sourceB &lt;@ eClick)
+
+      element displayInput # sink value displayB
+
+  getBody w # set children [getElement sourceInput, getElement clickBtn
+                          , getElement displayInput]</code></pre>
+</section><section id="combinators" class="slide level2">
+<h1>Combinators</h1>
+<pre><code>accumB :: MonadIO m =&gt; a -&gt; Event (a -&gt; a) -&gt; m (Behavior a)
+accumE :: MonadIO m =&gt; a -&gt; Event (a -&gt; a) -&gt; m (Event a)
+unions :: [Event a] -&gt; Event [a]
+apply :: Behavior (a -&gt; b) -&gt; Event a -&gt; Event b 
+stepper :: MonadIO m =&gt; a -&gt; Event a -&gt; m (Behavior a)
+unionWith :: (a -&gt; a -&gt; a) -&gt; Event a -&gt; Event a -&gt; Event a</code></pre>
+<p>... a few more (see the <a href="http://hackage.haskell.org/package/threepenny-gui-0.6.0.3/docs/Reactive-Threepenny.html">the documentation</a>)</p>
+</section><section id="threepenny-demo" class="slide level2">
+<h1>Threepenny Demo</h1>
+</section><section id="threepenny-summary" class="slide level2">
+<h1>Threepenny summary</h1>
+<ul>
+<li>Nice API
+<ul>
+<li>Event/Behavior composing functions have nice types, well-documented and are in <a href="http://hackage.haskell.org/package/threepenny-gui-0.6.0.3/docs/Reactive-Threepenny.html">one module</a>)
+<ul>
+<li><em>Event</em> and <em>Behavior</em> are Applicative and Functor instances</li>
+</ul></li>
+</ul></li>
+<li>Learn how use it by analyzing the examples in the <a href="https://github.com/HeinrichApfelmus/threepenny-gui/tree/master/samples">samples directory</a></li>
+<li>Unfortunately, no &quot;production-ready&quot; binding for GHCJS yet (<a href="https://github.com/ocharles/Francium">Francium</a> the only project I found)</li>
+</ul>
+</section></section>
+<section><section id="ghcjs" class="titleslide slide level1"><h1>GHCJS</h1></section><section id="what-is-ghcjs" class="slide level2">
+<h1>What is GHCJS</h1>
+<ul>
+<li>Haskell to JavaScript compiler, based on GHC</li>
+<li>has become increasingly popular, lately</li>
+<li>build/dependency management not yet on par with GHC</li>
+</ul>
+</section><section id="using-reflex-with-ghcjs" class="slide level2">
+<h1>Using Reflex with GHCJS</h1>
+<ul>
+<li><p>There is a <a href="https://github.com/ryantrinkle/try-reflex">repo of the Reflex author</a> which provides a GHCJS environment with the Reflex library in a Nix sandbox</p></li>
+<li><p>For build/dependency management of GHC projects there is <a href="https://github.com/commercialhaskell/stack/">stack</a>. <strong>Does stack support GHCJS?</strong></p></li>
+</ul>
+</section><section id="not-yet" class="slide level2">
+<h1>Not yet</h1>
+<ul>
+<li>However, it is in development and can already be used experimentally providing even a GHCJS interpreter
+<ul>
+<li><p>is explained in <a href="https://github.com/luigy/try-stack-reflex" class="uri">https://github.com/luigy/try-stack-reflex</a></p>
+<pre><code>stack upgrade --git
+./try-stack-reflex ghcjsi   # takes a long time! 
+stack ghci                  # Voilà!</code></pre></li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>or wait for a few months until <em>stack</em> fully supports GHCJS</li>
+</ul>
+</div>
+<div class="fragment">
+<p><span class="math"> ⇒ </span> Using GHC/GHCJS in a single project is going to be magical</p>
+</div>
+</section></section>
+<section><section id="reflex" class="titleslide slide level1"><h1>Reflex</h1></section><section id="reflex-libraries" class="slide level2">
+<h1>Reflex libraries</h1>
+<ul>
+<li><a href="http://hackage.haskell.org/package/reflex">reflex</a> is the basic FRP library
+<ul>
+<li>uses a <em>Dynamic</em> type which wraps a <em>Behavior</em> and an <em>Event</em> of its changes</li>
+<li>combinators in <a href="https://hackage.haskell.org/package/reflex-0.3/docs/Reflex-Class.html">Reflex.Class</a> and <a href="https://hackage.haskell.org/package/reflex-0.3/docs/Reflex-Dynamic.html">Reflex.Dynamic</a></li>
+</ul></li>
+<li><a href="http://hackage.haskell.org/package/reflex-dom">reflex-dom</a> is the web binding for it</li>
+</ul>
+</section><section id="reflex-example" class="slide level2">
+<h1>Reflex example</h1>
+<pre><code>app = do
+  sourceInput &lt;- textInput def
+
+  rec let config = def { _textInputConfig_initialValue = &quot;Not Set&quot; }
+                       &amp; setValue .~ (updated dDisplay)
+      displayInput &lt;- textInput config
+      dDisplay &lt;- holdDyn &quot;&quot; eContentWhenClicked
+
+      eClick &lt;- button &quot;Click Me&quot;
+
+      let bSource = current $ _textInput_value sourceInput
+          eContentWhenClicked = tag bSource eClick 
+  return ()</code></pre>
+<pre><code>current :: Dynamic t a -&gt; Behavior t a 
+updated :: Dynamic t a -&gt; Event t a 
+tag :: Reflex t =&gt; Behavior t b -&gt; Event t a -&gt; Event t b 
+holdDyn :: MonadHold t m =&gt; a -&gt; Event t a -&gt; m (Dynamic t a) </code></pre>
+</section><section id="more-combinators" class="slide level2">
+<h1>More combinators</h1>
+<pre><code>mapDyn :: (Reflex t, MonadHold t m) =&gt;
+          (a -&gt; b) -&gt; Dynamic t a -&gt; m (Dynamic t b) 
+foldDyn :: (Reflex t, MonadHold t m, MonadFix m) =&gt;
+          (a -&gt; b -&gt; b) -&gt; b -&gt; Event t a -&gt; m (Dynamic t b) 
+attachDynWith :: Reflex t =&gt;
+          (a -&gt; b -&gt; c) -&gt; Dynamic t a -&gt; Event t b -&gt; Event t c 
+count :: (Reflex t, MonadHold t m, MonadFix m, Num b) =&gt;
+          Event t a -&gt; m (Dynamic t b) 
+...</code></pre>
+<ul>
+<li>Type signatures not as nice as comparable threepenny combinator type signatures</li>
+<li><em>Dynamic</em> is not a a Functor, so you often need <em>mapDyn</em> <span class="math"> ⇒ </span> somehow ugly</li>
+</ul>
+</section><section id="reflex-demo" class="slide level2">
+<h1>Reflex Demo</h1>
+</section><section id="reflexthreepenny-conclusion" class="slide level2">
+<h1>Reflex/Threepenny conclusion</h1>
+<ul>
+<li>Reflex type signatures more complex</li>
+<li>Reflex documentation not on par with threepenny-gui's documentation</li>
+<li>Reflex adds DOM elements implicitly whereas threepenny does it explicitly</li>
+<li>Neither framework uses HTML markup directly (like AngularJS)</li>
+</ul>
+</section></section>
+    </div>
+  </div>
+
+
+  <script src=".//lib/js/head.min.js"></script>
+  <script src=".//js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,         // Display controls in the bottom right corner
+        progress: true,         // Display a presentation progress bar
+        history: true,          // Push each slide change to the browser history
+        center: true,                       // Vertical centering of slides
+        maxScale: 1.5,                  // Bounds for smallest/largest possible content scale
+        slideNumber: false,                // Display the page number of the current slide
+        theme: 'moon', // available themes are in /css/theme
+        transition: 'none', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: './/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: './/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: './/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+//          { src: './/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; }, }
+//          { src: './/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+]});
+    </script>
+    </body>
+</html>
