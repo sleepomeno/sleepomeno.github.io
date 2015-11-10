@@ -1,0 +1,55 @@
+#+SIDEBAR:
+#+PUBLISH: true
+#+TAGS: racket graphics
+#+CATEGORIES: programming tennis
+#+TITLE: Toying with Racket
+#+AUTHOR: Gregor Riegler
+#+EMAIL: gregor.riegler@gmail.com
+#+DATE: <2015-09-13 Son>
+
+2 hours to go... I've been waiting for the men's tennis US Open final
+to start. What should I do? In the end, I've been killing time listening to [[http://www.functionalgeekery.com/episode-24-matthew-flatt/][that]] Functional Geekery podcast episode
+which features Matthew Flatt talking about the [[http://racket-lang.org/][Racket]] programming
+language. Realizing the irony, my thoughts went something like: "Racket, tennis?! Can't be a coincidence! Still
+some time to burn, so I will programm something tennis-like in
+Racket!" So let's open the Racket [[http://docs.racket-lang.org/quick/][quickstart]] to somehow learn Racket
+and get an idea what the tennis-like thing should be.
+#+HTML: <!-- more -->
+
+
+#+ATTR_OCTOPRESS: :type image :class left :width 200px
+[[/images/court.png][Tennis Court drawn with Racket]]
+
+The idea came instantly when I saw that Racket offers quite
+newbie-friendly picture drawing examples in its tutorial. Now, it's
+obvious what I would do, isn't it? Exactly, I would draw a tennis
+court! So I [[http://download.racket-lang.org/][downloaded]] Racket and found the executable
+for the Racket IDE DrRacket in the *bin* folder of the resulting
+directory. Given the examples of the [[http://docs.racket-lang.org/quick/][quickstart]] tutorial I could come
+up with that code which got the job done. And it even has (kind of) the blue
+color of the US Open hard court ;)
+
+#+BEGIN_SRC racket
+(let* ([color "blue"]
+      [blue (lambda (pict) (colorize pict color))]
+      [double (blue (filled-rectangle 203 30))]
+      [base (blue (filled-rectangle 90 133))]
+      [margin 3]
+      [doubles (hc-append margin double double)]
+      [service (blue (filled-rectangle 110 65))]
+      [services (vc-append margin service service)]
+      [middle1 (hc-append margin base services)]
+      [middle2 (hc-append margin services base)]
+      [middles (hc-append margin middle1 middle2)])
+    (frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
+#+END_SRC
+
+The code can also be found in that [[https://gist.github.com/sleepomeno/f8f0af59b19324166619][gist]].
+
+Anyway, now the final is about to start, so only a few impressions of
+using Racket for the first time: DrRacket proved easy to use and the
+[[http://docs.racket-lang.org/pict/Basic_Pict_Constructors.html][documentation]] made it easy to find the right functions for drawing. It
+was quite pleasant to see that I could get things done in Racket even
+under severe time pressure ;)
+
+Go, Federer!
