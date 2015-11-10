@@ -1,0 +1,472 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>The notoriously point-free "((x.).)" trick - while true live</title>
+  <meta name="author" content="Gregor Riegler">
+
+  
+  <meta name="description" content="Point-free code is ubiquitous in every well-polished Hackage library.
+It&rsquo;s more concise than its pointed counterparts and feels more
+&ldquo; &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  <!--<script src="/javascripts/modernizr-2.0.js"></script>-->
+  <!--<script src="/javascripts/ender.js"></script>-->
+  <!--<script src="/javascripts/octopress.js" type="text/javascript"></script>-->
+  <link href="/atom.xml" rel="alternate" title="while true live" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/assets/app-c0f18cf1eab0ab482c858c55c0da5377.js"></script>
+
+<script id="search-results-template" type="text/x-handlebars-template">
+  {{#entries}}
+    <article>
+      <h3>
+         <small><time datetime="{{date}}" pubdate>{{date}}</time></small>
+         <a href="{{url}}">{{title}}</a>
+         <!--<p>tagged: {{ tags }} | category: <a href="blog/categories/{{category }}">{{category}}</a></p>-->
+				 <p>tagged: {{{ tags }}} | category: {{{category}}}</p>
+      </h3>
+    </article>
+  {{/entries}}
+</script>
+
+
+
+  
+  <script type="text/javascript">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-47975624-1', 'auto');  // Replace with your property ID.
+ga('send', 'pageview');
+  </script>
+
+
+
+
+  
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">sleepomeno</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">while true live</a></h1>
+  
+    <h2>Musings on the fatality of infinite loops and other stuff.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+
+  <form action="/search" method="get">
+  <fieldset role ="search">
+    <input type="text" id="search-query" name="q" placeholder="Search" autocomplete="off" class="search" />
+  </fieldset>
+</form>
+
+
+<ul class="main-navigation">
+  <li><a href="/about-me/">About me</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">The Notoriously Point-free "((X.).)" Trick</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-14T00:00:00+02:00" pubdate data-updated="true">Aug 14<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="http://www.haskell.org/haskellwiki/Pointfree" target="_blank">Point-free</a> code is ubiquitous in every well-polished Hackage library.
+It&rsquo;s more concise than its pointed counterparts and feels more
+&ldquo;hygienic&rdquo; as function composition immediately translates to its
+mathematical background.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">let</span> <span class="n">pointFree</span> <span class="ow">=</span> <span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">.</span> <span class="n">read</span>
+</span><span class='line'><span class="kr">let</span> <span class="n">notPointFree</span> <span class="n">x</span> <span class="ow">=</span> <span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">(</span><span class="n">read</span> <span class="n">x</span><span class="p">)</span>
+</span><span class='line'><span class="c1">-- notPointFree &#39;mentions&#39; its argument &quot;x&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So far, so good. However, you get a problem in your chain of function
+composition when your right-most function &ldquo;takes two parameters&rdquo;.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">let</span> <span class="n">plusOne</span> <span class="ow">=</span> <span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+</span><span class='line'><span class="kr">let</span> <span class="n">readTwoArgs</span> <span class="ow">=</span> <span class="p">(</span><span class="nf">\</span><span class="n">x</span> <span class="n">y</span> <span class="ow">-&gt;</span> <span class="n">read</span> <span class="n">x</span> <span class="o">+</span> <span class="n">read</span> <span class="n">y</span><span class="p">)</span> <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">let</span> <span class="n">coolSolution</span> <span class="ow">=</span> <span class="n">plusOne</span> <span class="o">.</span> <span class="n">readTwoArgs</span> <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+</span><span class='line'><span class="c1">-- Type checker doesn&#39;t like coolSolution</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">let</span> <span class="n">boringSolution</span> <span class="n">x</span> <span class="n">y</span> <span class="ow">=</span> <span class="n">plusOne</span> <span class="p">(</span><span class="n">readTwoArgs</span> <span class="n">x</span> <span class="n">y</span><span class="p">)</span>
+</span><span class='line'><span class="c1">-- it&#39;s boring since it&#39;s not point-free</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Unfortunately, <code>coolSolution</code> is not well-typed; this might drive you
+nuts for some time: It&rsquo;s obvious that composing those functions must
+somehow work. You&rsquo;d think: &ldquo;Even GHCI must have understood what I
+mean!&rdquo; However, Haskell doesn&rsquo;t care for what you mean as much as it
+cares for type-safety ;) ! So you might fall back on <code>boringSolution</code>
+which is only half the fun as it&rsquo;s not point-free&#x2026; anyway, there IS
+a way to compose those functions!</p>
+
+<!-- more -->
+
+
+<p>In the following I will use
+<a href="http://www.haskell.org/haskellwiki/GHC/TypedHoles" target="_blank">Typed holes</a>. They are a nice tool to look into the type checker&rsquo;s
+&ldquo;thoughts&rdquo;.
+Well, first have a look at why <code>coolSolution</code> did not type-check at all.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Couldn't match type ‘Int’ with ‘String -> Int’
+</span><span class='line'>    Expected type: Int -> String -> Int
+</span><span class='line'>      Actual type: Int -> Int
+</span><span class='line'>    In the first argument of ‘(.)’, namely ‘plusOne’
+</span><span class='line'>    In the expression: plusOne . readTwoArgs :: String -> String -> Int</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Essentially, this tells us that <code>plusOne</code> does not have the right type
+to be used together with <code>(. readTwoArgs)</code>. Now let&rsquo;s ask this
+question to the type checker: What do I need to apply to <code>plusOne</code> so
+that you are happy?</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="p">((</span><span class="kr">_</span> <span class="n">plusOne</span><span class="p">)</span> <span class="o">.</span> <span class="n">readTwoArgs</span><span class="p">)</span> <span class="s">&quot;3&quot;</span> <span class="s">&quot;2&quot;</span> <span class="ow">::</span> <span class="kt">Int</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The answer we get is:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Found hole ‘_’
+</span><span class='line'>      with type: (Int -> Int) -> (String -> Int) -> [Char] -> Int
+</span><span class='line'>    Relevant bindings include it :: Int (bound at &lt;interactive>:88:1)
+</span><span class='line'>    In the expression: _
+</span><span class='line'>    In the first argument of ‘(.)’, namely ‘(_ plusOne)’
+</span><span class='line'>    In the expression: (_ plusOne) . readTwoArgs</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Okay, this help us. Our &ldquo;hole function&rdquo;&rsquo;s type is <code>(Int -&gt; Int) -&gt;
+(String -&gt; Int) -&gt; [Char] -&gt; Int</code>. Now we just write that
+function &ndash; actually, the type signature and our knowledge of what
+should be the result of the whole expression give rise to that <em>unique</em> <code>holeFunction</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">let</span> <span class="n">holeFunction</span> <span class="n">plusOne&#39;</span> <span class="n">stringToInt</span> <span class="n">string</span> <span class="ow">=</span> <span class="n">plusOne&#39;</span> <span class="p">(</span><span class="n">stringToInt</span> <span class="n">string</span><span class="p">)</span>
+</span><span class='line'><span class="kr">let</span> <span class="n">holeFunction</span> <span class="n">plusOne&#39;</span> <span class="n">stringToInt</span> <span class="n">string</span> <span class="ow">=</span> <span class="n">plusOne&#39;</span> <span class="o">.</span> <span class="n">stringToInt</span> <span class="o">$</span> <span class="n">string</span>
+</span><span class='line'><span class="kr">let</span> <span class="n">holeFunction</span> <span class="n">plusOne&#39;</span> <span class="n">stringToInt</span> <span class="ow">=</span> <span class="n">plusOne&#39;</span> <span class="o">.</span> <span class="n">stringToInt</span>
+</span><span class='line'><span class="kr">let</span> <span class="n">holeFunction</span> <span class="n">plusOne&#39;</span> <span class="n">stringToInt</span> <span class="ow">=</span> <span class="p">(</span><span class="o">.</span><span class="p">)</span> <span class="n">plusOne&#39;</span> <span class="n">stringToInt</span>
+</span><span class='line'><span class="kr">let</span> <span class="n">holeFunction</span> <span class="n">plusOne&#39;</span> <span class="ow">=</span> <span class="p">(</span><span class="o">.</span><span class="p">)</span> <span class="n">plusOne&#39;</span>
+</span><span class='line'><span class="kr">let</span> <span class="n">holeFunction</span> <span class="ow">=</span> <span class="p">(</span><span class="o">.</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>By (re)writing it in a point-free style and by applying eta-reductions we
+get a very simple definition. It turns out that our <code>holeFunction</code> is
+just ordinary function composition^^. Anyway, let&rsquo;s have a look if that works.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">let</span> <span class="n">coolSolution</span> <span class="ow">=</span> <span class="p">((</span><span class="o">.</span><span class="p">)</span> <span class="n">plusOne</span><span class="p">)</span><span class="o">.</span> <span class="n">readTwoArgs</span>
+</span><span class='line'><span class="kr">let</span> <span class="n">coolSolution</span> <span class="ow">=</span> <span class="p">(</span><span class="n">plusOne</span> <span class="o">.</span><span class="p">)</span><span class="o">.</span> <span class="n">readTwoArgs</span>
+</span><span class='line'><span class="c1">-- (coolSolution &quot;3&quot; &quot;4&quot;) == 8</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yes, it does! That &ldquo;.).&rdquo; looks funny and will surely confuse everybody
+whose doesn&rsquo;t know that &ldquo;trick&rdquo; (and does not have a type-checker in
+their brain). However, it gets even funnier. When your right-most
+function expects even more arguments you just add &lsquo;a couple of&rsquo; &ldquo;.)&#8221;s
+in between!</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">let</span> <span class="n">wasteFourArgs</span> <span class="ow">=</span> <span class="p">(</span><span class="nf">\</span><span class="n">a</span> <span class="n">b</span> <span class="n">c</span> <span class="n">d</span> <span class="ow">-&gt;</span> <span class="n">read</span> <span class="n">a</span> <span class="o">+</span> <span class="n">read</span> <span class="n">b</span><span class="p">)</span> <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+</span><span class='line'><span class="kr">let</span> <span class="n">coolSolution&#39;</span> <span class="ow">=</span> <span class="p">(((</span><span class="n">plusOne</span> <span class="o">.</span><span class="p">)</span> <span class="o">.</span><span class="p">)</span> <span class="o">.</span><span class="p">)</span><span class="o">.</span> <span class="n">wasteFourArgs</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>Thus, we have found a way to use the (point-free) function
+composition even when you need to feed more than a single argument
+into it!</p>
+
+<p>As point-free code is more concise it can be clearer about what you
+want to do, however, it can obfuscate your intentions as well! (Look
+at those <a href="http://www.haskell.org/haskellwiki/Pointfree#Combinator_discoveries" target="_blank">combinators</a>). In the
+case of this <em>((x.).)</em> trick, I think it can still be beneficial if
+and only if everybody in your team &ldquo;knows the trick&rdquo; and does not have
+to think about it. The nice reason is: As soon as you delete that &ldquo;.)&rdquo;
+chain mentally you immediately grasp the meaning of the resulting function!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gregor Riegler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-14T00:00:00+02:00" pubdate data-updated="true">Aug 14<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions/" data-via="" data-counturl="http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2014/06/25/Explaining-the-Magic/" title="Previous Post: Explaining the Magic">&laquo; Explaining the Magic</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2014/08/16/Using-Google-Universal-Analytics-with-Octopress/" title="Next Post: Using Google Universal Analytics with Octopress">Using Google Universal Analytics with Octopress &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/09/13/Toying-with-Racket/">Toying With Racket</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/08/Historical-ELO-Tennis-Rating/">Historical Elo Tennis Rating</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/14/Approximating-PI-with-PureScript/">Approximating PI With PureScript</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/20/Partial-matching-in-R/">Partial Matching in R</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/">Preview Your Github Markdown Before Committing!</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+	<div id="tagcloud"><a style="font-size: 16px" href="/tags/c/">C</a>  
+<a style="font-size: 16px" href="/tags/st/">ST</a>  
+<a style="font-size: 16px" href="/tags/analytics/">analytics</a>  
+<a style="font-size: 16px" href="/tags/android/">android</a>  
+<a style="font-size: 16px" href="/tags/app/">app</a>  
+<a style="font-size: 23px" href="/tags/blog/">blog</a>  
+<a style="font-size: 16px" href="/tags/book/">book</a>  
+<a style="font-size: 16px" href="/tags/extension/">extension</a>  
+<a style="font-size: 16px" href="/tags/functional/">functional</a>  
+<a style="font-size: 16px" href="/tags/ghc/">ghc</a>  
+<a style="font-size: 16px" href="/tags/git/">git</a>  
+<a style="font-size: 16px" href="/tags/github/">github</a>  
+<a style="font-size: 21px" href="/tags/graphics/">graphics</a>  
+<a style="font-size: 28px" href="/tags/haskell/">haskell</a>  
+<a style="font-size: 16px" href="/tags/javascript/">javascript</a>  
+<a style="font-size: 16px" href="/tags/jquery/">jquery</a>  
+<a style="font-size: 16px" href="/tags/laziness/">laziness</a>  
+<a style="font-size: 16px" href="/tags/markdown/">markdown</a>  
+<a style="font-size: 16px" href="/tags/maybe/">maybe</a>  
+<a style="font-size: 16px" href="/tags/monadplus/">monadplus</a>  
+<a style="font-size: 16px" href="/tags/mutation/">mutation</a>  
+<a style="font-size: 16px" href="/tags/performance/">performance</a>  
+<a style="font-size: 16px" href="/tags/plaintext/">plaintext</a>  
+<a style="font-size: 16px" href="/tags/productivity/">productivity</a>  
+<a style="font-size: 16px" href="/tags/purescript/">purescript</a>  
+<a style="font-size: 21px" href="/tags/r/">r</a>  
+<a style="font-size: 16px" href="/tags/racket/">racket</a>  
+<a style="font-size: 16px" href="/tags/rankntypes/">rankntypes</a>  
+<a style="font-size: 16px" href="/tags/scm/">scm</a>  
+<a style="font-size: 21px" href="/tags/statistics/">statistics</a>  
+<a style="font-size: 16px" href="/tags/svn/">svn</a>  
+<a style="font-size: 16px" href="/tags/syntax/">syntax</a>  
+<a style="font-size: 16px" href="/tags/xmonad/">xmonad</a>
+</div>
+</section>
+<section>
+  <h1>Recent Comments</h1>
+  <div id="dsq-recentcomments" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/sleepomeno/recent_comments_widget.js?hide_avatars=1&num_items=3"></script></div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Gregor Riegler -
+	<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+	<span class="followTwitter"><a href="https://twitter.com/GregorRiegler" class="twitter-follow-button" data-show-count="false">Follow @GregorRiegler</a></span>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'sleepomeno';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions/';
+        var disqus_url = 'http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

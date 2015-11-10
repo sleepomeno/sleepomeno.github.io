@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: rankntypes | while true live]]></title>
+  <link href="http://sleepomeno.github.io/tags/rankntypes/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2015-11-10T21:43:27+01:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Gregor Riegler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Explaining Haskell RankNTypes for all]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/02/12/Explaining-Haskell-RankNTypes-for-all/"/>
+    <updated>2014-02-12T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/02/12/Explaining-Haskell-RankNTypes-for-all</id>
+    <content type="html"><![CDATA[<p>The Glasgow Haskell Compiler supports a language extension called
+<code>RankNTypes</code> which I&rsquo;ve had my problems to understand. The moment I
+understood that it mostly refers to first-order logic universal
+quantification things became easier, though&#x2026; but first let&rsquo;s explore why we
+need it in a step-by-step example.</p>
+
+<!-- more -->
+
+
+<h2>length :: forall a. [a] &ndash;> Int</h2>
+
+<p><code>haskell
+:t length
+-- length :: [a] -&gt; Int
+length [1,2,3]
+-- 3
+let intLength :: [Int] -&gt; Int; intLength = length
+:t intLength
+-- intLength :: [Int] -&gt; Int
+intLength [1,2,3]
+-- 3
+</code></p>
+
+<p>We start with the well-known polymorphic function <code>length</code> in a fresh
+GHCI session. Above we
+see how the type checker instantiates <code>a</code> to be <code>Int</code> in the type of
+<code>intLength</code>. Likewise we could create a function <code>charLength</code> &ndash;
+anyway, <code>length</code> can be instantiated to oblige to a list of any type
+we want, so it is defined <em>for all</em> possible types <code>a</code>. For the sake
+of simplicity, I&rsquo;ll call a function like <code>intLength</code> (which actually
+corresponds to instantiating the type variable <code>a</code> of <code>length</code>) a
+<em>version</em> of <code>length</code>.</p>
+
+<p>As a matter of fact, a normal Haskell type signature such as <code>[a]
+-&gt; Int</code> always implies that the type variable(s) are universally
+quantified with 1 <em>forall</em> section located at the beginning of the
+type declaration. <code>length</code>&rsquo;s type thus corresponds to <code>forall a. [a] -&gt;
+Int</code>. We call such a type a <em>Rank-1-Type</em> as there is 1 <em>forall</em> in
+the type annotation. The fact that we can omit the <em>forall</em> usually &ndash;
+and aren&rsquo;t used to it as a consequence &ndash; will make things look complicated
+when we actually need it, as we&rsquo;ll see later on. In the end, <em>forall</em> provides
+a scope just like its first-order logic equivalent.</p>
+
+<h2>Apply a length-like function to a list</h2>
+
+<p><code>haskell
+let apply :: ([a] -&gt; Int) -&gt; [a] -&gt; Int; apply f x = f x
+apply length "hello world"
+-- 11
+apply intLength [1,2,3]
+-- 3
+</code></p>
+
+<p>The <code>apply</code> function just applies a function that takes a list and
+returns an <code>Int</code> (like <code>length</code> does) to a value.
+Nothing fancy nor useful at all, obviously. Still, let&rsquo;s note that under the hood
+the type of <code>apply</code> is <code>forall a. ([a] -&gt; Int) -&gt; [a] -&gt; Int</code>. So far, so
+good, the type checker is happy. Now let&rsquo;s a write a function
+<code>applyToTuple</code> that applies a function like <code>length</code> to a tuple of
+lists so that the lists of the tuple can be of different types.</p>
+
+<h2>Apply a length-like function to a tuple of lists</h2>
+
+<p><code>haskell
+let applyToTuple f (a@(x:xs),b@(y:ys)) = (f a, f b) :: (Int, Int)
+applyToTuple length ("hallo",[1,2,3])
+--No instance for (Num Char)
+--  arising from the literal `1'
+-- ...
+:t applyToTuple
+-- applyToTuple :: ([t] -&gt; Int) -&gt; ([t], [t]) -&gt; (Int, Int)
+</code></p>
+
+<p>I wrote <code>applyToTuple</code> without a full type signature. <code>:: (Int,Int)</code>
+just makes sure my wanted result type and by the help of the list
+destructuring <code>a@(x:xs)</code> I make sure that the type inference algorithm
+will conclude
+that I have a tuple of lists in mind. Consequently, the type of the
+function given to <code>applyToTuple</code> is inferred to correspond to
+<code>length</code>&rsquo;s type; at least, that&rsquo;s what I would expect naively.</p>
+
+<p>However, type inference of <code>applyToTuple</code> does not result in the type I had
+in mind. As we can see the types of lists in the tuple <code>([t],[t])</code> are
+the same so that calling <code>applyToTuple length</code> with a heterogeneous
+tuple like <code>("hallo",[1,2,3])</code> doesn&rsquo;t work. Being stubborn I could
+then try &ldquo;forcing&rdquo; the type by providing a type signature:</p>
+
+<p><code>haskell
+let applyToTuple :: ([a] -&gt; Int) -&gt; ([b],[c]) -&gt; (Int, Int); applyToTuple f (x,y) = (f x, f y)
+-- Couldn't match type `b' with `a' ...
+-- Couldn't match type `c' with `a' ...
+</code></p>
+
+<p>This attempt also fails as GHCI complains about the fact that the
+types <code>b</code> and <code>a</code>, <code>c</code> and <code>a</code> respectively, do not match! However, the
+<code>length</code>-like function <code>([a] -&gt; Int)</code> should be applicable to a list of
+whatever type, shouldn&rsquo;t it?!? That&rsquo;s the moment
+you&rsquo;d start doubting either GHCI or your mental health as you know precisely
+that it <em>should be possible</em> to write such a function. After all, you
+know intuitively that it <strong>is</strong> possible to apply a function like <code>length</code>
+to both parts of a heterogeneous tuple of lists as in the code below;
+doing that in a more generic way in a function like <code>applyToTuple</code>
+should be possible as well!</p>
+
+<p><code>haskell
+-- Obviously, that works without a problem:
+(\(a,b) -&gt; (length a, length b)) ("hallo",[1,2,3])
+-- (5,3)
+</code></p>
+
+<h2>applyToTuple :: (forall a.[a] &ndash;> Int) &ndash;> ([b],[c]) &ndash;> (Int, Int)</h2>
+
+<p>Well, there is just one explanation: the type <code>([a] -&gt; Int)
+-&gt;([b],[c]) -&gt; (Int, Int)</code> is not really what we need for our purpose.
+In fact, we need <code>RankNTypes</code>!
+We first enable the extension in GHCI and can then write the correct
+<code>applyToTuple</code> implementation using the <code>forall</code> keyword in the type
+of the first parameter function. (If you want to use the
+<code>RankNTypes</code> extension in a file to compile, you actually need to add <code>{-#
+LANGUAGE RankNTypes #-}</code> at the top of the file)</p>
+
+<p><code>haskell
+:set -XRankNTypes
+let applyToTuple :: (forall a.[a] -&gt; Int) -&gt; ([b],[c]) -&gt; (Int, Int); applyToTuple f (x,y) = (f x, f y)
+applyToTuple length ("hello", [1,2,3])
+-- (5,3)
+</code></p>
+
+<p>This time it works! :&ndash;)</p>
+
+<h2>Explanation</h2>
+
+<p>We noted earlier that every Haskell type signature&rsquo;s type variables
+are <em>implicitly</em> universally quantified by an &lsquo;invisible&rsquo; <code>forall</code>
+section. Thus, under the hood we get the types as follows:</p>
+
+<p>``` haskell
+&mdash; just a reminder:
+&mdash; length :: forall a. [a] &ndash;> Int
+let intLength :: [Int] &ndash;> Int; intLength = length</p>
+
+<p>&mdash;  applyToTuple:
+let applyToTuple :: forall a b c. ([a] &ndash;> Int) &ndash;> ([b], [c]) &ndash;> (Int, Int); applyToTuple f (x,y) = (f x, f y)
+&mdash; correct applyToTuple:
+let applyToTuple :: forall b c. (forall a. [a] &ndash;> Int) &ndash;> ([b], [c]) &ndash;> (Int, Int); applyToTuple f (x,y) = (f x, f y)
+```</p>
+
+<p>Now things get clearer: The function in the type of the correct
+<code>applyToTuple</code> has the type <code>(forall a. [a] -&gt; Int)</code> which is exactly
+the type given for <code>length</code> above, hence it works. On the other hand,
+the type <code>([a] -&gt; Int)</code> of the function parameter in the wrong
+<code>applyToTuple</code> type signature <em>looks</em> like the type of <code>length</code> <strong>but it isn&rsquo;t</strong>!</p>
+
+<p>Have a look at what the type
+checker would &ldquo;think&rdquo; confronted with the wrong <code>applyToTuple</code> type
+signature. When it reads the expression <code>applyToTuple length</code> it would
+expect the type variables <code>a</code>, <code>b</code> and <code>c</code> to be <strong>different</strong>
+concrete types, so <code>([a] -&gt; Int)</code> might become <code>([Char] -&gt; Int)</code> or
+<code>([Int] -&gt; Int)</code> like our <code>intLength</code> function, shortly, some
+<em>version</em> of <code>length</code>. In the implementation <code>(f x, f y)</code> seeks to apply that <em>version</em> of
+<code>length</code> to two lists of <strong>different</strong> types &ndash; however, <strong>any</strong> <em>version</em> of
+<code>length</code> expects its list to always be of 1 concrete type only, e.g. <code>Int</code> in
+the case of our function <code>intLength</code>, consequently, the type checker
+refuses the lists of the tuple to possibly be of different types!</p>
+
+<p>Why does the correct definition of <code>applyToTuple</code> work then? It
+expects a <code>length</code>-like function of type <code>(forall a. [a] -&gt; Int)</code>, that&rsquo;s a function
+which works <strong>for all</strong> types <code>a</code>, no matter what type you throw at it!
+Thus, it forces that function to be a polymorphic function just like
+<code>length</code> and rules out any candidate <em>version</em> of <code>length</code> (like <code>intLength</code>) as a consequence.
+Since you can throw a list of any type at that function it can deal with the 2
+lists of different types and the code compiles!</p>
+
+<h2>Conclusion</h2>
+
+<p>Using <code>RankNTypes</code> and the <em>forall</em> keyword you can specify that a
+function&rsquo;s argument needs to be a <em>polymorphic</em> function (like
+<code>length</code> in our example). In spite of the fact that you can omit the top-level
+<em>forall</em> in the type signature of a polymorphic type, you need to include
+it when you reference it as a parameter.</p>
+
+<p>In a future blog post I will investigate an important application of
+<code>RankNTypes</code> in the Haskell standard library. It will be about the
+<code>ST</code> monad which provides a <em>safe</em> environment for <strong>mutation</strong> in
+Haskell with the help of <code>RankNTypes</code>. Mutation and Haskell?! Yes,
+you can do it thanks to <code>RankNTypes</code>!</p>
+
+<p><em>PS: There is a nice</em>
+<a href="http://stackoverflow.com/questions/3071136/what-does-the-forall-keyword-in-haskell-ghc-do" target="_blank">stackoverflow thread</a> <em>which investigates the use of &ldquo;forall&rdquo; in other
+language extensions as well. Actually, my &ldquo;applyToTuple&rdquo; function is based on</em>
+<a href="http://stackoverflow.com/a/3071932/928944" target="_blank">that answer</a> of the thread.</p>
+]]></content>
+  </entry>
+  
+</feed>

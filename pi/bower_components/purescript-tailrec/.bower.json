@@ -1,0 +1,29 @@
+{
+  "name": "purescript-tailrec",
+  "version": "0.2.1",
+  "authors": [
+    "Phil Freeman <paf31@cantab.net>"
+  ],
+  "description": "A type class for monadic recursion",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purescript-transformers": "~0.5.0"
+  },
+  "homepage": "https://github.com/paf31/purescript-tailrec",
+  "_release": "0.2.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.2.1",
+    "commit": "cb3c93120fa64aa4db0f94bf5ff6c21a07595b97"
+  },
+  "_source": "git://github.com/paf31/purescript-tailrec.git",
+  "_target": "~0.2.0",
+  "_originalSource": "purescript-tailrec"
+}

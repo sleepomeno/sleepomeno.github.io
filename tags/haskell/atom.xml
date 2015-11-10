@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: haskell | while true live]]></title>
+  <link href="http://sleepomeno.github.io/tags/haskell/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2015-11-10T21:43:27+01:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Gregor Riegler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[else return null]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/01/05/else-return-null/"/>
+    <updated>2015-01-05T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/01/05/else-return-null</id>
+    <content type="html"><![CDATA[<p>I guess everybody has a story or two in store about Nullpointer
+exceptions in Java (or in any language with nullable values). Sooner or later you will make the acquaintance of the dreaded stacktrace line
+denoting that you did something terribly wrong, demanding a value
+where none exists, and you just wonder <em>why, how the hell can that
+object be null?!</em> during an hour of painful debugging&#x2026; you know
+that? Good. Well, I won&rsquo;t ponder over how to avoid it, how to apply
+proper error handling etc. (that&rsquo;s way too complicated, I&rsquo;m tired) but I&rsquo;d just like to point out my personal
+favourite, the
+famous <code>else return null</code> idiom.</p>
+
+<!-- more -->
+
+
+<p>Anyway, the below snippet shows what I actually mean by that.</p>
+
+<p>``` java
+// Version 1
+if (password == &ldquo;12345&rdquo;)
+   return valuableTreasure;
+else
+   return null;</p>
+
+<p>// or, equivalently
+// Version 2
+if (password == &ldquo;12345&rdquo;)
+   return valuableTreasure;
+return null;
+```</p>
+
+<p>To make things more familiar, in Version 2 you could imagine multiple <code>return null</code> lines hidden in
+various control structures in an endless method and you surely get an idea
+how people feel when they try to reason about an object being <em>null</em>
+or not.
+Anyway, spotting an <code>else return null</code> I always get a bad gut feeling
+saying that things are not what they are supposed to be. I&rsquo;m aware
+that this obviously touches upon the question if you should avoid
+<em>null</em> values altogether. Anyway, I can&rsquo;t help my bad gut feeling
+whenever I see it ;)</p>
+
+<p>The funny thing is that I recently wrote similar code myself; that
+alone would not be a surprise yet, but I actually wrote it in
+Haskell which does not have that notion of <em>null</em> values and the
+corresponding Nullpointer exception. In Haskell, there is the <a href="https://www.haskell.org/haskellwiki/Maybe" target="_blank">Maybe monad</a> which facilitates chaining &ldquo;partial&rdquo; computations together without
+the risk of a Nullpointer exception. Here is the snippet of that code
+(obviously, only the <code>else Nothing</code> is &lsquo;important&rsquo;).</p>
+
+<p><code>haskell
+newState =
+  if not shouldBeCompiled &amp;&amp; w' == view T.word W.immediate' then
+   (oldState ^. lastColonDefinition ) &gt;&gt;=
+   (\x -&gt; return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True))
+  else
+   Nothing
+</code></p>
+
+<p>Anyway, believe me, if you ever write such an <code>else Nothing</code> in Haskell, that should
+be the trigger &ndash; take a deep breath, take a coffee and think about your
+problem again. At the least, you are overcomplicating things as using
+the <em>Monad</em> or <em>MonadPlus</em> nature of <em>Maybe</em> would make life easier
+but probably it&rsquo;s an indication that your thoughts are about to go
+astray and you get lost in old <code>else return null</code> habits or worse &ndash; so better
+stop it and take a break!</p>
+
+<p>How would the <em>MonadPlus</em> and <em>Monad</em> instances make life better? Look
+at the below version. In any case, it&rsquo;s functionally equivalent, so
+how would it be &lsquo;better&rsquo;? In my opinion, it conveys much
+more the impression that the programmer actually knows what they are doing.</p>
+
+<p>``` haskell
+newState = do
+  guard $ not shouldBeCompiled &amp;&amp; w' == (view T.word W.immediate')</p>
+
+<p>  x &lt;&ndash; oldState ^. lastColonDefinition
+  return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True)
+```</p>
+
+<p>Essentially, the <code>guard</code> function does the trick. <code>guard</code>, which has the type
+<em>guard :: MonadPlus m => Bool &ndash;> m ()</em>, makes the containing <em>do</em>
+block evaluate to <code>Nothing</code> if the <code>Bool</code> argument evaluates to
+<code>False</code>. In that sense, the <code>guard</code> expression actually looks like an
+assertion! The whole <em>MonadPlus</em> magic can be further explored <a href="http://en.wikibooks.org/wiki/Haskell/MonadPlus" target="_blank">here</a>.</p>
+
+<p>In my case, I finally ended up removing those lines altogether. As suspected, the
+good old <code>else Nothing</code> was the symptom that I had lost track of
+what I was coding at all &ndash; completely lost in nothingness &ndash; and I really needed a
+break.</p>
+
+<p>So what is your typical &lsquo;silly code&rsquo; that you typically start writing when
+you should rather take a break?</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using XMonad with a projector]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/11/07/Using-XMonad-with-a-projector/"/>
+    <updated>2014-11-07T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/11/07/Using-XMonad-with-a-projector</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been using XMonad for a few years now (lately in combination with
+GNOME) but just recently I have found a way to make it work in a useful way
+in the context of a presentation with a projector as a second screen.</p>
+
+<p>In general, XMonad does have decent multi-screen support. Building on
+Xinerama, the default configuration provides key-binding support for
+three screens; how workspaces are mapped to the screens and how this
+mapping can change, respectively, can be pretty confusing at first, though &ndash;
+it is best explained in <a href="http://www.reddit.com/r/xmonad/comments/ndww5/dual_screens_multi_monitors_tips_and_tricks/c38dsfx" target="_blank">here</a>. Whenever I want to use a projector
+things get pretty tricky, however.</p>
+
+<!-- more -->
+
+
+<p>The thing is: Using a projector as a second screen, I want to have
+exactly the same workspace (accordingly the same windows, same layout,
+obviously) on both screens. Apparently, I could do that by &lsquo;mirroring&rsquo;
+the screens and thus circumventing XMonad multi-screen support. I&rsquo;m
+not too happy with it, though, as, for some reason, I can&rsquo;t get <em>xrandr</em>
+make show a reasonable resolution on both screens in that scenario &ndash;
+part of what is shown on own screen is hidden on the other. Disabling
+mirroring, however, it is <strong>impossible</strong> for XMonad to show exactly the
+same on both screens &ndash; obviously, this is a restriction imposed by
+Xinerama as it manages all workspaces across screens as <em>one</em>
+large workspace under the hood.</p>
+
+<p>The cure for that disease is the trick I found in another reddit
+thread:
+<a href="http://www.reddit.com/r/xmonad/comments/2ha25r/same_workspaces_on_multiple_monitors_without/ckrobfj" target="_blank">same workspaces on multiple monitors</a>.
+So let&rsquo;s assume the following setup: Workspace 1 is shown on your
+projector screen, Workspace 2 is shown on your internal screen. You
+start a VNC server on workspace 1 on localhost:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>x11vnc -usepw -clip xinerama0 -noxdamage -geometry 1920x1080</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>(You might need to replace &lsquo;xinerama0&rsquo; by &lsquo;xinerama1&rsquo;. &lsquo;1920x1080&rsquo;
+conforms to the resolution of my internal screen. &lsquo;-noxdamage&rsquo; is
+optional but seems to be recommended.)</p>
+
+<p>On Workspace 2 you start a VNC client:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>vncviewer ViewOnly=1 UseLocalCursor=0 localhost:0</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>(Again you might need to replace &lsquo;localhost:0&rsquo; by &lsquo;localhost:1&rsquo;.)</p>
+
+<p>Well, now you get to see your projected presentation on your internal screen,
+too, showing the X display of your VNC server screen! Move to Workspace 1 and start your presentation (or your live
+coding, for example) while you actually watch your presentation on your internal screen on Workspace
+2! As a bonus, during your presentation you could easily do things
+which are not intended to be shown by the projector and/or move
+windows from an internal workspace to Workspace 1 when they need to be shown.</p>
+
+<p>Starting the vncviewer with the &lsquo;ViewOnly&rsquo; option makes it necessary
+that you actually make your live in-presentation changes on Workspace
+1, as I said (while watching your own changes on Workspace 2 on your
+internal screen). That&rsquo;s my recommendation anyway, in my experience the viewer setup thus works more
+stable and some keyboard inputs wouldn&rsquo;t be translated correctly from
+the viewer to the server using a non-ViewOnly mode.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The notoriously point-free "((x.).)" trick]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions/"/>
+    <updated>2014-08-14T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/08/14/Composing-two-argument-functions</id>
+    <content type="html"><![CDATA[<p><a href="http://www.haskell.org/haskellwiki/Pointfree" target="_blank">Point-free</a> code is ubiquitous in every well-polished Hackage library.
+It&rsquo;s more concise than its pointed counterparts and feels more
+&ldquo;hygienic&rdquo; as function composition immediately translates to its
+mathematical background.</p>
+
+<p><code>haskell
+let pointFree = (+1) . read
+let notPointFree x = (+1) (read x)
+-- notPointFree 'mentions' its argument "x"
+</code></p>
+
+<p>So far, so good. However, you get a problem in your chain of function
+composition when your right-most function &ldquo;takes two parameters&rdquo;.</p>
+
+<p>``` haskell
+let plusOne = (+1) :: Int &ndash;> Int
+let readTwoArgs = (\x y &ndash;> read x + read y) :: String &ndash;> String &ndash;> Int</p>
+
+<p>let coolSolution = plusOne . readTwoArgs :: String &ndash;> String &ndash;> Int
+&mdash; Type checker doesn&rsquo;t like coolSolution</p>
+
+<p>let boringSolution x y = plusOne (readTwoArgs x y)
+&mdash; it&rsquo;s boring since it&rsquo;s not point-free
+```</p>
+
+<p>Unfortunately, <code>coolSolution</code> is not well-typed; this might drive you
+nuts for some time: It&rsquo;s obvious that composing those functions must
+somehow work. You&rsquo;d think: &ldquo;Even GHCI must have understood what I
+mean!&rdquo; However, Haskell doesn&rsquo;t care for what you mean as much as it
+cares for type-safety ;) ! So you might fall back on <code>boringSolution</code>
+which is only half the fun as it&rsquo;s not point-free&#x2026; anyway, there IS
+a way to compose those functions!</p>
+
+<!-- more -->
+
+
+<p>In the following I will use
+<a href="http://www.haskell.org/haskellwiki/GHC/TypedHoles" target="_blank">Typed holes</a>. They are a nice tool to look into the type checker&rsquo;s
+&ldquo;thoughts&rdquo;.
+Well, first have a look at why <code>coolSolution</code> did not type-check at all.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>Couldn't match type ‘Int’ with ‘String -&gt; Int’
+</span><span class='line'>Expected type: Int -&gt; String -&gt; Int
+</span><span class='line'>  Actual type: Int -&gt; Int
+</span><span class='line'>In the first argument of ‘(.)’, namely ‘plusOne’
+</span><span class='line'>In the expression: plusOne . readTwoArgs :: String -&gt; String -&gt; Int
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Essentially, this tells us that <code>plusOne</code> does not have the right type
+to be used together with <code>(. readTwoArgs)</code>. Now let&rsquo;s ask this
+question to the type checker: What do I need to apply to <code>plusOne</code> so
+that you are happy?</p>
+
+<p><code>haskell
+((_ plusOne) . readTwoArgs) "3" "2" :: Int
+</code></p>
+
+<p>The answer we get is:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>Found hole ‘_’
+</span><span class='line'>  with type: (Int -&gt; Int) -&gt; (String -&gt; Int) -&gt; [Char] -&gt; Int
+</span><span class='line'>Relevant bindings include it :: Int (bound at &lt;interactive&gt;:88:1)
+</span><span class='line'>In the expression: _
+</span><span class='line'>In the first argument of ‘(.)’, namely ‘(_ plusOne)’
+</span><span class='line'>In the expression: (_ plusOne) . readTwoArgs
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Okay, this help us. Our &ldquo;hole function&rdquo;&rsquo;s type is <code>(Int -&gt; Int) -&gt;
+(String -&gt; Int) -&gt; [Char] -&gt; Int</code>. Now we just write that
+function &ndash; actually, the type signature and our knowledge of what
+should be the result of the whole expression give rise to that <em>unique</em> <code>holeFunction</code>:</p>
+
+<p><code>haskell
+let holeFunction plusOne' stringToInt string = plusOne' (stringToInt string)
+let holeFunction plusOne' stringToInt string = plusOne' . stringToInt $ string
+let holeFunction plusOne' stringToInt = plusOne' . stringToInt
+let holeFunction plusOne' stringToInt = (.) plusOne' stringToInt
+let holeFunction plusOne' = (.) plusOne'
+let holeFunction = (.)
+</code></p>
+
+<p>By (re)writing it in a point-free style and by applying eta-reductions we
+get a very simple definition. It turns out that our <code>holeFunction</code> is
+just ordinary function composition^^. Anyway, let&rsquo;s have a look if that works.</p>
+
+<p><code>haskell
+let coolSolution = ((.) plusOne). readTwoArgs
+let coolSolution = (plusOne .). readTwoArgs
+-- (coolSolution "3" "4") == 8
+</code></p>
+
+<p>Yes, it does! That &ldquo;.).&rdquo; looks funny and will surely confuse everybody
+whose doesn&rsquo;t know that &ldquo;trick&rdquo; (and does not have a type-checker in
+their brain). However, it gets even funnier. When your right-most
+function expects even more arguments you just add &lsquo;a couple of&rsquo; &ldquo;.)"s
+in between!</p>
+
+<p><code>haskell
+let wasteFourArgs = (\a b c d -&gt; read a + read b) :: String -&gt; String -&gt; String -&gt; String -&gt; Int
+let coolSolution' = (((plusOne .) .) .). wasteFourArgs
+</code></p>
+
+<h2>Conclusion</h2>
+
+<p>Thus, we have found a way to use the (point-free) function
+composition even when you need to feed more than a single argument
+into it!</p>
+
+<p>As point-free code is more concise it can be clearer about what you
+want to do, however, it can obfuscate your intentions as well! (Look
+at those <a href="http://www.haskell.org/haskellwiki/Pointfree#Combinator_discoveries" target="_blank">combinators</a>). In the
+case of this <em>((x.).)</em> trick, I think it can still be beneficial if
+and only if everybody in your team &ldquo;knows the trick&rdquo; and does not have
+to think about it. The nice reason is: As soon as you delete that &ldquo;.)&rdquo;
+chain mentally you immediately grasp the meaning of the resulting function!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Explaining the Magic]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/06/25/Explaining-the-Magic/"/>
+    <updated>2014-06-25T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/06/25/Explaining-the-Magic</id>
+    <content type="html"><![CDATA[<p>Yesterday I came across a <a href="http://www.reddit.com/r/haskell/comments/28zx87/whats_your_favorite_response_to_the_show_me_the/" target="_blank">post</a> on the haskell reddit where somebody
+posted the following application of <em>replicateM</em>:</p>
+
+<p><code>haskell
+:m +Control.Monad
+replicateM 3 "01"
+-- ["000","001","010","011","100","101","110","111"]
+</code></p>
+
+<h2>Dark Magic</h2>
+
+<p>It obviously results in all three-character combinations of zeros and
+ones and in general, <em>replicateM x &ldquo;01&rdquo;</em> generates all x-character
+combinations of zeros and ones accordingly.</p>
+
+<p><em>replicateM</em> is a standard library function and its haddock
+documentation says: &ldquo;<em>replicateM n act</em> performs the action n times,
+gathering the results&rdquo; and its type actually is <code>replicateM :: Monad m
+=&gt; Int -&gt; m a -&gt; m [a]</code>. So <em>replicateM</em> is <strong>not</strong> a function
+explicitly crafted for the purpose of a &ldquo;get me all x-ary combinations
+of my string&rdquo; task, it is actually defined for all monads. Just
+imagine a more obvious application using the IO monad, which <em>performs the action of
+printing hello 3 times and gathers the result</em>.</p>
+
+<p><code>haskell
+replicateM 3 (putStrLn "hello")
+-- hello
+-- hello
+-- hello
+-- [(),(),()]
+</code></p>
+
+<p>It is typical Haskell practice to use a function with such a <em>general</em> look
+to solve a rather <em>special</em> problem as our original one &ndash; to such a
+degree that it seems like <strong>magic</strong> to programmers with a different
+background. Actually, it might look like &ldquo;dark&rdquo; magic when you don&rsquo;t
+grasp how/why the hell that result comes about in spite of looking at
+the source of <em>replicateM</em>, and you might start getting annoyed with
+Haskell altogether if that happens several times&#x2026; anyway, there is no
+such thing as (dark) magic ;) so let&rsquo;s demystify that interesting example!</p>
+
+<!-- more -->
+
+
+<h2>Why it works</h2>
+
+<p>Before looking at the source &ndash; and getting to the operational side of
+<em>replicateM</em> &ndash; let&rsquo;s ask ourselves <em>why</em> we get that result.</p>
+
+<p>By taking the documentation into account we can paraphrase <em>replicateM 3 &ldquo;01&rdquo;</em> by saying:
+<em>It performs &ldquo;01&rdquo; 3 times and gathers the results</em>. But what sort of action is <code>&ldquo;01&rdquo;</code>.
+As a string is a list of characters, it&rsquo;s equal to <code>[&lsquo;0&rsquo;,&lsquo;1&rsquo;]</code> which denotes a &lsquo;non-deterministic&rsquo; character value.
+Imagine it as a two-faced character which doesn&rsquo;t know if it really is a &lsquo;0&rsquo; or a &lsquo;1&rsquo;! So what does <em>performing &ldquo;01&rdquo;</em> really mean?
+I picture it as creating two parallel universes where that value dissolves into &lsquo;0&rsquo; in the first and into &lsquo;1&rsquo; in the second universe.
+Performing another &ldquo;01&rdquo; branches those two universes again so that we get 4 universes. Doing that a third time, those 4
+universes branch again in choosing the third value of either &lsquo;0&rsquo; or &lsquo;1&rsquo;. As a result, we get 8 universes which really are 8 lists of characters.
+When you gather them you obviously get <em>[&ldquo;000&rdquo;,&ldquo;001&rdquo;,&ldquo;010&rdquo;,&ldquo;011&rdquo;,&ldquo;100&rdquo;,&ldquo;101&rdquo;,&ldquo;110&rdquo;,&ldquo;111&rdquo;]</em>! Confused? Maybe you like the &lsquo;How&rsquo; better!</p>
+
+<h2>How it works</h2>
+
+<p><a href="http://www.haskell.org/hoogle/" target="_blank">Hoogle</a> is my tool of choice to quickly get to base library haskell
+source. So <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/src/Control-Monad.html#replicateM" target="_blank">this</a> tells how <em>replicateM</em> is defined:</p>
+
+<p><code>haskell
+replicateM n x = sequence (replicate n x)
+:t replicateM
+-- replicateM :: Monad m =&gt; Int -&gt; m a -&gt; m [a]
+</code></p>
+
+<p>By hoogling for <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/src/GHC-List.html#replicate" target="_blank">replicate</a> and <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/src/Control-Monad.html#sequence" target="_blank">sequence</a> we get the whole picture:</p>
+
+<p>``` haskell</p>
+
+<p>sequence ms = let k m m' = do { x &lt;&ndash; m; xs &lt;&ndash; m'; return (x:xs) } in foldr k (return []) ms
+replicate n x           =  take n (repeat x)</p>
+
+<p>:t sequence     <br/>
+&mdash;sequence :: Monad m => [m a] &ndash;> m [a]
+:t replicate
+&mdash;replicate :: Int &ndash;> a &ndash;> [a]
+```</p>
+
+<p><em>replicate</em> surely is the easiest function to grasp: <code>replicate n x</code>
+results in a list with <em>n</em> elements of value <em>x</em>. For instance:</p>
+
+<p><code>haskell
+replicate 3 "01"
+--["01","01","01"]
+</code></p>
+
+<p>So we can actually get the following equations:</p>
+
+<p><code>haskell
+replicateM 3 "01" == sequence ["01","01","01"] ==
+["000","001","010","011","100","101","110","111"]
+</code></p>
+
+<p>So the magic somehow lies in the <em>sequence</em> method or rather in the
+List monad!</p>
+
+<h3>Sequence</h3>
+
+<p>As in our application <em>sequence</em> operates in the list monad you can
+picture it using a list comprehension if you are more familiar with it:</p>
+
+<p><code>haskell
+sequence ms = let k m m' = [x:xs | x &lt;- m, xs &lt;- m'] in foldr k (return []) ms
+-- m is a string, x is a character
+-- m' is a list of strings (= the accumulator), xs is a string
+:t sequence
+-- sequence :: [[a]] -&gt; [[a]]
+</code></p>
+
+<p>Let&rsquo;s have a closer look at the last call of <em>k</em> in <em>sequence</em>.</p>
+
+<p><code>haskell
+replicateM 3 "01"
+-- == k "01" ["00","01","10","11"] ==
+[x:xs | x &lt;- "01", xs &lt;- ["00","01","10","11"]]
+-- == ["000","001","010","011"] ++ ["100","101","110","111"]
+-- == ["000","001","010","011","100","101","110","111"]
+</code></p>
+
+<p>At first <em>x</em> is selected to be &lsquo;0&rsquo; and prepended to all strings of
+<em>xs</em>, the resulting list of strings is then concatenated with <em>x</em>
+being &lsquo;1&rsquo; prepended to all strings of <em>xs</em> again. As a result, we will
+always get a lexicographically correct ordering of all <em>n</em>-ary combinations of
+&ldquo;01&rdquo; no matter what <em>n</em> we choose in <strong>replicateM n [&lsquo;0&rsquo;,&lsquo;1&rsquo;]</strong>.</p>
+
+<p>We have seen how an innocent-looking function like <em>replicateM</em> can &ndash;
+when it is used with the List monad &ndash; produce a &ldquo;magical&rdquo; result, only to then discover that there is no magic involved ;)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Migrating a mutating algorithm from C to Haskell]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell/"/>
+    <updated>2014-03-11T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve recently stumbled on a C implementation of an algorithm computing
+the <em>combinations without repetition</em> (of a certain size <strong>k</strong>) of the first <strong>n</strong> natural
+numbers. So the wanted result is a list of combinations like for
+example <code>0 1 2 3 4</code> or <code>11 13 20 33 49</code> in the case of <code>k=5</code> and
+<code>n=50</code> (<em>without repetition</em> means that no number occurs twice in the
+same combination). As a matter of fact, I wanted to migrate that
+function to Haskell; so this post is about the evolution of the
+solution I came up with. I guess this case study is somehow kind of exemplary for
+the thought process which you need to undergo whenever you migrate a
+not-so-trivial algorithm from C to Haskell as it touches upon the
+topics of <em>laziness</em> and <em>mutation</em>.</p>
+
+<!-- more -->
+
+
+<h1>The C Version</h1>
+
+<p>So let&rsquo;s start with the C Version:</p>
+
+<p>``` c</p>
+
+<h1>include &lt;stdio.h></h1>
+
+<p>int idx = 0;
+/<em> puts all combinations into the array of its first argument </em>/
+void combinationsWithoutRepetition(int <em>combinations, int </em>feld,int bound,int length,int pos,int val){
+  if(pos==length) {</p>
+
+<pre><code>int i;
+for(i=0; i&lt;length; i++) {
+  combinations[idx++] = feld[i];
+}
+</code></pre>
+
+<p>  } else {</p>
+
+<pre><code>int* feldPos = &amp;feld[pos];
+int i;
+for(i=val;i&lt;bound;++i){ 
+  *feldPos=i; 
+  combinationsWithoutRepetition(combinations,feld,bound,length,pos+1,i+1); 
+}
+</code></pre>
+
+<p>  }
+}
+int main(int argc, char <em><em>argv) {
+  int n=50;
+  int k=5;
+  int nrOfCombinations = 2118760; // assume that&rsquo;s correct for n=50,k=5
+  int </em>combinations;
+  combinations = malloc(nrOfCombinations</em>k*sizeof(int));</p>
+
+<p>  int <em>singleCombination;
+  singleCombination = malloc(k</em>sizeof(int));</p>
+
+<p>  combinationsWithoutRepetition(combinations,singleCombination,n,k,0,0);
+  int i = 0;
+  for (i=0; i &lt; 50; i=i+5) {</p>
+
+<pre><code>printf("%d %d %d %d %d \n", combinations[i],combinations[i+1],combinations[i+2],combinations[i+3],combinations[i+4]);
+</code></pre>
+
+<p>  }
+}
+```</p>
+
+<p>So <code>combinationsWithoutRepetition</code> does all the work, however, memory
+needs to be allocated for the two pointers to int first. (Surely, in a
+real program <code>nrOfCombinations</code> would call a subroutine computing the
+necessary number of computations, I omitted it for brevity&rsquo;s sake.) In
+the end, the computed combinations can be accessed through the pointer
+<code>combinations</code>.</p>
+
+<p>Anyway, <code>combinationsWithoutRepetition</code> didn&rsquo;t look straightforward to
+me, I didn&rsquo;t really understand how it worked and above all, I couldn&rsquo;t
+see how I could tweak the algorithm so that I could do without the mutation
+of <code>combinations</code> and <code>idx</code> in the Haskell solution. Consequently, I decided to
+translate the C version more or less directly to Haskell, using the
+<code>ST</code> monad.</p>
+
+<p>The <code>ST</code> monad makes it possible to have references pointing to
+mutable memory in Haskell. This comes in handy when you want to solve
+a problem for which there is no efficient algorithm known doing
+without mutation. In our case it gives us the power to create a first
+running Haskell version without fully understanding the underlying
+algorithm of the C implementation. Bear in mind that you always need to run <code>runST</code> to
+get a value out of the <code>ST</code> monad like below.</p>
+
+<h2>The ST Version</h2>
+
+<p>``` haskell
+comb1 :: Int &ndash;> [Int] &ndash;> [[Int]]
+comb1 k elements = runST $ do
+  let bound = length elements</p>
+
+<pre><code>  boundMinus1 = bound-1
+  elementArray = listArray (0, bound-1) elements
+
+  comb1' :: STRef s [[Int]] -&gt; (Int, Int) -&gt; ST s ()
+  comb1' combos  (pos, val) = 
+    let comb1'' currentCombo (!pos, val)
+          | pos == k  = modifySTRef combos ((:) currentCombo)
+          | otherwise = forM_ [val..boundMinus1] $ \x -&gt; comb1'' (elementArray!x : currentCombo) (pos+1,x+1)
+    in
+     comb1'' [] (pos, val)
+</code></pre>
+
+<p>  combos &lt;&ndash; newSTRef []
+  comb1' combos (0,0)
+  readSTRef combos
+```</p>
+
+<p>This version already has two conceptual advantages: It can use an arbitrary list
+of <code>Int</code> s as its second parameter (actually it could even be polymorphic
+in the type of the list) and returns a list of lists which is
+semantically more correct than the C implementation which implicitly
+returned a long concatenation of the combination lists. Moreover, I
+didn&rsquo;t need any mutable equivalent of <code>idx</code>.</p>
+
+<p>Obviously, I wasn&rsquo;t too satisfied with this implementation, though.
+Above all, the lack of <em>laziness</em> proves to be really annoying &ndash; the
+whole list of combinations needs to be computed before you can access
+the first element of it! This is devastating as in every real word
+scenario of a decently large <code>n</code> and <code>k</code> the resulting list of
+combinations is unlikely to fit into your available memory. So comes
+the lazy <code>ST</code> monad to the rescue!</p>
+
+<h2>The Lazy ST Version</h2>
+
+<p>``` haskell
+comb2 :: Int &ndash;> [Int] &ndash;> [[Int]]
+comb2 k elements = L.runST $ do
+  let bound = length elements</p>
+
+<pre><code>  boundMinus1 = bound-1
+  elementArray = listArray (0, bound-1) elements
+
+  comb2' :: STRef s [[Int]] -&gt; (Int, Int) -&gt; L.ST s [[Int]]
+  comb2' combos  (pos, val) = 
+    let comb2'' currentCombo (!pos, val)
+          | pos == k  = do { L.strictToLazyST $ modifySTRef combos ((:) currentCombo); return [currentCombo] }
+          | otherwise = fmap concat $ forM [val..boundMinus1] $ \x -&gt; comb2'' (elementArray!x : currentCombo) (pos+1,x+1)
+    in
+     comb2'' [] (pos, val)
+</code></pre>
+
+<p>  combos &lt;&ndash; L.strictToLazyST $ newSTRef []
+  comb2' combos (0,0)
+```</p>
+
+<p>Anyway, that&rsquo;s the first lazy <code>ST</code> implementation I could come up with
+and luckily, it gave me the intuition how I could get completely rid of the <code>ST</code>
+monad. It is obvious that the <code>modifySTRef</code> calls are absolutely
+pointless as <code>fmap concat</code> just concatenates the <code>[currentCombo]</code>
+lists returned by the base cases of the recursion and <code>combos</code> is not
+even considered in the result of the computation. So let&rsquo;s see the
+version resulting from throwing the <code>ST</code> monad into the garbage can:</p>
+
+<h2>The No ST Version</h2>
+
+<p>``` haskell
+comb3 :: Int &ndash;> [Int] &ndash;> [[Int]]
+comb3 k elements =
+  let bound = length elements</p>
+
+<pre><code>  boundMinus1 = bound-1
+  elementArray = listArray (0, bound-1) elements
+  comb3'  (pos, val) = comb3'' [] (pos, val)
+    where
+    comb3'' currentCombo (!pos, val)
+      | pos == k  = [currentCombo]
+      | otherwise = concat [comb3'' (elementArray!x : currentCombo) (pos+1, x+1) | x &lt;- [val..boundMinus1]]
+  in
+</code></pre>
+
+<p>  comb3' (0,0)
+```</p>
+
+<p>That&rsquo;s much better but still a little obscure. In the end, I found a nice
+declarative solution at last:</p>
+
+<h2>The Declarative Version</h2>
+
+<p><code>haskell
+comb4 :: Int -&gt; [Int] -&gt; [[Int]]
+comb4 0 _      = [[]]
+comb4 n (x:xs) = map (x:) (comb4 (n-1) xs) ++ comb4 n xs
+comb4 _ _      = []
+</code></p>
+
+<p>It just reads as: &ldquo;In order to get all <em>k</em>-combinations of a <em>n</em>
+length list take the first element of the list, prepend it to all
+combinations of size <em>k-1</em> of the tail of the list and then add all
+those <em>k</em>-combations of the tail of the list!&rdquo; It finally makes sense
+when you think about it for a long time ;) In addition, that approach
+can be made a little bit more efficient for certain <em>n</em> and <em>k</em> using
+a very simple memoization strategy. (This simple strategy very quickly
+eats up your memory, though.)</p>
+
+<h2>The memoized Declarative Version</h2>
+
+<p>``` haskell
+&mdash; Version with very simple memoization (&ldquo;memo table&rdquo;)
+combTable = [[ comb5 n (drop elementNr numbers) | elementNr &lt;&ndash; zeroToLength] | n &lt;&ndash; zeroToLength]
+   where
+   zeroToLength = [0..length numbers]</p>
+
+<p>comb5 :: Int &ndash;> [Int] &ndash;> [[Int]]
+comb5 0 _      = [[]]
+comb5 k (x:xs) = map (x:) (combTable !! (k-1) !! newlength) ++ (combTable !! k !! newlength)</p>
+
+<pre><code>            where
+                newlength = n-length xs
+</code></pre>
+
+<p>comb5 _ _      = []
+```</p>
+
+<h1>Conclusion</h1>
+
+<p>Originally, I planned to examine each version&rsquo;s performance in detail,
+however, that soon felt too cumbersome to me. Anyway, the <em>lazy</em>
+versions do have a significant practical advantage as they do not need
+to compute all combinations in order to get the first 10 combinations!
+Judging from a few tests I have made, it also turns out that <code>comb3</code> (not using mutation) performs better
+than both versions using <code>ST</code> even when all combinations are
+requested so this seems to be a case where mutation does not buy you
+anything in Haskell. If things look differently on your machine, feel
+free to tell me ;)</p>
+
+<p>You can find all solution versions <a href="http://sleepomeno.github.io/combinations/haskell-all.hs" target="_blank">here</a>, ready for GHCi. Anyway, feel
+free to post other solutions to the problem which may score better in
+terms of laziness/time performance/space performance/etc.</p>
+]]></content>
+  </entry>
+  
+</feed>

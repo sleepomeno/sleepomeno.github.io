@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: programming | while true live]]></title>
+  <link href="http://sleepomeno.github.io/blog/categories/programming/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2015-11-10T21:43:27+01:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Gregor Riegler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Toying with Racket]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket/"/>
+    <updated>2015-09-13T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket</id>
+    <content type="html"><![CDATA[<p>2 hours to go&#x2026; I&rsquo;ve been waiting for the men&rsquo;s tennis US Open final
+to start. What should I do? In the end, I&rsquo;ve been killing time listening to <a href="http://www.functionalgeekery.com/episode-24-matthew-flatt/" target="_blank">that</a> Functional Geekery podcast episode
+which features Matthew Flatt talking about the <a href="http://racket-lang.org/" target="_blank">Racket</a> programming
+language. Realizing the irony, my thoughts went something like: &ldquo;Racket, tennis?! Can&rsquo;t be a coincidence! Still
+some time to burn, so I will programm something tennis-like in
+Racket!&rdquo; So let&rsquo;s open the Racket <a href="http://docs.racket-lang.org/quick/" target="_blank">quickstart</a> to somehow learn Racket
+and get an idea what the tennis-like thing should be.</p>
+
+<!-- more -->
+
+
+<p><img class="left" src="/images/court.png" width="200"></p>
+
+<p>The idea came instantly when I saw that Racket offers quite
+newbie-friendly picture drawing examples in its tutorial. Now, it&rsquo;s
+obvious what I would do, isn&rsquo;t it? Exactly, I would draw a tennis
+court! So I <a href="http://download.racket-lang.org/" target="_blank">downloaded</a> Racket and found the executable
+for the Racket IDE DrRacket in the <strong>bin</strong> folder of the resulting
+directory. Given the examples of the <a href="http://docs.racket-lang.org/quick/" target="_blank">quickstart</a> tutorial I could come
+up with that code which got the job done. And it even has (kind of) the blue
+color of the US Open hard court ;)</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(let* ([color &ldquo;blue&rdquo;]&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>  [blue (lambda (pict) (colorize pict color))]
+</span><span class='line'>  [double (blue (filled-rectangle 203 30))]
+</span><span class='line'>  [base (blue (filled-rectangle 90 133))]
+</span><span class='line'>  [margin 3]
+</span><span class='line'>  [doubles (hc-append margin double double)]
+</span><span class='line'>  [service (blue (filled-rectangle 110 65))]
+</span><span class='line'>  [services (vc-append margin service service)]
+</span><span class='line'>  [middle1 (hc-append margin base services)]
+</span><span class='line'>  [middle2 (hc-append margin services base)]
+</span><span class='line'>  [middles (hc-append margin middle1 middle2)])
+</span><span class='line'>(frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The code can also be found in that <a href="https://gist.github.com/sleepomeno/f8f0af59b19324166619" target="_blank">gist</a>.</p>
+
+<p>Anyway, now the final is about to start, so only a few impressions of
+using Racket for the first time: DrRacket proved easy to use and the
+<a href="http://docs.racket-lang.org/pict/Basic_Pict_Constructors.html" target="_blank">documentation</a> made it easy to find the right functions for drawing. It
+was quite pleasant to see that I could get things done in Racket even
+under severe time pressure ;)</p>
+
+<p>Go, Federer!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Historical Elo Tennis Rating]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/09/08/Historical-ELO-Tennis-Rating/"/>
+    <updated>2015-09-08T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/09/08/Historical-ELO-Tennis-Rating</id>
+    <content type="html"><![CDATA[<p>Recently I&rsquo;ve come across <a href="http://fivethirtyeight.com/features/serena-williams-and-the-difference-between-all-time-great-and-greatest-of-all-time/" target="_blank">that fivethirtyeight article</a> comparing the
+female tennis all-time greats by means of an  <a href="https://en.wikipedia.org/wiki/Elo_rating_system" target="_blank">Elo rating variant</a> (originally known from chess). It concludes that Serena Williams does
+<strong>not</strong> have the highest rating in history, although she is frequently
+considered as the greatest player of all time nowadays. Obviously, I
+wondered what&rsquo;s the situation like in the men&rsquo;s tennis world. Have
+Roger Federer&rsquo;s record 17 Grand Slam wins led to the highest Elo
+rating as well? What about players like Borg and McEnroe? Anyway, I
+have found surprising results.</p>
+
+<!-- more -->
+
+
+<h2>Technical approach</h2>
+
+<p><a href="https://github.com/JeffSackmann/tennis_atp" target="_blank">This</a> is where I got the match data on ATP matches from 1968
+onwards providing the source of the Elo evaluation in yearly CSV
+files. I have adopted the mathematical details of the computation from
+<a href="https://en.wikipedia.org/wiki/Elo_rating_system#Mathematical_details" target="_blank">the Elo rating Wikipedia page</a>, while I took the recommendation for the
+computation of the <strong>K-factor</strong> from <a href="http://fivethirtyeight.com/features/serena-williams-and-the-difference-between-all-time-great-and-greatest-of-all-time/#fn-3" target="_blank">fivethirtyeight</a>. In addition, I
+valued Grand Slam tournament matches higher than other matches
+(because of the longer and more challenging best-of-5-sets distance) by
+increasing the rating changes resulting from those matches by 10%.
+Anyway, I wrote an R script which can be found <a href="https://github.com/sleepomeno/tennis_atp/blob/master/examples/elo.R" target="_blank">here</a>.</p>
+
+<h2>The top 10 highest tennis Elo ratings</h2>
+
+<p>Obviously, the main question is: Who has acquired the highest Elo
+rating? The answer is: <span class="underline">Novak Djokovic</span> in May 2015! That&rsquo;s the top 10:</p>
+
+<table class="stat"><thead><tr><th>Rank</th><th>Rating</th><th>Player</th></tr></thead><tbody> <tr><td>1</td><td>2335</td><td>Novak Djokovic</td></tr> <tr><td>2</td><td>2310</td><td>Bjorn Borg</td></tr> <tr><td>3</td><td>2304</td><td>John McEnroe</td></tr> <tr><td>4</td><td>2274</td><td>Rafael Nadal</td></tr> <tr><td>5</td><td>2254</td><td>Roger Federer</td></tr> <tr><td>6</td><td>2253</td><td>Ivan Lendl</td></tr> <tr><td>7</td><td>2191</td><td>Jimmy Connors</td></tr> <tr><td>8</td><td>2168</td><td>Boris Becker</td></tr> <tr><td>9</td><td>2159</td><td>Andy Murray</td></tr> <tr><td>10</td><td>2132</td><td>Pete Sampras</td></tr></tbody></table>
+
+
+<p>Interesting to see that Borg, McEnroe and Lendl (dominating the 1980s) rank in between the likes of
+Djokovic, Nadal and Federer who have dominated the last decade.</p>
+
+<p>Anyway, you might be surprised to see 14-time Grand Slam winner Pete
+Sampras only in 10th place. In my opinion, his case demonstrates a <strong>practical</strong>
+requirement to get to the top of the above list &ndash; or rather
+a lack thereof: High-ranked opponents.</p>
+
+<div style="clear:both">&nbsp;</div>
+
+
+<h2>Everything is relative &ndash; being the best, too!?</h2>
+
+<p>No matter how good a professional tennis player you are, you will lose
+sooner or later &ldquo;because you are human&rdquo; (this is obviously
+controversial and Elo does not account for this). When the defeat happens it is
+better to lose against higher Elo-rated opponents since you then lose
+less points. To put it bluntly: When you have an hypothetical Elo advantage of 1000
+points with regard to the next-best player at the start of the season and you win
+99 of 100 matches, you will most likely have a worse rating in the end
+of that wonderful season due to that one devastating loss!
+Consequently, it could be said that Sampras might have lacked high-valued contemporaries to
+make an even deeper run. In contrast, Djokovic has benefited from the
+high ratings of Nadal and Federer to get to the very top. (Apart from
+that, <a href="https://en.wikipedia.org/wiki/Elo_rating_system#Ratings_inflation_and_deflation" target="_blank">Elo inflation</a> might be a reason for higher ratings nowadays, too.) Similarly,
+Borg, McEnroe and Lendl have benefited from the strong competition in
+boosting their respective peaks. That&rsquo;s why I have looked for a way to
+abstract the performance from absolute ratings: I have compared the
+margins that the above best players could amass in comparison to the
+next-best player at their ratings' peaks. Thus, it can be analyzed by
+what margin a player has been able to set oneself apart from the
+competition, which I consider as an indicator as significant as the
+maximal Elo rating.</p>
+
+<table class="stat"><thead><tr><th>Gap</th><th>Player</th></tr></thead><tbody> <tr><td>225</td><td>Roger Federer</td></tr> <tr><td>194</td><td>Ivan Lendl</td></tr> <tr><td>181</td><td>Bjorn Borg</td></tr> <tr><td>172</td><td>Novak Djokovic</td></tr> <tr><td>154</td><td>Pete Sampras</td></tr> <tr><td>148</td><td>John McEnroe</td></tr> <tr><td>61</td><td>Rafael Nadal</td></tr> </tbody></table>
+
+
+<p>In February 2007 Federer reached his rating peak and the next-best
+player at that time, Rafael Nadal, trailed 225 Elo points. That event
+has marked the biggest gap of the Elo rating&rsquo;s leader and the rest
+of the world; a difference of 225 Elo points means a winning chance of
+78% for the higher-ranked player. Well, two months later Federer lost to Nadal in the 2007 French
+Open final, nevertheless.</p>
+
+<div style="clear:both">&nbsp;</div>
+
+
+<h2>Conclusion</h2>
+
+<p>No matter whether you &lsquo;prefer&rsquo; the first or the second table &ndash; both
+tables shows the current top players count among the best of all
+times, however, they don&rsquo;t really outperform the likes of Borg,
+McEnroe and Lendl! The R source code for my analysis can be found <a href="https://github.com/sleepomeno/tennis_atp/blob/master/examples/elo.R" target="_blank">here</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Approximating PI with PureScript]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/03/14/Approximating-PI-with-PureScript/"/>
+    <updated>2015-03-14T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/03/14/Approximating-PI-with-PureScript</id>
+    <content type="html"><![CDATA[<p>Oh, it is Pi day! To be honest, I had not known about it until today
+but it somehow made it into my Twitter stream. Well, after some relaxed Saturday morning browsing I stumbled across the <a href="http://demonstrations.wolfram.com/ApproximatingPiWithInscribedPolygons/" target="_blank">Wolfram Pi approximation demonstration</a>. It looks like this:</p>
+
+<script type='text/javascript' src='http://demonstrations.wolfram.com/javascript/embed.js' ></script>
+
+
+<script type='text/javascript'>var demoObj = new DEMOEMBED(); demoObj.run('ApproximatingPiWithInscribedPolygons', '', '389', '613');</script>
+
+
+<div id='DEMO_ApproximatingPiWithInscribedPolygons'><a class='demonstrationHyperlink' href='http://demonstrations.wolfram.com/ApproximatingPiWithInscribedPolygons/' target='_blank'>Approximating Pi with Inscribed Polygons</a> from the <a class='demonstrationHyperlink' href='http://demonstrations.wolfram.com/' target='_blank'>Wolfram Demonstrations Project</a> by Rob Morris</div>
+
+
+<br />
+
+
+<p>Pi is approximated by computing the area of the inscribed
+polygon and by dividing that area by the square of the circle radius &ndash;
+after all, the area of a circle is <strong>r²π</strong>. Obviously, that idea is
+that beautiful and so simple that Pi has thus been approximated thousands of
+years ago (of course, there are many better and faster ways!), so
+I decided to implement it myself.</p>
+
+<!-- more -->
+
+
+<h2>PureScript</h2>
+
+<p>Some days ago I stumbled across <strong>PureScript</strong> which compiles to
+JavaScript. It is heavily influenced by Haskell and shares its quality
+of static typing. However, it has been designed to target JavaScript
+from the getgo such that it incorporates the strict evaluation
+semantics of JavaScript. In addition, it provides a syntax similar to
+native JavaScript for accessing object properties. Given some Haskell knowledge,
+PureScript seems to be a decent alternative to Fay or Haste for
+creating Javascript code! So I thought I would give
+it a try and implement something similar to the above Wolfram
+demonstration! So this is the result I accomplished after one day&rsquo;s
+work on a <a href="http://sleepomeno.github.io/pi/html/index.html" target="_blank">PureScript clone</a>:</p>
+
+<iframe src="http://sleepomeno.github.io/pi/html/index.html" width="500" height="720" style="margin:auto;display:block"></iframe>
+
+
+<h3>PureScript learning resources</h3>
+
+<p>First of all these are the best resources on PureScript development that I found:</p>
+
+<ul><li>
+
+<a href="https://gist.github.com/paf31/8e9177b20ee920480fbc" target="_blank">24 days of PureScript</a>
+
+</li><li>
+
+<a href="https://leanpub.com/purescript" target="_blank">PureScript by Example</a> - very detailed but excellent!
+
+</li><li>
+
+<a href="https://github.com/purescript/purescript/wiki" target="_blank">PureScript Wiki</a> 
+
+</li></ul>
+
+
+<p><a href="https://gist.github.com/paf31/8e9177b20ee920480fbc" target="_blank">24 days of PureScript</a> gives a very good overview of the PureScript
+library landscape. Above all, running code for every introduced
+library is given which is crucial to getting quickly started. In
+addition, there is a project called <a href="http://pursuit.purescript.org/" target="_blank">Pursuit</a> which provides a search
+engine for functions of PureScript packages. It is still far from
+being as useful as Hoogle or Hayoo for Haskell development, though.</p>
+
+<h2>PureScript libraries and building process</h2>
+
+<p>PureScript libraries are managed by <strong>bower</strong> which has worked
+surprisingly well for me. However, at the beginning I had problems getting the interpreter <code>psci</code> running with
+all dependencies as I&rsquo;m not used to <strong>grunt</strong> (and <strong>npm</strong>) which are
+typically needed in the whole building process. Anyway, when I decided
+to use certain PureScript libraries for my implementation their
+integration worked like a charm!</p>
+
+<h2>HTML5 Canvas bindings</h2>
+
+<p>PureScript has very decent wrappers of the HTML5 Canvas API in form
+of <code>purescript-canvas</code> and <code>purescript-free-canvas</code>. Obviously, I made
+heavy use of those to get the circle and the polygon drawn.</p>
+
+<p><code>haskell
+center = { x : 210, y : 210 }
+drawCircle = do
+  arc { x: center.x, y: center.y, r: radius, start: 0, end: Math.pi * 2 }
+  setFillStyle "#000000"
+  fill
+</code></p>
+
+<p>As an argument to <code>arc</code> we actually have an example of the <em>Object</em>
+syntax of PureScript which is just like native JavaScript.</p>
+
+<h2>Angular, React or something else?</h2>
+
+<p>PureScript does have bindings to AngularJS and React (find PureScript
+libraries by <a href="http://bower.io/search/?q=purescript" target="_blank">searching bower</a>), however, they are both still
+experimental and alpha. So I somehow didn&rsquo;t want to commit to something
+half-working which could be very hard to understand for a PureScript
+newbie like me. Anyway, I decided that the JQuery binding of
+<code>purescript-jquery</code> should be enough for my Pi approximation application; in the end, I
+also used <code>purescript-rx</code> (also mentioned on <a href="https://gist.github.com/paf31/8e9177b20ee920480fbc" target="_blank">24 days of PureScript)</a>
+but I only scratched the surface of reactive PureScript UI modelling.</p>
+
+<h2>What about the slider?</h2>
+
+<p>I definitely wanted a fancy slider for setting the number of vertices
+of the polygon like in the Wolfram demo &ndash; without
+too much ado, I immediately decided on using the vanilla <a href="http://jqueryui.com/slider/" target="_blank">JQuery-UI
+slider</a>. Copy-Paste. That however means that my PureScript has to
+somehow interact with the native slider JavaScript.</p>
+
+<h2>The main function</h2>
+
+<p>The first few lines are about getting representations of the HTML
+elements with <code>purescript-jquery</code>. Then I define event handlers for
+changing the number of vertices and for toggling the checkbox to
+show/hide the triangles. <code>onAsObservable</code> actually is from the
+<code>purescript-rx</code> binding to the reactive <a href="https://github.com/Reactive-Extensions/RxJS" target="_blank">RxJS</a> libraries which could be
+used to define complex event handling.</p>
+
+<p>``` haskell
+main = do
+  canvas &lt;&ndash; getCanvasElementById &ldquo;canvas&rdquo;
+  context &lt;&ndash; getContext2D canvas
+  verticesInput &lt;&ndash; select &ldquo;#vertices&rdquo;
+  polygonArea &lt;&ndash; select &ldquo;#polygonArea&rdquo;
+  pi &lt;&ndash; select &ldquo;#pi&rdquo;
+  triangles &lt;&ndash; select &ldquo;#triangles&rdquo;</p>
+
+<p>  let updateUI num showTriangles = do</p>
+
+<pre><code>  { pArea : polygonAreaPercent, pi : piApprox } &lt;- showPolygon canvas context num showTriangles
+  setText (show polygonAreaPercent &lt;&gt; "%") polygonArea
+  setText (show piApprox) pi
+</code></pre>
+
+<p>  let updateUI' = do</p>
+
+<pre><code>    showTriangles &lt;- ((== "true") &lt;&lt;&lt; stringify) &lt;$&gt; getProp "checked" triangles
+    num &lt;- (stringify &gt;&gt;&gt; readInt 10) &lt;$&gt; getValue verticesInput
+    updateUI num showTriangles
+</code></pre>
+
+<p>  trianglesChange &lt;&ndash; &ldquo;click&rdquo; <code>onAsObservable</code> triangles
+  trianglesChange <code>subscribe</code> _ &ndash;> void updateUI'</p>
+
+<p>  verticesChange &lt;&ndash; &ldquo;focus&rdquo; <code>onAsObservable</code> verticesInput
+  verticesChange <code>subscribe</code> _ &ndash;> void updateUI'</p>
+
+<p>  updateUI defaultVertices defaultShowTriangles
+```</p>
+
+<h2>The Foreign Function Interface</h2>
+
+<p>In the above code I accessed the current value of the checkbox and the
+slider value with the <code>purescript-jquery</code> functions <code>getValue</code> and
+<code>getProp</code>. However, it was surprisingly difficult to use those values
+as they were not of type <code>String</code> but <code>Foreign</code> and I got those
+dragged into the field of the Foreign Function Interface for
+communicating with JavaScript code. Anyway, after some digging in I
+ended up writing the function <code>stringify</code> which trivially transforms the
+incoming Javascript value to a <code>String</code>.</p>
+
+<p><code>haskell
+foreign import stringify
+  "function stringify(x) {\
+  \  return x+\"\";\
+  \}" :: Foreign -&gt; String
+</code></p>
+
+<p>That&rsquo;s an example of how you can integrate JavaScript functions in
+PureScript. It is a little bit of a joke as of now sice you need to add all
+those backslashes, however, things might get easier in case PureScript
+gets a meta programming facility like <strong>TemplateHaskell</strong> in the Haskell
+world in the future.</p>
+
+<h2>Conclusion</h2>
+
+<p>All in all, PureScript really makes a nice impression. There is already
+a surprising number of libraries available; decent, mature bindings to
+Angular or React would be crucial for getting easy web development
+adoption, though. Meta programming integration of JavaScript code would
+also prove very nice as would be Source Map support&#x2026; anyway, I&rsquo;m
+looking forward to using it again and might get into improving it myself.</p>
+
+<p>PS: You find the code for the PureScript application on <a href="https://github.com/sleepomeno/InscribePolygons" target="_blank">my GitHub</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Partial matching in R]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/02/20/Partial-matching-in-R/"/>
+    <updated>2015-02-20T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/02/20/Partial-matching-in-R</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve not been too exposed to statistics programming in the last few
+year, however, sometimes it couldn&rsquo;t be avoided &ndash; and R couldn&rsquo;t be
+avoided! (I still have too much self-esteem to think about
+falling back to Excel, even for the simplest things.)</p>
+
+<p>I don&rsquo;t hate R and I don&rsquo;t like R; it just strikes me as very
+<strong>strange</strong>. Often, the syntax strikes me as odd and above all, the
+multitude of ways to express the same thing reminds of my little Perl
+experience. Anyway, I have subscribed to the Coursera R course for fun
+and in hope to somehow &ldquo;get the better of R&rdquo;, to grok in on a deep
+level or to at least get a more profound idea as to why I don&rsquo;t like it ;)</p>
+
+<p>Anyway, here is a language construct which is very <strong>strange</strong> and a
+little bit absurd, no whatever how often I think about it. It&rsquo;s called
+<span class="underline">partial matching</span>. To put it bluntly, partial matching makes it
+possible to avoid spelling out the whole name of an element of a list
+in oder to access it. Let&rsquo;s have a look.</p>
+
+<!-- more -->
+
+
+<p><code>r
+x &lt;- list(a_is_the_first_letter = 1 : 5)
+</code></p>
+
+<p>Now let&rsquo;s access <code>a_is_the_first_letter</code>! That&rsquo;s the normal way:</p>
+
+<p>``` r
+x$a_is_the_first_letter</p>
+
+<h1>1 2 3 4 5</h1>
+
+<p>```</p>
+
+<p>However, you could make your life a lot &ldquo;easier&rdquo;:</p>
+
+<p>``` r
+x$a</p>
+
+<h1>1 2 3 4 5</h1>
+
+<p>```</p>
+
+<p>Well, the crucial question is: what happens if the prefix of your
+partial matching is not unique?</p>
+
+<p>``` r
+x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
+
+<pre><code>      a_is_my_first_letter_too = 6 : 10)
+</code></pre>
+
+<p>x$a</p>
+
+<h1>NULL</h1>
+
+<p>```</p>
+
+<p>The result is <code>NULL</code>!</p>
+
+<p>``` r
+x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
+
+<pre><code>      a_is_my_first_letter_too = 6 : 10)
+</code></pre>
+
+<p>x$a_is_m</p>
+
+<h1>6 7 8 9 10</h1>
+
+<p>```</p>
+
+<p>Here the prefix is unique again. Hooray!</p>
+
+<p>Funny, isn&rsquo;t it? I don&rsquo;t like it, though. Why? Because it&rsquo;s not &lsquo;obvious&rsquo;.
+You need to know that feature beforehand, otherwise the fact that an
+accidentally misspelled field is handled the same way as a non-unique
+field prefix (both returning <code>NULL</code>) is awkward, to say the least.
+It&rsquo;s nearly as though I said to the R interpreter: &lsquo;Give me field
+xy or any field that is somehow similar&#x2026; or just do what you fucking
+want (= return NULL)!&rsquo; Anyway, it introduces complexity and indeterminism into the code.</p>
+
+<p>There is another twist to partial matching. Of course, there is more
+than one way to access a field of a list. Making use of the double bracket
+syntax, that feature of partial matching is handled differently.</p>
+
+<p>``` r
+x &lt;&ndash; list(a_is_the_first_letter = 1 : 5)
+x[[&ldquo;a&rdquo;]]</p>
+
+<h1>NULL</h1>
+
+<p>```</p>
+
+<p>Using the double bracket field accessing method, partial matching is
+not the default. But R is perly so you still have a way to get that
+behavior in a different way:</p>
+
+<p>``` r
+x[[&ldquo;a&rdquo;, exact = FALSE]]</p>
+
+<h1>1 2 3 4 5</h1>
+
+<p>```</p>
+
+<p>At least I now have a better idea why I don&rsquo;t really like R. It
+introduces a sort of laisser-faire programming which I consider too
+&ldquo;inexact&rdquo;. I mean, would you really want something like the following to be the
+future of programming:</p>
+
+<p>``` java
+interface God {</p>
+
+<pre><code>void killMankind();
+void keepUpTheGoodWork();
+</code></pre>
+
+<p>}</p>
+
+<p>// &hellip;
+god.k() // What the hell happens? Who cares.
+```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[else return null]]></title>
+    <link href="http://sleepomeno.github.io/blog/2015/01/05/else-return-null/"/>
+    <updated>2015-01-05T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2015/01/05/else-return-null</id>
+    <content type="html"><![CDATA[<p>I guess everybody has a story or two in store about Nullpointer
+exceptions in Java (or in any language with nullable values). Sooner or later you will make the acquaintance of the dreaded stacktrace line
+denoting that you did something terribly wrong, demanding a value
+where none exists, and you just wonder <em>why, how the hell can that
+object be null?!</em> during an hour of painful debugging&#x2026; you know
+that? Good. Well, I won&rsquo;t ponder over how to avoid it, how to apply
+proper error handling etc. (that&rsquo;s way too complicated, I&rsquo;m tired) but I&rsquo;d just like to point out my personal
+favourite, the
+famous <code>else return null</code> idiom.</p>
+
+<!-- more -->
+
+
+<p>Anyway, the below snippet shows what I actually mean by that.</p>
+
+<p>``` java
+// Version 1
+if (password == &ldquo;12345&rdquo;)
+   return valuableTreasure;
+else
+   return null;</p>
+
+<p>// or, equivalently
+// Version 2
+if (password == &ldquo;12345&rdquo;)
+   return valuableTreasure;
+return null;
+```</p>
+
+<p>To make things more familiar, in Version 2 you could imagine multiple <code>return null</code> lines hidden in
+various control structures in an endless method and you surely get an idea
+how people feel when they try to reason about an object being <em>null</em>
+or not.
+Anyway, spotting an <code>else return null</code> I always get a bad gut feeling
+saying that things are not what they are supposed to be. I&rsquo;m aware
+that this obviously touches upon the question if you should avoid
+<em>null</em> values altogether. Anyway, I can&rsquo;t help my bad gut feeling
+whenever I see it ;)</p>
+
+<p>The funny thing is that I recently wrote similar code myself; that
+alone would not be a surprise yet, but I actually wrote it in
+Haskell which does not have that notion of <em>null</em> values and the
+corresponding Nullpointer exception. In Haskell, there is the <a href="https://www.haskell.org/haskellwiki/Maybe" target="_blank">Maybe monad</a> which facilitates chaining &ldquo;partial&rdquo; computations together without
+the risk of a Nullpointer exception. Here is the snippet of that code
+(obviously, only the <code>else Nothing</code> is &lsquo;important&rsquo;).</p>
+
+<p><code>haskell
+newState =
+  if not shouldBeCompiled &amp;&amp; w' == view T.word W.immediate' then
+   (oldState ^. lastColonDefinition ) &gt;&gt;=
+   (\x -&gt; return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True))
+  else
+   Nothing
+</code></p>
+
+<p>Anyway, believe me, if you ever write such an <code>else Nothing</code> in Haskell, that should
+be the trigger &ndash; take a deep breath, take a coffee and think about your
+problem again. At the least, you are overcomplicating things as using
+the <em>Monad</em> or <em>MonadPlus</em> nature of <em>Maybe</em> would make life easier
+but probably it&rsquo;s an indication that your thoughts are about to go
+astray and you get lost in old <code>else return null</code> habits or worse &ndash; so better
+stop it and take a break!</p>
+
+<p>How would the <em>MonadPlus</em> and <em>Monad</em> instances make life better? Look
+at the below version. In any case, it&rsquo;s functionally equivalent, so
+how would it be &lsquo;better&rsquo;? In my opinion, it conveys much
+more the impression that the programmer actually knows what they are doing.</p>
+
+<p>``` haskell
+newState = do
+  guard $ not shouldBeCompiled &amp;&amp; w' == (view T.word W.immediate')</p>
+
+<p>  x &lt;&ndash; oldState ^. lastColonDefinition
+  return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True)
+```</p>
+
+<p>Essentially, the <code>guard</code> function does the trick. <code>guard</code>, which has the type
+<em>guard :: MonadPlus m => Bool &ndash;> m ()</em>, makes the containing <em>do</em>
+block evaluate to <code>Nothing</code> if the <code>Bool</code> argument evaluates to
+<code>False</code>. In that sense, the <code>guard</code> expression actually looks like an
+assertion! The whole <em>MonadPlus</em> magic can be further explored <a href="http://en.wikibooks.org/wiki/Haskell/MonadPlus" target="_blank">here</a>.</p>
+
+<p>In my case, I finally ended up removing those lines altogether. As suspected, the
+good old <code>else Nothing</code> was the symptom that I had lost track of
+what I was coding at all &ndash; completely lost in nothingness &ndash; and I really needed a
+break.</p>
+
+<p>So what is your typical &lsquo;silly code&rsquo; that you typically start writing when
+you should rather take a break?</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,22 @@
+{
+  "name": "purescript-coproducts",
+  "keywords": [
+    "purescript"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "output",
+    "tests",
+    "tmp",
+    "bower.json",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "purescript-either": "~0.1.4",
+    "purescript-foldable-traversable": "~0.3.0"
+  }
+}

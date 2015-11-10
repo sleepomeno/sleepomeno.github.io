@@ -1,0 +1,32 @@
+{
+  "name": "rxjs-jquery",
+  "version": "1.1.7",
+  "main": "rx.jquery.js",
+  "dependencies": {
+    "rxjs": "*"
+  },
+  "ignore": [
+    ".*",
+    "*.bat",
+    "*.md",
+    "*.min.*",
+    "*.txt",
+    "*.log",
+    "package.json",
+    "node_modules",
+    "doc",
+    "examples",
+    "src",
+    "tests"
+  ],
+  "homepage": "https://github.com/Reactive-Extensions/rxjs-jquery",
+  "_release": "1.1.7",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.1.7",
+    "commit": "0be523d702955a6a0b5a81cd6f1ce72aafbe5b53"
+  },
+  "_source": "git://github.com/Reactive-Extensions/rxjs-jquery.git",
+  "_target": "1.1.7",
+  "_originalSource": "rxjs-jquery"
+}

@@ -1,0 +1,33 @@
+{
+  "name": "purescript-exists",
+  "description": "Existential types as a library",
+  "keywords": [
+    "purescript"
+  ],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "output",
+    "tests",
+    "output",
+    "js",
+    "tmp",
+    "bower.json",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "homepage": "https://github.com/paf31/purescript-exists",
+  "version": "0.1.1",
+  "_release": "0.1.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.1.1",
+    "commit": "07a950a6e1e94b83cfc40b03d0e0f4fe7e9c5081"
+  },
+  "_source": "git://github.com/paf31/purescript-exists.git",
+  "_target": "~0.1.0",
+  "_originalSource": "purescript-exists"
+}

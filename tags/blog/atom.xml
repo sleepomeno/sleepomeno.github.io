@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: blog | while true live]]></title>
+  <link href="http://sleepomeno.github.io/tags/blog/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2015-11-10T21:43:27+01:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Gregor Riegler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using Google Universal Analytics with Octopress]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/08/16/Using-Google-Universal-Analytics-with-Octopress/"/>
+    <updated>2014-08-16T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/08/16/Using-Google-Universal-Analytics-with-Octopress</id>
+    <content type="html"><![CDATA[<p>When I first set up my Github pages Octopress blog I followed <a href="http://stefanalfbo.github.io/blog/2013/04/17/octopress-google-analytics-github-pages/" target="_blank">those
+instructions</a> to set Google Analytics tracking up &ndash; and it worked. However, in May Google
+Analytics somehow decided to move my account to <em>Universal
+Analytics</em> &ndash; maybe I had approved it without really knowing what it
+meant&#x2026;</p>
+
+<p>Well, what is <em>Universal Analytics</em>? I have no idea! The
+important thing to notice is, though, that you need to change your
+JavaScript <strong>tracking code</strong> if you make that transition; obviously, I
+didn&rsquo;t know that. Otherwise tracking wouldn&rsquo;t work any longer; would
+it? As a matter of fact, it <em>somehow</em> did.</p>
+
+<p><blockquote><p>It is not only not right, it is not even wrong.</p><footer><strong>Wolfgang Pauli</strong></footer></blockquote></p>
+
+<p>Actually, my Analytics dashboard <strong>did</strong> show some visits and hits, that&rsquo;s
+why I didn&rsquo;t notice the problem for a long time, however, I guess it
+only mentioned 10% of them! Anyway, after a long
+debugging session with <a href="https://www.google.at/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCAQFjAA&url=https%3A%2F%2Fchrome.google.com%2Fwebstore%2Fdetail%2Ftag-assistant-by-google%2Fkejbdjndbnbjgmefkgdddjlbokphdefk&ei=xivvU6rFCoTE7AbJ54GgBw&usg=AFQjCNHiOEtvqJl1-RFk6_Q6oVWZTGRFPw&sig2=cuQ2UpUVHzSDJBg77fP0hw&bvm=bv.73231344,d.ZGU" target="_blank">Google Tag Assistant</a> and <a href="https://www.google.at/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCAQFjAA&url=https%3A%2F%2Fchrome.google.com%2Fwebstore%2Fdetail%2Fgoogle-analytics-debugger%2Fjnkmfdileelhofjcijamephohjechhna&ei=NizvU-u2Nef17AaSp4CIAg&usg=AFQjCNHR1yQN0Rdzn4xwMA1bTPZkNEGK_Q&sig2=CEZMIArRE6i7HVQLoSVTiQ&bvm=bv.73231344,d.ZGU" target="_blank">Google Analytics Debugger</a> I figured out the necessity to change the code, finally.</p>
+
+<p>Shortly, you just need to change your
+<code>source/_includes/google_analytics.html</code> to this code:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{% if site.google_analytics_tracking_id %}
+</span><span class='line'>  &lt;script type="text/javascript">&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+</span><span class='line'>m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+</span><span class='line'>})(window,document,&lsquo;script&rsquo;,&lsquo;//www.google-analytics.com/analytics.js&rsquo;,&lsquo;ga&rsquo;);&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>ga(&lsquo;create&rsquo;, &lsquo;{{ site.google_analytics_tracking_id }}&rsquo;, &lsquo;auto&rsquo;);
+</span><span class='line'>ga(&lsquo;send&rsquo;, &lsquo;pageview&rsquo;);
+</span><span class='line'>  &lt;/script>
+</span><span class='line'>{% endif %}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Concerning Github pages, it&rsquo;s not necessary to include a call to set your domain to
+<strong>github.io</strong> any longer. It just works out of the box &ndash; what a
+progress! It is not only right, it is not even wrong now!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Why Blogging Matters]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/02/07/Why-Blogging-Matters/"/>
+    <updated>2014-02-07T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/02/07/Why-Blogging-Matters</id>
+    <content type="html"><![CDATA[<p>There is that fancy phrase &ldquo;pics or it didn&rsquo;t happen&rdquo;. It&rsquo;s just
+claiming evidence for a, more or less, hardly credible experience which has often to do
+with some sort of drug abuse. Yes, experience shows it&rsquo;s
+sometimes cleverer to do without taking a photo, anyway, it crossed my mind that that phrase might be
+applicable not only to excess-like experiences but to&#x2026; pretty much
+everything in life.</p>
+
+<!-- more -->
+
+
+<p>I&rsquo;ll come back later to what that actually means.. actually, I&rsquo;ve just found a nice <a href="http://mdswanson.com/blog/2013/08/11/write-things-tell-people.html" target="_blank">blog post</a>
+about the importance of running a blog as a developer which goes
+nicely with what I&rsquo;ve been thinking. The author, Matt Swanson, says
+&ldquo;Do things, write about it&rdquo; and explains how sharing his learning on
+his blog has been incredibly rewarding: Firstly, people told him how much they
+enjoy reading his posts (those compliments alone may be worth it!) and secondly, he gained reputation by
+demonstrating his abilities and initiative. As a result, he somehow became some
+sort of a &ldquo;super hero&rdquo; in people&rsquo;s minds although his posts are not
+exactly rocket-science. Regular posts (content is still king!) and a
+pretty straight-forward way of expressing things were enough to raise
+his value&#x2026; the question is: Did Matt just fool his readers? Isn&rsquo;t he a clever guy after all?</p>
+
+<p>Of course he is &ldquo;clever&rdquo;. He is &ldquo;clever&rdquo; <strong>because</strong> he shares his
+projects, learnings and insights on his blog. Being a Software
+developer, blogging about your projects is the most efficient way of
+gaining an over-all reputation &ndash; a manager, who considers hiring you, won&rsquo;t read commit logs of Open Source
+Projects where your name might appear but he can enjoy a well-written blog! In fact,
+the &lsquo;positive&rsquo; effect on the manager&rsquo;s decision seems inevitable; and that&rsquo;s
+where the &ldquo;pics or it didn&rsquo;t happen&rdquo; attitude comes into play. In
+order to convey your abilities to the manager you need definite proof,
+pretty similiar to the situation in court, actually: In the end, the
+judge reaches a verdict and <strong>decides what is the truth</strong>. Analogously,
+you will always <strong>be</strong> exactly as &ldquo;clever&rdquo; as your vis-à-vis, respectively the
+readers of your blog, think you are! It goes without saying that you
+can replace the word &ldquo;clever&rdquo; with whatever other positive quality you&rsquo;d
+like to convey &ndash; &ldquo;competent&rdquo;, &ldquo;open-minded&rdquo;, &ldquo;innovative&rdquo;, &#x2026;, you
+name it.</p>
+
+<p>Funnily enough, you will actually get cleverer when you blog regularly
+;&ndash;) Strange? Well, first let&rsquo;s get rid of the word &ldquo;clever&rdquo; once and
+for all, it is somehow inaccurate &ndash; what I want to say is: You will
+get better at those topics you&rsquo;re blogging about. (And that not only
+applies to tech blogs!) The reason for that: The extra thinking
+necessary for presenting your work in a nicely structured way on your
+blog will actually force you to nicely structure your projects as
+well! In addition, your inner urge to at least blog once, twice or X
+times a week will actually force you to pursue your projects and
+learnings &lsquo;cause otherwise you wouldn&rsquo;t have anything to blog about.
+As a result, you&rsquo;ll inevitably get better at reasoning and get a
+better understanding of your blog posts&rsquo; topics&#x2026; briefly, you get
+&ldquo;cleverer&rdquo;! Isn&rsquo;t that ironic? ;&ndash;)</p>
+
+<p>Anyway, I haven&rsquo;t been able to post regularly in the past, for
+whatever reasons. In the end that always led to abandonning my past blogs altogether, so I&rsquo;m not
+quite sure the above argumentation is too believable coming from me,
+to be honest. However, for the moment, it is enough motivation for me to try a fresh
+start with this blog. After all, it&rsquo;s all about motivation and inspiration.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[A fresh start]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/02/06/A-fresh-start/"/>
+    <updated>2014-02-06T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/02/06/A-fresh-start</id>
+    <content type="html"><![CDATA[<p>2014 has just started a month ago and I&rsquo;ve painfully realized that I
+didn&rsquo;t come up with any New Year&rsquo;s resolutions at that time. There is
+no resolution to violate, consequently, no reason to feel bad at all &ndash;
+so why not start a new blog which I could then feel bad about when I
+post nothing for months?! Well, to be serious, that&rsquo;s at least how all
+my blogging attempts have ended so far. I definitely don&rsquo;t know if
+history will repeat itself again this time. Maybe this post will actually stay the
+only post for two months? Any bets? ;&ndash;)</p>
+
+<p>Anyway, I better shortly summarize what I plan blogging about. Being a
+software developer, tech topics will probably dominate. Still I can&rsquo;t
+promise not to rant about some random topic from time to time ;&ndash;) As
+an Emacs user I might blog about my <strong>Elisp</strong> learning progress or other
+stuff like the one and only <strong>org-mode</strong>. Using <strong>Octopress</strong> as my blogging
+engine it will be unavoidable to mention it as well, ranging from
+plugins and customizations to its philosophy. From time to time I&rsquo;d also
+like talking about my journeys to <strong>Haskell</strong> wonderland and
+<strong>Clojure(Script)</strong> development. Or mention some Android apps? There are
+enough topics for sure, we&rsquo;ll see if there is enough motivation to
+carry on blogging as well ;&ndash;)</p>
+
+<p>Let&rsquo;s hope the best!</p>
+]]></content>
+  </entry>
+  
+</feed>

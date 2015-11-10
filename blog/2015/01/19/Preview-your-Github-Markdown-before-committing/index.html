@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Preview your Github Markdown before committing! - while true live</title>
+  <meta name="author" content="Gregor Riegler">
+
+  
+  <meta name="description" content="Writing software documentation can be a pretty dull task and is
+neglected too often (at least by me). But what purpose does the best program
+serve if &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sleepomeno.github.io/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  <!--<script src="/javascripts/modernizr-2.0.js"></script>-->
+  <!--<script src="/javascripts/ender.js"></script>-->
+  <!--<script src="/javascripts/octopress.js" type="text/javascript"></script>-->
+  <link href="/atom.xml" rel="alternate" title="while true live" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/assets/app-c0f18cf1eab0ab482c858c55c0da5377.js"></script>
+
+<script id="search-results-template" type="text/x-handlebars-template">
+  {{#entries}}
+    <article>
+      <h3>
+         <small><time datetime="{{date}}" pubdate>{{date}}</time></small>
+         <a href="{{url}}">{{title}}</a>
+         <!--<p>tagged: {{ tags }} | category: <a href="blog/categories/{{category }}">{{category}}</a></p>-->
+				 <p>tagged: {{{ tags }}} | category: {{{category}}}</p>
+      </h3>
+    </article>
+  {{/entries}}
+</script>
+
+
+
+  
+  <script type="text/javascript">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-47975624-1', 'auto');  // Replace with your property ID.
+ga('send', 'pageview');
+  </script>
+
+
+
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">sleepomeno</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">while true live</a></h1>
+  
+    <h2>Musings on the fatality of infinite loops and other stuff.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+
+  <form action="/search" method="get">
+  <fieldset role ="search">
+    <input type="text" id="search-query" name="q" placeholder="Search" autocomplete="off" class="search" />
+  </fieldset>
+</form>
+
+
+<ul class="main-navigation">
+  <li><a href="/about-me/">About me</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Preview Your Github Markdown Before Committing!</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-19T00:00:00+01:00" pubdate data-updated="true">Jan 19<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Writing software documentation can be a pretty dull task and is
+neglected too often (at least by me). But what purpose does the best program
+serve if nobody knows how to use it? None.</p>
+
+<p>Looking at Github, the Markdown formatted <strong>README.md</strong> is the front
+ page of every repository and the first (and mostly only) source of
+ documentation.
+Until recently, I have treated my <strong>README.md</strong> files rather shabbily; I
+ would have thought that this lack of motivation originates from a
+ general dislike of writing documentation, however, I might have
+ changed my opinion. This <a href="http://increasinglyfunctional.com/2014/12/18/github-flavored-markdown-previews-emacs/" target="_blank">blog post</a> has opened my eyes to an
+ alternative explanation: writing Github Markdown documentation is not
+ trivial when you don&rsquo;t have a chance to preview the resulting
+ markdown before committing! In that case the output will look
+ not as expected more often than not &ndash; which makes the committer angry
+ as s/he needs to push another commit just for improving the Markdown.
+ Anyway, I remember feeling annoyed quite frequently by that procedure in
+ retrospective. It does not need a stretch of imagination to foresee
+ the negative influence that annoyance has on my willingness to
+ provide <strong>README.md</strong> documentation&#x2026; ;)</p>
+
+<p>The solution is obvious but not that trivial. Obviously, there surely
+are plugins for various IDEs which can parse Markdown and output HTML
+markup. I remember having once installed such an Eclipse plugin. But things get trickier as Github does not use vanilla
+Markdown but its own brand of Markdown &ndash; it is not that easy to find a
+way to display Github Markdown with good confidence in its conformity;
+in addition it shouldn&rsquo;t force me to use any special IDE as I do most
+stuff in Emacs.</p>
+
+<p>The script that I use now was mentioned in the referenced blog post
+above: <a href="https://gist.github.com/joshuamiller/6d58f8bd239df56cabe8" target="_blank">flavor.rb</a>. It is a ruby script which actually asks the Github API (!) to do the hard
+work, namely providing the HTML output! That looks stupid at first
+glance but it is actually the only way to be really sure of the
+preview&rsquo;s congruence with the actual display on the Github page&#x2026;</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gregor Riegler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-19T00:00:00+01:00" pubdate data-updated="true">Jan 19<span>th</span>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/emacs/'>emacs</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sleepomeno.github.io/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/" data-via="" data-counturl="http://sleepomeno.github.io/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2015/01/05/else-return-null/" title="Previous Post: else return null">&laquo; else return null</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2015/02/20/Partial-matching-in-R/" title="Next Post: Partial matching in R">Partial matching in R &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/09/13/Toying-with-Racket/">Toying With Racket</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/08/Historical-ELO-Tennis-Rating/">Historical Elo Tennis Rating</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/14/Approximating-PI-with-PureScript/">Approximating PI With PureScript</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/20/Partial-matching-in-R/">Partial Matching in R</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/">Preview Your Github Markdown Before Committing!</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+	<div id="tagcloud"><a style="font-size: 16px" href="/tags/c/">C</a>  
+<a style="font-size: 16px" href="/tags/st/">ST</a>  
+<a style="font-size: 16px" href="/tags/analytics/">analytics</a>  
+<a style="font-size: 16px" href="/tags/android/">android</a>  
+<a style="font-size: 16px" href="/tags/app/">app</a>  
+<a style="font-size: 23px" href="/tags/blog/">blog</a>  
+<a style="font-size: 16px" href="/tags/book/">book</a>  
+<a style="font-size: 16px" href="/tags/extension/">extension</a>  
+<a style="font-size: 16px" href="/tags/functional/">functional</a>  
+<a style="font-size: 16px" href="/tags/ghc/">ghc</a>  
+<a style="font-size: 16px" href="/tags/git/">git</a>  
+<a style="font-size: 16px" href="/tags/github/">github</a>  
+<a style="font-size: 21px" href="/tags/graphics/">graphics</a>  
+<a style="font-size: 28px" href="/tags/haskell/">haskell</a>  
+<a style="font-size: 16px" href="/tags/javascript/">javascript</a>  
+<a style="font-size: 16px" href="/tags/jquery/">jquery</a>  
+<a style="font-size: 16px" href="/tags/laziness/">laziness</a>  
+<a style="font-size: 16px" href="/tags/markdown/">markdown</a>  
+<a style="font-size: 16px" href="/tags/maybe/">maybe</a>  
+<a style="font-size: 16px" href="/tags/monadplus/">monadplus</a>  
+<a style="font-size: 16px" href="/tags/mutation/">mutation</a>  
+<a style="font-size: 16px" href="/tags/performance/">performance</a>  
+<a style="font-size: 16px" href="/tags/plaintext/">plaintext</a>  
+<a style="font-size: 16px" href="/tags/productivity/">productivity</a>  
+<a style="font-size: 16px" href="/tags/purescript/">purescript</a>  
+<a style="font-size: 21px" href="/tags/r/">r</a>  
+<a style="font-size: 16px" href="/tags/racket/">racket</a>  
+<a style="font-size: 16px" href="/tags/rankntypes/">rankntypes</a>  
+<a style="font-size: 16px" href="/tags/scm/">scm</a>  
+<a style="font-size: 21px" href="/tags/statistics/">statistics</a>  
+<a style="font-size: 16px" href="/tags/svn/">svn</a>  
+<a style="font-size: 16px" href="/tags/syntax/">syntax</a>  
+<a style="font-size: 16px" href="/tags/xmonad/">xmonad</a>
+</div>
+</section>
+<section>
+  <h1>Recent Comments</h1>
+  <div id="dsq-recentcomments" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/sleepomeno/recent_comments_widget.js?hide_avatars=1&num_items=3"></script></div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Gregor Riegler -
+	<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+	<span class="followTwitter"><a href="https://twitter.com/GregorRiegler" class="twitter-follow-button" data-show-count="false">Follow @GregorRiegler</a></span>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'sleepomeno';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sleepomeno.github.io/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/';
+        var disqus_url = 'http://sleepomeno.github.io/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

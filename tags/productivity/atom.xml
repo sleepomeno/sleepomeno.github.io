@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: productivity | while true live]]></title>
+  <link href="http://sleepomeno.github.io/tags/productivity/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2015-11-10T21:43:27+01:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Gregor Riegler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[This is not an org-mode tutorial]]></title>
+    <link href="http://sleepomeno.github.io/blog/2014/02/16/This-is-not-an-org-mode-Tutorial/"/>
+    <updated>2014-02-16T00:00:00+01:00</updated>
+    <id>http://sleepomeno.github.io/blog/2014/02/16/This-is-not-an-org-mode-Tutorial</id>
+    <content type="html"><![CDATA[<p>I guess it was about a year ago when I decided to give <code>org-mode</code>
+another go; I had used it before but hadn&rsquo;t been able to quite wrap my head
+around it. This time I managed to get through the hard first
+difficulties so that I&rsquo;m a vivid <code>org-mode</code> user by now&#x2026; but first
+make clear: what is <code>org-mode</code> anyway and what has it to do with plain text?</p>
+
+<!-- more -->
+
+
+<h2>Org-mode</h2>
+
+<p><code>org-mode</code> is an Emacs major mode. There is lots of
+<a href="http://orgmode.org/#docs" target="_blank">documentation and tutorials</a> on <code>org-mode</code> and I won&rsquo;t be tempted to
+give another tutorial (the sheer amount of <code>org-mode</code> features to present would
+make that post very, very long&#x2026;). I&rsquo;d rather like to give an
+explanation of its philosophy and applicability.</p>
+
+<p>On its <a href="http://orgmode.org/" target="_blank">official website</a> it is characterized as
+follows: <strong>Org mode is for keeping notes, maintaining TODO lists, planning projects, and authoring documents with a fast and effective
+plain-text system</strong>. Although that obviously is a description without a doubt,
+<code>org-mode</code> still has a broader area of applicability &ndash; in fact, the HTML title
+of that <a href="http://orgmode.org/" target="_blank">official website</a> describes it best: <strong>Your Life in Plain Text</strong>.</p>
+
+<p>To put it bluntly, <code>org-mode</code> can act as a replacement for any
+application you normally use for structuring any text-based
+information. Well, what is &lsquo;text-based&rsquo; information? Actually, this is
+pretty much everything; only images and audio files come to my mind as
+exceptions. However, even for images and audio files you normally
+store text-based information in the form of meta information. So,
+generally, nearly all information that needs structuring is of a
+text-based nature which is accessible to <code>org-mode</code> as a consequence.</p>
+
+<h2>Org-mode&rsquo;s killer feature</h2>
+
+<p>So the &lsquo;killer feature&rsquo; of <code>org-mode</code> is not any specific
+application &ndash; neither &lsquo;TODO lists&rsquo;, nor
+&lsquo;planning projects&rsquo; &ndash; it is rather the fact that you can use it for
+structuring/managing whatever text-based information you want! You
+don&rsquo;t need to use 20 different applications for your daily
+&lsquo;informational needs&rsquo; any longer, you just need 1 to rule them all!
+That fact alone of replacing 20 different things with 1 single, more
+general thing somehow makes my programmer&rsquo;s soul smile &ndash; just imagine
+the improvement of code quality when you factor out a common pattern
+of 20 similar methods into 1 generalized method. Or: Imagine a
+&lsquo;collection&rsquo; interface which provides methods like &lsquo;length&rsquo; for all
+&lsquo;collection&rsquo; implementations&#x2026; Anyway, I&rsquo;m
+convinced that such an abstraction not only shines in programming
+but also in &lsquo;real life&rsquo; &ndash; look at it from this point of view: for any
+rise of efficiency you&rsquo;ll achieve in mastering
+<code>org-mode</code> you would have needed an equal rise of efficiency in all 20
+applications in the first place! <em>And:</em> you <strong>own</strong> all your information in plain
+text. I&rsquo;ll explain in a second the benefits of &lsquo;owning&rsquo;; first, let&rsquo;s address
+another objection which will lead us there.</p>
+
+<h2>We are slaves of interfaces</h2>
+
+<p>You might argue that you don&rsquo;t even need close to 20 applications but you&rsquo;d be
+surprised how fast they add up: preparing slides,
+managing your calendar, writing your thesis, managing contacts, TODOs,
+writing a blog post, adding bookmarks, etc. &ndash; with the rise of IT we have gradually become slaves
+of a lot of programs. Still some of us might remember the <em>organizers</em>
+we once had for taking down anything a decade or two ago &ndash; handwritten, plain text was
+good enough in those times &ndash; they were the <strong>Personal Information
+Managers</strong> of the pre-IT era. Gradually, we have been convinced to use
+different desktop applications with specialized interfaces for
+managing text-based information; the smartphone and tablet era has
+actually even amplified that trend of veering away from plain text.</p>
+
+<h2>We don&rsquo;t own our information</h2>
+
+<p>Those 20 applications from before have &lsquo;hidden&rsquo; our information in databases which only understand SQL.
+So you would need to learn SQL to connect to &lsquo;your&rsquo; information &ndash; apart from
+the fact that the application in question might be a web application
+and you don&rsquo;t have any direct access to the server where &lsquo;your&rsquo;
+information is located&#x2026; that legal loss of ownership is not what bugs
+me for this blog post&rsquo;s sake, though. It is rather losing one&rsquo;s grasp
+on one&rsquo;s information.
+Suppose it&rsquo;s a TODO list application: you need the
+corresponding app for our tablet/smartphone/etc. to get to your
+TODO items. For many domains of applications a plain text export option can
+<strong>not</strong> be taken for granted. Even for an application with a that simple
+domain model like a TODO list application you might have troubles to
+just copy the TODO items from your browser window as this would not
+save the &ldquo;done&rdquo; status ;) (Calendar applications normally are the
+exception as they provide some standardized import/export options)</p>
+
+<p>I want to emphasize that this should <strong>not</strong> be understood as a rant on the IT world and evil web
+apps which hide my data ;) On the contrary, I like my iPad and the
+applications which provide me nice interfaces to add my text-based
+information. I just pity the fact all those IT developments have led to
+a loss of control of our information which is equally proportional to the
+degree of which we moved away from plain text! Anways, we are lucky, there is a
+possible escape: Use <code>org-mode</code>&rsquo;s plain text as the <em>data source</em> and
+the beautiful iPad app as its <em>view</em> only! For instance, that works well
+for my <code>org-mode</code> calendar data which I can sync with Google Calendar.
+Another example is this blog post: I&rsquo;m actually writing this in
+<code>org-mode</code> and export it in a Markdown format which the Octopress
+blogging framework understands.</p>
+
+<p>Anyway, I will perhaps post several customizations of how I tailored <code>org-mode</code> to my
+needs in future posts.</p>
+
+<h2>Conclusion</h2>
+
+<p><code>org-mode</code> provides the power of structuring text-based information
+and numerous export options to communicate those information to the
+outside-world. If you care about information and you are an Emacs user anyway, give it a try.</p>
+
+<p>If you shy away from Emacs you might be interested in the web
+application <a href="https://workflowy.com/" target="_blank">workflowy</a>. It provides some portion of <code>org-mode</code>&rsquo;s benefits of
+managing hierarchical textual information with only structure and no
+layout in mind. If you need the full power there is no alternative to
+<code>org-mode</code>, though. After all, there is only one ring to rule them all.</p>
+]]></content>
+  </entry>
+  
+</feed>

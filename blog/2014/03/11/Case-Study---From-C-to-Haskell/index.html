@@ -1,0 +1,627 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Migrating a mutating algorithm from C to Haskell - while true live</title>
+  <meta name="author" content="Gregor Riegler">
+
+  
+  <meta name="description" content="I&rsquo;ve recently stumbled on a C implementation of an algorithm computing
+the combinations without repetition (of a certain size k) of the first n &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  <!--<script src="/javascripts/modernizr-2.0.js"></script>-->
+  <!--<script src="/javascripts/ender.js"></script>-->
+  <!--<script src="/javascripts/octopress.js" type="text/javascript"></script>-->
+  <link href="/atom.xml" rel="alternate" title="while true live" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/assets/app-c0f18cf1eab0ab482c858c55c0da5377.js"></script>
+
+<script id="search-results-template" type="text/x-handlebars-template">
+  {{#entries}}
+    <article>
+      <h3>
+         <small><time datetime="{{date}}" pubdate>{{date}}</time></small>
+         <a href="{{url}}">{{title}}</a>
+         <!--<p>tagged: {{ tags }} | category: <a href="blog/categories/{{category }}">{{category}}</a></p>-->
+				 <p>tagged: {{{ tags }}} | category: {{{category}}}</p>
+      </h3>
+    </article>
+  {{/entries}}
+</script>
+
+
+
+  
+  <script type="text/javascript">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-47975624-1', 'auto');  // Replace with your property ID.
+ga('send', 'pageview');
+  </script>
+
+
+
+
+  
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">sleepomeno</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">while true live</a></h1>
+  
+    <h2>Musings on the fatality of infinite loops and other stuff.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+
+  <form action="/search" method="get">
+  <fieldset role ="search">
+    <input type="text" id="search-query" name="q" placeholder="Search" autocomplete="off" class="search" />
+  </fieldset>
+</form>
+
+
+<ul class="main-navigation">
+  <li><a href="/about-me/">About me</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Migrating a Mutating Algorithm From C to Haskell</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-11T00:00:00+01:00" pubdate data-updated="true">Mar 11<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I&rsquo;ve recently stumbled on a C implementation of an algorithm computing
+the <em>combinations without repetition</em> (of a certain size <strong>k</strong>) of the first <strong>n</strong> natural
+numbers. So the wanted result is a list of combinations like for
+example <code>0 1 2 3 4</code> or <code>11 13 20 33 49</code> in the case of <code>k=5</code> and
+<code>n=50</code> (<em>without repetition</em> means that no number occurs twice in the
+same combination). As a matter of fact, I wanted to migrate that
+function to Haskell; so this post is about the evolution of the
+solution I came up with. I guess this case study is somehow kind of exemplary for
+the thought process which you need to undergo whenever you migrate a
+not-so-trivial algorithm from C to Haskell as it touches upon the
+topics of <em>laziness</em> and <em>mutation</em>.</p>
+
+<!-- more -->
+
+
+<h1>The C Version</h1>
+
+<p>So let&rsquo;s start with the C Version:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="cm">/* puts all combinations into the array of its first argument */</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">combinationsWithoutRepetition</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">combinations</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">feld</span><span class="p">,</span><span class="kt">int</span> <span class="n">bound</span><span class="p">,</span><span class="kt">int</span> <span class="n">length</span><span class="p">,</span><span class="kt">int</span> <span class="n">pos</span><span class="p">,</span><span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">pos</span><span class="o">==</span><span class="n">length</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">combinations</span><span class="p">[</span><span class="n">idx</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">feld</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span><span class="o">*</span> <span class="n">feldPos</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">feld</span><span class="p">[</span><span class="n">pos</span><span class="p">];</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">val</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">bound</span><span class="p">;</span><span class="o">++</span><span class="n">i</span><span class="p">){</span>
+</span><span class='line'>      <span class="o">*</span><span class="n">feldPos</span><span class="o">=</span><span class="n">i</span><span class="p">;</span>
+</span><span class='line'>      <span class="n">combinationsWithoutRepetition</span><span class="p">(</span><span class="n">combinations</span><span class="p">,</span><span class="n">feld</span><span class="p">,</span><span class="n">bound</span><span class="p">,</span><span class="n">length</span><span class="p">,</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">nrOfCombinations</span> <span class="o">=</span> <span class="mi">2118760</span><span class="p">;</span> <span class="c1">// assume that&#39;s correct for n=50,k=5</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="o">*</span><span class="n">combinations</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">combinations</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="n">nrOfCombinations</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kt">int</span> <span class="o">*</span><span class="n">singleCombination</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">singleCombination</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">combinationsWithoutRepetition</span><span class="p">(</span><span class="n">combinations</span><span class="p">,</span><span class="n">singleCombination</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">;</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">5</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d %d %d %d %d </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">4</span><span class="p">]);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So <code>combinationsWithoutRepetition</code> does all the work, however, memory
+needs to be allocated for the two pointers to int first. (Surely, in a
+real program <code>nrOfCombinations</code> would call a subroutine computing the
+necessary number of computations, I omitted it for brevity&rsquo;s sake.) In
+the end, the computed combinations can be accessed through the pointer
+<code>combinations</code>.</p>
+
+<p>Anyway, <code>combinationsWithoutRepetition</code> didn&rsquo;t look straightforward to
+me, I didn&rsquo;t really understand how it worked and above all, I couldn&rsquo;t
+see how I could tweak the algorithm so that I could do without the mutation
+of <code>combinations</code> and <code>idx</code> in the Haskell solution. Consequently, I decided to
+translate the C version more or less directly to Haskell, using the
+<code>ST</code> monad.</p>
+
+<p>The <code>ST</code> monad makes it possible to have references pointing to
+mutable memory in Haskell. This comes in handy when you want to solve
+a problem for which there is no efficient algorithm known doing
+without mutation. In our case it gives us the power to create a first
+running Haskell version without fully understanding the underlying
+algorithm of the C implementation. Bear in mind that you always need to run <code>runST</code> to
+get a value out of the <code>ST</code> monad like below.</p>
+
+<h2>The ST Version</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">comb1</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
+</span><span class='line'><span class="nf">comb1</span> <span class="n">k</span> <span class="n">elements</span> <span class="ow">=</span> <span class="n">runST</span> <span class="o">$</span> <span class="kr">do</span>
+</span><span class='line'>  <span class="kr">let</span> <span class="n">bound</span> <span class="ow">=</span> <span class="n">length</span> <span class="n">elements</span>
+</span><span class='line'>      <span class="n">boundMinus1</span> <span class="ow">=</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>      <span class="n">elementArray</span> <span class="ow">=</span> <span class="n">listArray</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">elements</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">comb1&#39;</span> <span class="ow">::</span> <span class="kt">STRef</span> <span class="n">s</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">Int</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">ST</span> <span class="n">s</span> <span class="nb">()</span>
+</span><span class='line'>      <span class="n">comb1&#39;</span> <span class="n">combos</span>  <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">=</span>
+</span><span class='line'>        <span class="kr">let</span> <span class="n">comb1&#39;&#39;</span> <span class="n">currentCombo</span> <span class="p">(</span><span class="o">!</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>              <span class="o">|</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">k</span>  <span class="ow">=</span> <span class="n">modifySTRef</span> <span class="n">combos</span> <span class="p">((</span><span class="kt">:</span><span class="p">)</span> <span class="n">currentCombo</span><span class="p">)</span>
+</span><span class='line'>              <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="n">forM_</span> <span class="p">[</span><span class="n">val</span><span class="o">..</span><span class="n">boundMinus1</span><span class="p">]</span> <span class="o">$</span> <span class="nf">\</span><span class="n">x</span> <span class="ow">-&gt;</span> <span class="n">comb1&#39;&#39;</span> <span class="p">(</span><span class="n">elementArray</span><span class="o">!</span><span class="n">x</span> <span class="kt">:</span> <span class="n">currentCombo</span><span class="p">)</span> <span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>        <span class="kr">in</span>
+</span><span class='line'>         <span class="n">comb1&#39;&#39;</span> <span class="kt">[]</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">combos</span> <span class="ow">&lt;-</span> <span class="n">newSTRef</span> <span class="kt">[]</span>
+</span><span class='line'>  <span class="n">comb1&#39;</span> <span class="n">combos</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">readSTRef</span> <span class="n">combos</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This version already has two conceptual advantages: It can use an arbitrary list
+of <code>Int</code> s as its second parameter (actually it could even be polymorphic
+in the type of the list) and returns a list of lists which is
+semantically more correct than the C implementation which implicitly
+returned a long concatenation of the combination lists. Moreover, I
+didn&rsquo;t need any mutable equivalent of <code>idx</code>.</p>
+
+<p>Obviously, I wasn&rsquo;t too satisfied with this implementation, though.
+Above all, the lack of <em>laziness</em> proves to be really annoying &ndash; the
+whole list of combinations needs to be computed before you can access
+the first element of it! This is devastating as in every real word
+scenario of a decently large <code>n</code> and <code>k</code> the resulting list of
+combinations is unlikely to fit into your available memory. So comes
+the lazy <code>ST</code> monad to the rescue!</p>
+
+<h2>The Lazy ST Version</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">comb2</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
+</span><span class='line'><span class="nf">comb2</span> <span class="n">k</span> <span class="n">elements</span> <span class="ow">=</span> <span class="kt">L</span><span class="o">.</span><span class="n">runST</span> <span class="o">$</span> <span class="kr">do</span>
+</span><span class='line'>  <span class="kr">let</span> <span class="n">bound</span> <span class="ow">=</span> <span class="n">length</span> <span class="n">elements</span>
+</span><span class='line'>      <span class="n">boundMinus1</span> <span class="ow">=</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>      <span class="n">elementArray</span> <span class="ow">=</span> <span class="n">listArray</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">elements</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">comb2&#39;</span> <span class="ow">::</span> <span class="kt">STRef</span> <span class="n">s</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">Int</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ST</span> <span class="n">s</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
+</span><span class='line'>      <span class="n">comb2&#39;</span> <span class="n">combos</span>  <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">=</span>
+</span><span class='line'>        <span class="kr">let</span> <span class="n">comb2&#39;&#39;</span> <span class="n">currentCombo</span> <span class="p">(</span><span class="o">!</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>              <span class="o">|</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">k</span>  <span class="ow">=</span> <span class="kr">do</span> <span class="p">{</span> <span class="kt">L</span><span class="o">.</span><span class="n">strictToLazyST</span> <span class="o">$</span> <span class="n">modifySTRef</span> <span class="n">combos</span> <span class="p">((</span><span class="kt">:</span><span class="p">)</span> <span class="n">currentCombo</span><span class="p">);</span> <span class="n">return</span> <span class="p">[</span><span class="n">currentCombo</span><span class="p">]</span> <span class="p">}</span>
+</span><span class='line'>              <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="n">fmap</span> <span class="n">concat</span> <span class="o">$</span> <span class="n">forM</span> <span class="p">[</span><span class="n">val</span><span class="o">..</span><span class="n">boundMinus1</span><span class="p">]</span> <span class="o">$</span> <span class="nf">\</span><span class="n">x</span> <span class="ow">-&gt;</span> <span class="n">comb2&#39;&#39;</span> <span class="p">(</span><span class="n">elementArray</span><span class="o">!</span><span class="n">x</span> <span class="kt">:</span> <span class="n">currentCombo</span><span class="p">)</span> <span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>        <span class="kr">in</span>
+</span><span class='line'>         <span class="n">comb2&#39;&#39;</span> <span class="kt">[]</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">combos</span> <span class="ow">&lt;-</span> <span class="kt">L</span><span class="o">.</span><span class="n">strictToLazyST</span> <span class="o">$</span> <span class="n">newSTRef</span> <span class="kt">[]</span>
+</span><span class='line'>  <span class="n">comb2&#39;</span> <span class="n">combos</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Anyway, that&rsquo;s the first lazy <code>ST</code> implementation I could come up with
+and luckily, it gave me the intuition how I could get completely rid of the <code>ST</code>
+monad. It is obvious that the <code>modifySTRef</code> calls are absolutely
+pointless as <code>fmap concat</code> just concatenates the <code>[currentCombo]</code>
+lists returned by the base cases of the recursion and <code>combos</code> is not
+even considered in the result of the computation. So let&rsquo;s see the
+version resulting from throwing the <code>ST</code> monad into the garbage can:</p>
+
+<h2>The No ST Version</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">comb3</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
+</span><span class='line'><span class="nf">comb3</span> <span class="n">k</span> <span class="n">elements</span> <span class="ow">=</span>
+</span><span class='line'>  <span class="kr">let</span> <span class="n">bound</span> <span class="ow">=</span> <span class="n">length</span> <span class="n">elements</span>
+</span><span class='line'>      <span class="n">boundMinus1</span> <span class="ow">=</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>      <span class="n">elementArray</span> <span class="ow">=</span> <span class="n">listArray</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">elements</span>
+</span><span class='line'>      <span class="n">comb3&#39;</span>  <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">=</span> <span class="n">comb3&#39;&#39;</span> <span class="kt">[]</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>        <span class="kr">where</span>
+</span><span class='line'>        <span class="n">comb3&#39;&#39;</span> <span class="n">currentCombo</span> <span class="p">(</span><span class="o">!</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>          <span class="o">|</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">k</span>  <span class="ow">=</span> <span class="p">[</span><span class="n">currentCombo</span><span class="p">]</span>
+</span><span class='line'>          <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="n">concat</span> <span class="p">[</span><span class="n">comb3&#39;&#39;</span> <span class="p">(</span><span class="n">elementArray</span><span class="o">!</span><span class="n">x</span> <span class="kt">:</span> <span class="n">currentCombo</span><span class="p">)</span> <span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">x</span> <span class="ow">&lt;-</span> <span class="p">[</span><span class="n">val</span><span class="o">..</span><span class="n">boundMinus1</span><span class="p">]]</span>
+</span><span class='line'>      <span class="kr">in</span>
+</span><span class='line'>  <span class="n">comb3&#39;</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s much better but still a little obscure. In the end, I found a nice
+declarative solution at last:</p>
+
+<h2>The Declarative Version</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">comb4</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
+</span><span class='line'><span class="nf">comb4</span> <span class="mi">0</span> <span class="kr">_</span>      <span class="ow">=</span> <span class="p">[</span><span class="kt">[]</span><span class="p">]</span>
+</span><span class='line'><span class="nf">comb4</span> <span class="n">n</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">xs</span><span class="p">)</span> <span class="ow">=</span> <span class="n">map</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="p">)</span> <span class="p">(</span><span class="n">comb4</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">xs</span><span class="p">)</span> <span class="o">++</span> <span class="n">comb4</span> <span class="n">n</span> <span class="n">xs</span>
+</span><span class='line'><span class="nf">comb4</span> <span class="kr">_</span> <span class="kr">_</span>      <span class="ow">=</span> <span class="kt">[]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It just reads as: &ldquo;In order to get all <em>k</em>-combinations of a <em>n</em>
+length list take the first element of the list, prepend it to all
+combinations of size <em>k-1</em> of the tail of the list and then add all
+those <em>k</em>-combations of the tail of the list!&rdquo; It finally makes sense
+when you think about it for a long time ;) In addition, that approach
+can be made a little bit more efficient for certain <em>n</em> and <em>k</em> using
+a very simple memoization strategy. (This simple strategy very quickly
+eats up your memory, though.)</p>
+
+<h2>The memoized Declarative Version</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="c1">-- Version with very simple memoization (&quot;memo table&quot;)</span>
+</span><span class='line'><span class="nf">combTable</span> <span class="ow">=</span> <span class="p">[[</span> <span class="n">comb5</span> <span class="n">n</span> <span class="p">(</span><span class="n">drop</span> <span class="n">elementNr</span> <span class="n">numbers</span><span class="p">)</span> <span class="o">|</span> <span class="n">elementNr</span> <span class="ow">&lt;-</span> <span class="n">zeroToLength</span><span class="p">]</span> <span class="o">|</span> <span class="n">n</span> <span class="ow">&lt;-</span> <span class="n">zeroToLength</span><span class="p">]</span>
+</span><span class='line'>   <span class="kr">where</span>
+</span><span class='line'>   <span class="n">zeroToLength</span> <span class="ow">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="n">length</span> <span class="n">numbers</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">comb5</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
+</span><span class='line'><span class="nf">comb5</span> <span class="mi">0</span> <span class="kr">_</span>      <span class="ow">=</span> <span class="p">[</span><span class="kt">[]</span><span class="p">]</span>
+</span><span class='line'><span class="nf">comb5</span> <span class="n">k</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">xs</span><span class="p">)</span> <span class="ow">=</span> <span class="n">map</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="p">)</span> <span class="p">(</span><span class="n">combTable</span> <span class="o">!!</span> <span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!!</span> <span class="n">newlength</span><span class="p">)</span> <span class="o">++</span> <span class="p">(</span><span class="n">combTable</span> <span class="o">!!</span> <span class="n">k</span> <span class="o">!!</span> <span class="n">newlength</span><span class="p">)</span>
+</span><span class='line'>                <span class="kr">where</span>
+</span><span class='line'>                    <span class="n">newlength</span> <span class="ow">=</span> <span class="n">n</span><span class="o">-</span><span class="n">length</span> <span class="n">xs</span>
+</span><span class='line'><span class="nf">comb5</span> <span class="kr">_</span> <span class="kr">_</span>      <span class="ow">=</span> <span class="kt">[]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Conclusion</h1>
+
+<p>Originally, I planned to examine each version&rsquo;s performance in detail,
+however, that soon felt too cumbersome to me. Anyway, the <em>lazy</em>
+versions do have a significant practical advantage as they do not need
+to compute all combinations in order to get the first 10 combinations!
+Judging from a few tests I have made, it also turns out that <code>comb3</code> (not using mutation) performs better
+than both versions using <code>ST</code> even when all combinations are
+requested so this seems to be a case where mutation does not buy you
+anything in Haskell. If things look differently on your machine, feel
+free to tell me ;)</p>
+
+<p>You can find all solution versions <a href="/combinations/haskell-all.hs" target="_blank">here</a>, ready for GHCi. Anyway, feel
+free to post other solutions to the problem which may score better in
+terms of laziness/time performance/space performance/etc.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gregor Riegler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-11T00:00:00+01:00" pubdate data-updated="true">Mar 11<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell/" data-via="" data-counturl="http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2014/02/24/git-diff-svn/" title="Previous Post: Why Git is better than SVN... or is it?">&laquo; Why Git is better than SVN... or is it?</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2014/06/25/Explaining-the-Magic/" title="Next Post: Explaining the Magic">Explaining the Magic &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/09/13/Toying-with-Racket/">Toying With Racket</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/08/Historical-ELO-Tennis-Rating/">Historical Elo Tennis Rating</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/14/Approximating-PI-with-PureScript/">Approximating PI With PureScript</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/20/Partial-matching-in-R/">Partial Matching in R</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/Preview-your-Github-Markdown-before-committing/">Preview Your Github Markdown Before Committing!</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+	<div id="tagcloud"><a style="font-size: 16px" href="/tags/c/">C</a>  
+<a style="font-size: 16px" href="/tags/st/">ST</a>  
+<a style="font-size: 16px" href="/tags/analytics/">analytics</a>  
+<a style="font-size: 16px" href="/tags/android/">android</a>  
+<a style="font-size: 16px" href="/tags/app/">app</a>  
+<a style="font-size: 23px" href="/tags/blog/">blog</a>  
+<a style="font-size: 16px" href="/tags/book/">book</a>  
+<a style="font-size: 16px" href="/tags/extension/">extension</a>  
+<a style="font-size: 16px" href="/tags/functional/">functional</a>  
+<a style="font-size: 16px" href="/tags/ghc/">ghc</a>  
+<a style="font-size: 16px" href="/tags/git/">git</a>  
+<a style="font-size: 16px" href="/tags/github/">github</a>  
+<a style="font-size: 21px" href="/tags/graphics/">graphics</a>  
+<a style="font-size: 28px" href="/tags/haskell/">haskell</a>  
+<a style="font-size: 16px" href="/tags/javascript/">javascript</a>  
+<a style="font-size: 16px" href="/tags/jquery/">jquery</a>  
+<a style="font-size: 16px" href="/tags/laziness/">laziness</a>  
+<a style="font-size: 16px" href="/tags/markdown/">markdown</a>  
+<a style="font-size: 16px" href="/tags/maybe/">maybe</a>  
+<a style="font-size: 16px" href="/tags/monadplus/">monadplus</a>  
+<a style="font-size: 16px" href="/tags/mutation/">mutation</a>  
+<a style="font-size: 16px" href="/tags/performance/">performance</a>  
+<a style="font-size: 16px" href="/tags/plaintext/">plaintext</a>  
+<a style="font-size: 16px" href="/tags/productivity/">productivity</a>  
+<a style="font-size: 16px" href="/tags/purescript/">purescript</a>  
+<a style="font-size: 21px" href="/tags/r/">r</a>  
+<a style="font-size: 16px" href="/tags/racket/">racket</a>  
+<a style="font-size: 16px" href="/tags/rankntypes/">rankntypes</a>  
+<a style="font-size: 16px" href="/tags/scm/">scm</a>  
+<a style="font-size: 21px" href="/tags/statistics/">statistics</a>  
+<a style="font-size: 16px" href="/tags/svn/">svn</a>  
+<a style="font-size: 16px" href="/tags/syntax/">syntax</a>  
+<a style="font-size: 16px" href="/tags/xmonad/">xmonad</a>
+</div>
+</section>
+<section>
+  <h1>Recent Comments</h1>
+  <div id="dsq-recentcomments" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/sleepomeno/recent_comments_widget.js?hide_avatars=1&num_items=3"></script></div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Gregor Riegler -
+	<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+	<span class="followTwitter"><a href="https://twitter.com/GregorRiegler" class="twitter-follow-button" data-show-count="false">Follow @GregorRiegler</a></span>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'sleepomeno';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell/';
+        var disqus_url = 'http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
