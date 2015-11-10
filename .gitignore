@@ -1,0 +1,5 @@
+public
+source
+/_deploy/
+.sass-cache
+.pygments-cache
