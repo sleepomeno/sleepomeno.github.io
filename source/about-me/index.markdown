@@ -6,11 +6,21 @@ sharing: false
 sidebar: collapse
 footer: true
 ---
-Hi! My name is Gregor Riegler in case you don't know. I'm in my twenties and I have studied Computer Science at the Technical University of Vienna. At the moment I'm finishing my Master's degree in Software Engineering and Internet Computing. 
+Hi! My name is Gregor Riegler in case you don't know. I'm a software
+engineer in my twenties. I have a master's degree in Computer Science from the Technical University of Vienna.
 
-So far I've worked as a backend and frontend web developer for several years. In my projects I have used following technologies among others: GWT, AngularJS, Clojure, Java, Groovy, Scala, Android, Python, Liferay, Java, C, Perl, Sass, KnockoutJS, Typo3, Haskell, etc.
+So far I've worked as a backend and frontend web developer for several
+years. In my projects I have used following technologies among others:
+Haskell, PureScript, GWT, AngularJS, Clojure, Java, Groovy, Scala,
+Android, Python, Liferay, Java, Perl, Sass, KnockoutJS, Typo3, etc.
+It's not a secret that I have a bias for unusual, bleeding-edge
+technologies. I especially prefer functional programming in languages
+like Haskell, PureScript or Clojure. I regularly give talks about
+topics arising in the functional programming world in local tech meetups.
 
-In my free time chances are good that you might meet me at a local coffee shop. Apart from coffee I also like playing billiards, chess, poker and darts and solving sudokus. In addition, I practice Karate and juggling (<a href="http://www.youtube.com/watch?v=kOOhAXUTnvE" target="_blank">this</a> is still the dream...). What I don't like: pessimism and slow passersby.
+In my free time chances are good that you might meet me at a local
+coffee shop. Apart from coffee I also like playing billiards, chess,
+poker and darts and solving sudokus. In addition, I practice juggling (<a href="http://www.youtube.com/watch?v=kOOhAXUTnvE" target="_blank">this</a> is still the dream...). What I don't like: pessimism and slow passersby.
 
 You can find me on github as [sleepomeno](https://github.com/sleepomeno "sleepomeno") and could follow me on Twitter. 
 
