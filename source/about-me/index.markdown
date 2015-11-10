@@ -25,7 +25,7 @@ In my free time chances are good that you might meet me at a local
 coffee shop. Apart from coffee I also like playing billiards, chess,
 poker and darts and solving sudokus. In addition, I practice juggling (<a href="http://www.youtube.com/watch?v=kOOhAXUTnvE" target="_blank">this</a> is still the dream...). What I don't like: pessimism and slow passersby.
 
-You can find me on github as [sleepomeno](https://github.com/sleepomeno "sleepomeno") and could follow me on Twitter. 
+You can find me on GitHub as [sleepomeno](https://github.com/sleepomeno "sleepomeno") and could follow me on Twitter. 
 
 <a href="https://twitter.com/GregorRiegler" class="twitter-follow-button" data-show-count="false">Follow @GregorRiegler</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
