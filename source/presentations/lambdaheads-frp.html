@@ -32,7 +32,7 @@
 <section>
     <h1 class="title">Haskell FRP in the browser</h1>
     <h2 class="author">Gregor Riegler</h2>
-    <h3 class="date">Lambdaheads -- Nov 11 2015</h3>
+    <h3 class="date">Lambdaheads -- Nov 11, 2015</h3>
 </section>
 
 <section><section id="functional-reactive-programming" class="titleslide slide level1"><h1>Functional Reactive Programming</h1></section><section id="frp-is..." class="slide level2">
@@ -171,8 +171,105 @@ apply :: Behavior (a -&gt; b) -&gt; Event a -&gt; Event b
 stepper :: MonadIO m =&gt; a -&gt; Event a -&gt; m (Behavior a)
 unionWith :: (a -&gt; a -&gt; a) -&gt; Event a -&gt; Event a -&gt; Event a</code></pre>
 <p>... a few more (see the <a href="http://hackage.haskell.org/package/threepenny-gui-0.6.0.3/docs/Reactive-Threepenny.html">the documentation</a>)</p>
-</section><section id="threepenny-demo" class="slide level2">
-<h1>Threepenny Demo</h1>
+</section><section id="threepenny-crud" class="slide level2">
+<h1>Threepenny CRUD</h1>
+<figure>
+<img src="imgs/crud.png" />
+</figure>
+</section><section id="threepenny-crud-1" class="slide level2">
+<h1>Threepenny CRUD</h1>
+<pre><code>type Key = Int
+type Names = (String,String)
+type Database = Map Key Names
+
+let bDatabase :: Behavior Database
+    bDatabase = accumB&#39; empty solution
+    solution :: [Event (Database -&gt; Database)]
+    solution = [ _createName, _updateName, _deleteName ]</code></pre>
+<div class="fragment">
+<pre><code>eCreate :: Event ()
+eDelete :: Event ()
+eNames  :: Event Names
+bSelection :: Behavior (Maybe Key)
+
+create :: Names -&gt; Database -&gt; Database
+update :: Maybe Key -&gt; Names -&gt; Maybe (Database -&gt; Database) 
+delete :: Key -&gt; Database -&gt; Database
+
+filterJust :: Event (Maybe a) -&gt; Event a
+(&lt;@) :: Behavior a -&gt; Event b -&gt; Event a
+(&lt;@&gt;) :: Behavior (a -&gt; b) -&gt; Event a -&gt; Event b</code></pre>
+</div>
+</section><section id="crud-createname-12" class="slide level2">
+<h1>CRUD createName 1/2</h1>
+<pre><code>createName :: Event (Database -&gt; Database)
+createName = ???</code></pre>
+<div class="fragment">
+<pre><code>eCreate :: Event ()
+
+emil = (&quot;Emil,&quot;Example&quot;) :: Names
+create :: Names -&gt; Database -&gt; Database
+const :: a -&gt; b -&gt; a
+fmap :: (a -&gt; b) -&gt; Event a -&gt; Event b</code></pre>
+</div>
+</section><section id="crud-createname-22" class="slide level2">
+<h1>CRUD createName 2/2</h1>
+<pre><code>eCreate :: Event ()
+
+emil = (&quot;Emil,&quot;Example&quot;) :: Names
+create :: Names -&gt; Database -&gt; Database
+const :: a -&gt; b -&gt; a
+fmap :: (a -&gt; b) -&gt; Event a -&gt; Event b</code></pre>
+<pre><code>createEmil :: Database -&gt; Database
+createEmil = create emil</code></pre>
+<div class="fragment">
+<pre><code>constCreateEmil :: () -&gt; (Database -&gt; Database)
+constCreateEmil = const createEmil</code></pre>
+</div>
+<div class="fragment">
+<pre><code>createName :: Event (Database -&gt; Database)
+createName = fmap constCreateEmil eCreate</code></pre>
+</div>
+<div class="fragment">
+<pre><code>-- More succinct:
+createName = create (&quot;Emil&quot;,&quot;Example&quot;) &lt;$ eCreate</code></pre>
+</div>
+</section><section id="crud-deletename-12" class="slide level2">
+<h1>CRUD deleteName 1/2</h1>
+<pre><code>deleteName :: Event (Database -&gt; Database)
+deleteName = ???</code></pre>
+<div class="fragment">
+<pre><code>eDelete :: Event ()
+bSelection :: Behavior (Maybe Key)
+
+delete :: Key -&gt; Database -&gt; Database
+fmap :: (a -&gt; b) -&gt; Event a -&gt; Event b
+
+(&lt;@) :: Behavior a -&gt; Event b -&gt; Event a
+filterJust :: Event (Maybe a) -&gt; Event a</code></pre>
+</div>
+</section><section id="crud-deletename-22" class="slide level2">
+<h1>CRUD deleteName 2/2</h1>
+<pre><code>eDelete :: Event ()
+bSelection :: Behavior (Maybe Key)
+
+delete :: Key -&gt; Database -&gt; Database
+fmap :: (a -&gt; b) -&gt; Event a -&gt; Event b
+
+(&lt;@) :: Behavior a -&gt; Event b -&gt; Event a
+filterJust :: Event (Maybe a) -&gt; Event a</code></pre>
+<div class="fragment">
+<pre><code>bSelectionOnDelete :: Event (Maybe Key)
+bSelectionOnDelete = bSelection &lt;@ eDelete</code></pre>
+</div>
+<div class="fragment">
+<pre><code>bKeyOnDelete :: Event Key
+bKeyOnDelete = filterJust bSelectionOnDelete</code></pre>
+</div>
+<div class="fragment">
+<pre><code>deleteName :: Event (Database -&gt; Database)
+deleteName = fmap delete bKeyOnDelete</code></pre>
+</div>
 </section><section id="threepenny-summary" class="slide level2">
 <h1>Threepenny summary</h1>
 <ul>
@@ -217,7 +314,7 @@ stack ghci                  # Voilà!</code></pre></li>
 </ul>
 </div>
 <div class="fragment">
-<p><span class="math"> ⇒ </span> Using GHC/GHCJS in a single project is going to be magical</p>
+<p><span class="math"> ⇒ </span> Using GHC/GHCJS in a single project is going to be &quot;magical&quot;!</p>
 </div>
 </section></section>
 <section><section id="reflex" class="titleslide slide level1"><h1>Reflex</h1></section><section id="reflex-libraries" class="slide level2">
@@ -264,8 +361,150 @@ count :: (Reflex t, MonadHold t m, MonadFix m, Num b) =&gt;
 <li>Type signatures not as nice as comparable threepenny combinator type signatures</li>
 <li><em>Dynamic</em> is not a a Functor, so you often need <em>mapDyn</em> <span class="math"> ⇒ </span> somehow ugly</li>
 </ul>
-</section><section id="reflex-demo" class="slide level2">
-<h1>Reflex Demo</h1>
+</section><section id="reflex-sudoku" class="slide level2">
+<h1>Reflex Sudoku</h1>
+<p><a href="https://github.com/sleepomeno/reflex-sudoku" class="uri">https://github.com/sleepomeno/reflex-sudoku</a></p>
+</section><section id="cell-correctness" class="slide level2">
+<h1>Cell Correctness</h1>
+<pre><code>foldDyn&#39; :: x -&gt; [Event t (x -&gt; x)] -&gt; Dynamic t x
+
+cellContentCorrect :: (Event t Correctness, Event t Digit)
+                   -&gt; Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = ?</code></pre>
+<pre><code>data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -&gt; Bool
+isNotADigit :: Correctness -&gt; Bool
+ffilter :: (a -&gt; Bool) -&gt; Event t a -&gt; Event t a
+
+eSelectedSudoku :: Event Int</code></pre>
+</section><section id="solved-17" class="slide level2">
+<h1>Solved 1/7</h1>
+<pre><code>cellContentCorrect :: (Event t Correctness, Event t Digit) -&gt; Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn&#39; False [
+    -- should be True when the digit is a free digit
+    -- should be True when the digit cell input is correct
+    -- should be False when the cell input is not a digit
+    -- should be False when a new sudoku is chosen
+    -- should be False when the digit cell input is incorrect
+    ]</code></pre>
+<pre><code>data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -&gt; Bool
+isNotADigit :: Correctness -&gt; Bool
+ffilter :: (a -&gt; Bool) -&gt; Event t a -&gt; Event t a
+
+eSelectedSudoku :: Event Int</code></pre>
+</section><section id="solved-27" class="slide level2">
+<h1>Solved 2/7</h1>
+<pre><code>cellContentCorrect :: (Event t Correctness, Event t Digit) -&gt; Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn&#39; False [
+      const True &lt;$ ffilter isFree eDigit
+    -- should be True when the digit cell input is correct
+    -- should be False when the cell input is not a digit
+    -- should be False when a new sudoku is chosen
+    -- should be False when the digit cell input is incorrect
+    ]</code></pre>
+<pre><code>data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -&gt; Bool
+isNotADigit :: Correctness -&gt; Bool
+ffilter :: (a -&gt; Bool) -&gt; Event t a -&gt; Event t a
+
+eSelectedSudoku :: Event Int</code></pre>
+</section><section id="solved-37" class="slide level2">
+<h1>Solved 3/7</h1>
+<pre><code>cellContentCorrect :: (Event t Correctness, Event t Digit) -&gt; Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn&#39; False [
+      const True &lt;$ ffilter isFree eDigit
+    , const True &lt;$ ffilter isCorrect eInput
+    -- should be False when the cell input is not a digit
+    -- should be False when a new sudoku is chosen
+    -- should be False when the digit cell input is incorrect
+    ]</code></pre>
+<pre><code>data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -&gt; Bool
+isNotADigit :: Correctness -&gt; Bool
+ffilter :: (a -&gt; Bool) -&gt; Event t a -&gt; Event t a
+
+eSelectedSudoku :: Event Int</code></pre>
+</section><section id="solved-47" class="slide level2">
+<h1>Solved 4/7</h1>
+<pre><code>cellContentCorrect :: (Event t Correctness, Event t Digit) -&gt; Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn&#39; False [
+      const True &lt;$ ffilter isFree eDigit
+    , const True &lt;$ ffilter isCorrect eInput
+    , const False &lt;$ ffilter isNotADigit eInput
+    -- should be False when a new sudoku is chosen
+    -- should be False when the digit cell input is incorrect
+    ]</code></pre>
+<pre><code>data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -&gt; Bool
+isNotADigit :: Correctness -&gt; Bool
+ffilter :: (a -&gt; Bool) -&gt; Event t a -&gt; Event t a
+
+eSelectedSudoku :: Event Int</code></pre>
+</section><section id="solved-57" class="slide level2">
+<h1>Solved 5/7</h1>
+<pre><code>cellContentCorrect :: (Event t Correctness, Event t Digit) -&gt; Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn&#39; False [
+      const True &lt;$ ffilter isFree eDigit
+    , const True &lt;$ ffilter isCorrect eInput
+    , const False &lt;$ ffilter isNotADigit eInput
+    , const False &lt;$ eSelectedSudoku
+    -- should be False when the digit cell input is incorrect
+    ]</code></pre>
+<pre><code>data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -&gt; Bool
+isNotADigit :: Correctness -&gt; Bool
+ffilter :: (a -&gt; Bool) -&gt; Event t a -&gt; Event t a
+
+eSelectedSudoku :: Event Int</code></pre>
+</section><section id="solved-67" class="slide level2">
+<h1>Solved 6/7</h1>
+<pre><code>cellContentCorrect :: (Event t Correctness, Event t Digit) -&gt; Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn&#39; False [
+      const True &lt;$ ffilter isFree eDigit
+    , const True &lt;$ ffilter isCorrect eInput
+    , const False &lt;$ ffilter isNotADigit eInput
+    , const False &lt;$ eSelectedSudoku
+    , const False &lt;$ ffilter isNotCorrect eInput
+    ]</code></pre>
+<pre><code>data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -&gt; Bool
+isNotADigit :: Correctness -&gt; Bool
+ffilter :: (a -&gt; Bool) -&gt; Event t a -&gt; Event t a
+
+eSelectedSudoku :: Event Int</code></pre>
+</section><section id="solved-77" class="slide level2">
+<h1>Solved 7/7</h1>
+<pre><code>cellContentCorrect :: (Event t Correctness, Event t Digit)
+                   -&gt; Dynamic t Bool
+eCorrectness :: [Event t Correctness]
+eDigits :: [Event t Digit]
+mconcatDyn :: (Monoid a) =&gt; [Dynamic t a] -&gt; Dynamic t a</code></pre>
+<div class="fragment">
+<pre><code>dCorrectCells :: [Dynamic t Monoid.All] &lt;-
+  forM (zip eCorrectness dDigits)
+    (isCellInput &gt;=&gt; mapDyn Monoid.All) 
+
+dSudokuSolved :: Dynamic t Bool &lt;-
+  mconcatDyn dCorrectCells &gt;&gt;= mapDyn Monoid.getAll
+
+elClass &quot;h3&quot; &quot;solved&quot; $ dynText =&lt;&lt; forDyn dSudokuSolved $
+  \isSolved -&gt; if isSolved then &quot;Solved!&quot; else mempty</code></pre>
+</div>
 </section><section id="reflexthreepenny-conclusion" class="slide level2">
 <h1>Reflex/Threepenny conclusion</h1>
 <ul>
