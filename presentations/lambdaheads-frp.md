@@ -149,7 +149,153 @@ unionWith :: (a -> a -> a) -> Event a -> Event a -> Event a
 ```
 ... a few more (see the [the documentation](http://hackage.haskell.org/package/threepenny-gui-0.6.0.3/docs/Reactive-Threepenny.html))
 
-## Threepenny Demo
+## Threepenny CRUD
+
+
+![](imgs/crud.png)
+
+
+## Threepenny CRUD
+
+```
+type Key = Int
+type Names = (String,String)
+type Database = Map Key Names
+
+let bDatabase :: Behavior Database
+    bDatabase = accumB' empty solution
+    solution :: [Event (Database -> Database)]
+    solution = [ _createName, _updateName, _deleteName ]
+```
+
+. . . 
+
+```
+eCreate :: Event ()
+eDelete :: Event ()
+eNames  :: Event Names
+bSelection :: Behavior (Maybe Key)
+
+create :: Names -> Database -> Database
+update :: Maybe Key -> Names -> Maybe (Database -> Database) 
+delete :: Key -> Database -> Database
+
+filterJust :: Event (Maybe a) -> Event a
+(<@) :: Behavior a -> Event b -> Event a
+(<@>) :: Behavior (a -> b) -> Event a -> Event b
+```
+
+## CRUD createName 1/2
+
+```
+createName :: Event (Database -> Database)
+createName = ???
+```
+
+. . .
+
+```
+eCreate :: Event ()
+
+emil = ("Emil,"Example") :: Names
+create :: Names -> Database -> Database
+const :: a -> b -> a
+fmap :: (a -> b) -> Event a -> Event b
+```
+
+## CRUD createName 2/2
+
+```
+eCreate :: Event ()
+
+emil = ("Emil,"Example") :: Names
+create :: Names -> Database -> Database
+const :: a -> b -> a
+fmap :: (a -> b) -> Event a -> Event b
+```
+
+```
+createEmil :: Database -> Database
+createEmil = create emil
+```
+
+. . .
+
+```
+constCreateEmil :: () -> (Database -> Database)
+constCreateEmil = const createEmil
+```
+
+. . .
+
+```
+createName :: Event (Database -> Database)
+createName = fmap constCreateEmil eCreate
+```
+
+. . .
+
+```
+-- More succinct:
+createName = create ("Emil","Example") <$ eCreate
+```
+
+## CRUD deleteName 1/2
+
+```
+deleteName :: Event (Database -> Database)
+deleteName = ???
+```
+
+. . .
+
+```
+eDelete :: Event ()
+bSelection :: Behavior (Maybe Key)
+
+delete :: Key -> Database -> Database
+fmap :: (a -> b) -> Event a -> Event b
+
+(<@) :: Behavior a -> Event b -> Event a
+filterJust :: Event (Maybe a) -> Event a
+```
+
+## CRUD deleteName 2/2
+
+```
+eDelete :: Event ()
+bSelection :: Behavior (Maybe Key)
+
+delete :: Key -> Database -> Database
+fmap :: (a -> b) -> Event a -> Event b
+
+(<@) :: Behavior a -> Event b -> Event a
+filterJust :: Event (Maybe a) -> Event a
+```
+
+. . .
+
+```
+bSelectionOnDelete :: Event (Maybe Key)
+bSelectionOnDelete = bSelection <@ eDelete
+```
+
+. . . 
+
+```
+bKeyOnDelete :: Event Key
+bKeyOnDelete = filterJust bSelectionOnDelete
+```
+
+. . .
+
+```
+deleteName :: Event (Database -> Database)
+deleteName = fmap delete bKeyOnDelete
+```
+
+
+
 
 ## Threepenny summary
 
@@ -248,7 +394,189 @@ count :: (Reflex t, MonadHold t m, MonadFix m, Num b) =>
 * Type signatures not as nice as comparable threepenny combinator type signatures
 * _Dynamic_ is not a a Functor, so you often need _mapDyn_ $\Rightarrow$ somehow ugly
 
-## Reflex Demo
+## Reflex Sudoku
+
+[https://github.com/sleepomeno/reflex-sudoku](https://github.com/sleepomeno/reflex-sudoku)
+
+## Cell Correctness
+```
+foldDyn' :: x -> [Event t (x -> x)] -> Dynamic t x
+
+cellContentCorrect :: (Event t Correctness, Event t Digit)
+                   -> Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = ?
+```
+```
+data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -> Bool
+isNotADigit :: Correctness -> Bool
+ffilter :: (a -> Bool) -> Event t a -> Event t a
+
+eSelectedSudoku :: Event Int
+```
+
+## Solved 1/7
+
+```
+cellContentCorrect :: (Event t Correctness, Event t Digit) -> Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn' False [
+    -- should be True when the digit is a free digit
+    -- should be True when the digit cell input is correct
+    -- should be False when the cell input is not a digit
+    -- should be False when a new sudoku is chosen
+    -- should be False when the digit cell input is incorrect
+    ]
+```
+```
+data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -> Bool
+isNotADigit :: Correctness -> Bool
+ffilter :: (a -> Bool) -> Event t a -> Event t a
+
+eSelectedSudoku :: Event Int
+```
+
+## Solved 2/7
+
+```
+cellContentCorrect :: (Event t Correctness, Event t Digit) -> Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn' False [
+      const True <$ ffilter isFree eDigit
+    -- should be True when the digit cell input is correct
+    -- should be False when the cell input is not a digit
+    -- should be False when a new sudoku is chosen
+    -- should be False when the digit cell input is incorrect
+    ]
+```
+```
+data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -> Bool
+isNotADigit :: Correctness -> Bool
+ffilter :: (a -> Bool) -> Event t a -> Event t a
+
+eSelectedSudoku :: Event Int
+```
+
+## Solved 3/7
+
+```
+cellContentCorrect :: (Event t Correctness, Event t Digit) -> Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn' False [
+      const True <$ ffilter isFree eDigit
+    , const True <$ ffilter isCorrect eInput
+    -- should be False when the cell input is not a digit
+    -- should be False when a new sudoku is chosen
+    -- should be False when the digit cell input is incorrect
+    ]
+```
+```
+data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -> Bool
+isNotADigit :: Correctness -> Bool
+ffilter :: (a -> Bool) -> Event t a -> Event t a
+
+eSelectedSudoku :: Event Int
+```
+
+## Solved 4/7
+
+```
+cellContentCorrect :: (Event t Correctness, Event t Digit) -> Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn' False [
+      const True <$ ffilter isFree eDigit
+    , const True <$ ffilter isCorrect eInput
+    , const False <$ ffilter isNotADigit eInput
+    -- should be False when a new sudoku is chosen
+    -- should be False when the digit cell input is incorrect
+    ]
+```
+```
+data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -> Bool
+isNotADigit :: Correctness -> Bool
+ffilter :: (a -> Bool) -> Event t a -> Event t a
+
+eSelectedSudoku :: Event Int
+```
+
+## Solved 5/7
+
+```
+cellContentCorrect :: (Event t Correctness, Event t Digit) -> Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn' False [
+      const True <$ ffilter isFree eDigit
+    , const True <$ ffilter isCorrect eInput
+    , const False <$ ffilter isNotADigit eInput
+    , const False <$ eSelectedSudoku
+    -- should be False when the digit cell input is incorrect
+    ]
+```
+```
+data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -> Bool
+isNotADigit :: Correctness -> Bool
+ffilter :: (a -> Bool) -> Event t a -> Event t a
+
+eSelectedSudoku :: Event Int
+```
+
+## Solved 6/7
+
+```
+cellContentCorrect :: (Event t Correctness, Event t Digit) -> Dynamic t Bool
+cellContentCorrect (eCorrectness, eDigit) = foldDyn' False [
+      const True <$ ffilter isFree eDigit
+    , const True <$ ffilter isCorrect eInput
+    , const False <$ ffilter isNotADigit eInput
+    , const False <$ eSelectedSudoku
+    , const False <$ ffilter isNotCorrect eInput
+    ]
+```
+```
+data Digit = Guess Int | Free Int
+data Correctness = Correct | NotCorrect | NotADigit
+
+isCorrect :: Correctness -> Bool
+isNotADigit :: Correctness -> Bool
+ffilter :: (a -> Bool) -> Event t a -> Event t a
+
+eSelectedSudoku :: Event Int
+```
+
+## Solved 7/7
+
+```
+cellContentCorrect :: (Event t Correctness, Event t Digit)
+                   -> Dynamic t Bool
+eCorrectness :: [Event t Correctness]
+eDigits :: [Event t Digit]
+mconcatDyn :: (Monoid a) => [Dynamic t a] -> Dynamic t a
+```
+. . . 
+
+```
+dCorrectCells :: [Dynamic t Monoid.All] <-
+  forM (zip eCorrectness dDigits)
+    (isCellInput >=> mapDyn Monoid.All) 
+
+dSudokuSolved :: Dynamic t Bool <-
+  mconcatDyn dCorrectCells >>= mapDyn Monoid.getAll
+
+elClass "h3" "solved" $ dynText =<< forDyn dSudokuSolved $
+  \isSolved -> if isSolved then "Solved!" else mempty
+```
 
 ## Reflex/Threepenny conclusion
 
