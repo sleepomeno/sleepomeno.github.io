@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: graphics | while true live]]></title>
   <link href="http://sleepomeno.github.io/tags/graphics/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2015-11-16T15:15:39+01:00</updated>
+  <updated>2017-04-02T17:19:56+02:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -58,17 +58,17 @@ color of the US Open hard court ;)</p>
 <span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>(let* ([color &ldquo;blue&rdquo;]&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>  [blue (lambda (pict) (colorize pict color))]
-</span><span class='line'>  [double (blue (filled-rectangle 203 30))]
-</span><span class='line'>  [base (blue (filled-rectangle 90 133))]
-</span><span class='line'>  [margin 3]
-</span><span class='line'>  [doubles (hc-append margin double double)]
-</span><span class='line'>  [service (blue (filled-rectangle 110 65))]
-</span><span class='line'>  [services (vc-append margin service service)]
-</span><span class='line'>  [middle1 (hc-append margin base services)]
-</span><span class='line'>  [middle2 (hc-append margin services base)]
-</span><span class='line'>  [middles (hc-append margin middle1 middle2)])
-</span><span class='line'>(frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
+</span><span class='line'>&lt;pre>&lt;code>        [blue (lambda (pict) (colorize pict color))]
+</span><span class='line'>        [double (blue (filled-rectangle 203 30))]
+</span><span class='line'>        [base (blue (filled-rectangle 90 133))]
+</span><span class='line'>        [margin 3]
+</span><span class='line'>        [doubles (hc-append margin double double)]
+</span><span class='line'>        [service (blue (filled-rectangle 110 65))]
+</span><span class='line'>        [services (vc-append margin service service)]
+</span><span class='line'>        [middle1 (hc-append margin base services)]
+</span><span class='line'>        [middle2 (hc-append margin services base)]
+</span><span class='line'>        [middles (hc-append margin middle1 middle2)])
+</span><span class='line'>    (frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
 </span><span class='line'>&lt;/code>&lt;/pre>
 </span><span class='line'>
 </span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
@@ -173,13 +173,16 @@ integration worked like a charm!</p>
 of <code>purescript-canvas</code> and <code>purescript-free-canvas</code>. Obviously, I made
 heavy use of those to get the circle and the polygon drawn.</p>
 
-<p><code>haskell
+<p>``` haskell
 center = { x : 210, y : 210 }
-drawCircle = do
-  arc { x: center.x, y: center.y, r: radius, start: 0, end: Math.pi * 2 }
-  setFillStyle "#000000"
-  fill
-</code></p>
+drawCircle = do</p>
+
+<pre><code>arc { x: center.x, y: center.y, r: radius, start: 0, end: Math.pi * 2 }
+setFillStyle "#000000"
+fill
+</code></pre>
+
+<p>```</p>
 
 <p>As an argument to <code>arc</code> we actually have an example of the <em>Object</em>
 syntax of PureScript which is just like native JavaScript.</p>
@@ -213,36 +216,34 @@ show/hide the triangles. <code>onAsObservable</code> actually is from the
 used to define complex event handling.</p>
 
 <p>``` haskell
-main = do
-  canvas &lt;&ndash; getCanvasElementById &ldquo;canvas&rdquo;
-  context &lt;&ndash; getContext2D canvas
-  verticesInput &lt;&ndash; select &ldquo;#vertices&rdquo;
-  polygonArea &lt;&ndash; select &ldquo;#polygonArea&rdquo;
-  pi &lt;&ndash; select &ldquo;#pi&rdquo;
-  triangles &lt;&ndash; select &ldquo;#triangles&rdquo;</p>
+main = do</p>
 
-<p>  let updateUI num showTriangles = do</p>
+<pre><code>canvas &lt;- getCanvasElementById "canvas"
+context &lt;- getContext2D canvas
+verticesInput &lt;- select "#vertices"
+polygonArea &lt;- select "#polygonArea"
+pi &lt;- select "#pi"
+triangles &lt;- select "#triangles"
 
-<pre><code>  { pArea : polygonAreaPercent, pi : piApprox } &lt;- showPolygon canvas context num showTriangles
-  setText (show polygonAreaPercent &lt;&gt; "%") polygonArea
-  setText (show piApprox) pi
+let updateUI num showTriangles = do 
+        { pArea : polygonAreaPercent, pi : piApprox } &lt;- showPolygon canvas context num showTriangles
+        setText (show polygonAreaPercent &lt;&gt; "%") polygonArea
+        setText (show piApprox) pi
+let updateUI' = do 
+            showTriangles &lt;- ((== "true") &lt;&lt;&lt; stringify) &lt;$&gt; getProp "checked" triangles
+            num &lt;- (stringify &gt;&gt;&gt; readInt 10) &lt;$&gt; getValue verticesInput
+            updateUI num showTriangles
+
+trianglesChange &lt;- "click" `onAsObservable` triangles
+trianglesChange `subscribe` \_ -&gt; void updateUI'
+
+verticesChange &lt;- "focus" `onAsObservable` verticesInput
+verticesChange `subscribe` \_ -&gt; void updateUI'
+
+updateUI defaultVertices defaultShowTriangles
 </code></pre>
 
-<p>  let updateUI' = do</p>
-
-<pre><code>    showTriangles &lt;- ((== "true") &lt;&lt;&lt; stringify) &lt;$&gt; getProp "checked" triangles
-    num &lt;- (stringify &gt;&gt;&gt; readInt 10) &lt;$&gt; getValue verticesInput
-    updateUI num showTriangles
-</code></pre>
-
-<p>  trianglesChange &lt;&ndash; &ldquo;click&rdquo; <code>onAsObservable</code> triangles
-  trianglesChange <code>subscribe</code> _ &ndash;> void updateUI'</p>
-
-<p>  verticesChange &lt;&ndash; &ldquo;focus&rdquo; <code>onAsObservable</code> verticesInput
-  verticesChange <code>subscribe</code> _ &ndash;> void updateUI'</p>
-
-<p>  updateUI defaultVertices defaultShowTriangles
-```</p>
+<p>```</p>
 
 <h2>The Foreign Function Interface</h2>
 
@@ -255,12 +256,15 @@ communicating with JavaScript code. Anyway, after some digging in I
 ended up writing the function <code>stringify</code> which trivially transforms the
 incoming Javascript value to a <code>String</code>.</p>
 
-<p><code>haskell
-foreign import stringify
-  "function stringify(x) {\
-  \  return x+\"\";\
-  \}" :: Foreign -&gt; String
-</code></p>
+<p>``` haskell
+foreign import stringify</p>
+
+<pre><code>"function stringify(x) {\
+\  return x+\"\";\
+\}" :: Foreign -&gt; String
+</code></pre>
+
+<p>```</p>
 
 <p>That&rsquo;s an example of how you can integrate JavaScript functions in
 PureScript. It is a little bit of a joke as of now sice you need to add all

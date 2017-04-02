@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: statistics | while true live]]></title>
   <link href="http://sleepomeno.github.io/tags/statistics/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2015-11-16T15:15:39+01:00</updated>
+  <updated>2017-04-02T17:19:56+02:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -160,7 +160,7 @@ partial matching is not unique?</p>
 <p>``` r
 x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
 
-<pre><code>      a_is_my_first_letter_too = 6 : 10)
+<pre><code>                a_is_my_first_letter_too = 6 : 10)
 </code></pre>
 
 <p>x$a</p>
@@ -174,7 +174,7 @@ x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
 <p>``` r
 x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
 
-<pre><code>      a_is_my_first_letter_too = 6 : 10)
+<pre><code>                a_is_my_first_letter_too = 6 : 10)
 </code></pre>
 
 <p>x$a_is_m</p>
@@ -224,8 +224,8 @@ future of programming:</p>
 <p>``` java
 interface God {</p>
 
-<pre><code>void killMankind();
-void keepUpTheGoodWork();
+<pre><code>    void killMankind();
+    void keepUpTheGoodWork();
 </code></pre>
 
 <p>}</p>

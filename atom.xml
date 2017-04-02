@@ -4,7 +4,7 @@
   <title><![CDATA[while true live]]></title>
   <link href="http://sleepomeno.github.io/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2015-11-16T15:15:39+01:00</updated>
+  <updated>2017-04-02T17:19:56+02:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -12,6 +12,173 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Rolling the dice using random Enum values]]></title>
+    <link href="http://sleepomeno.github.io/blog/2017/04/02/Generating-random-Enum-values/"/>
+    <updated>2017-04-02T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2017/04/02/Generating-random-Enum-values</id>
+    <content type="html"><![CDATA[<p>Every wanted to roll the dice in Haskell? Let&rsquo;s say you have a data type like</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">data</span> <span class="kt">Number</span> <span class="ow">=</span> <span class="kt">One</span> <span class="o">|</span> <span class="kt">Two</span> <span class="o">|</span> <span class="kt">Three</span> <span class="o">|</span> <span class="kt">Four</span> <span class="o">|</span> <span class="kt">Five</span> <span class="o">|</span> <span class="kt">Six</span>
+</span><span class='line'>   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Enum</span><span class="p">,</span> <span class="kt">Bounded</span><span class="p">,</span> <span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>How do you generate a random <code>Number</code> value? There are several ways to do it, usually in an <code>IO</code> context, obviously. In order to use it in a
+common monad transformer stack, the primitives of the <code>MonadRandom</code> type class come to my mind. So it would be most convenient to get a
+ random value using <code>getRandom</code>. Anyway, as much fun as rolling the dice is, let&rsquo;s derive a solution working for all bounded Enums.</p>
+
+<!-- more -->
+
+
+<p>Anyway, import <strong>Control.Monad.Random</strong> as we want to use <code>getRandom</code> of the <code>MonadRandom</code> class which looks like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">class</span> <span class="kt">Monad</span> <span class="n">m</span> <span class="ow">=&gt;</span> <span class="kt">MonadRandom</span> <span class="p">(</span><span class="n">m</span> <span class="ow">::</span> <span class="o">*</span> <span class="ow">-&gt;</span> <span class="o">*</span><span class="p">)</span> <span class="kr">where</span>
+</span><span class='line'>  <span class="n">getRandom</span> <span class="ow">::</span> <span class="kt">Random</span> <span class="n">a</span> <span class="ow">=&gt;</span> <span class="n">m</span> <span class="n">a</span>
+</span><span class='line'><span class="c1">-- other functions we don&#39;t need</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">class</span> <span class="kt">Random</span> <span class="n">a</span> <span class="kr">where</span>
+</span><span class='line'><span class="c1">-- needs to provide:</span>
+</span><span class='line'>  <span class="n">randomR</span> <span class="ow">::</span> <span class="kt">RandomGen</span> <span class="n">g</span> <span class="ow">=&gt;</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="n">g</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">random</span> <span class="ow">::</span> <span class="kt">RandomGen</span> <span class="n">g</span> <span class="ow">=&gt;</span> <span class="n">g</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Shortly, <code>randomR</code> needs to be able to provide a random <code>Number</code> value in the specified interval, given a random number generator. So the idea is about mapping the Enum values to <code>Int</code> values
+and deriving a random Enum value from a randomly generated number.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="c1">-- :t fromEnum</span>
+</span><span class='line'><span class="c1">-- fromEnum :: Enum a =&gt; a -&gt; Int</span>
+</span><span class='line'><span class="c1">-- :t toEnum</span>
+</span><span class='line'><span class="c1">-- toEnum :: Enum a =&gt; Int -&gt; a</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">-- 1)</span>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">Random</span> <span class="kt">Number</span> <span class="kr">where</span>
+</span><span class='line'>  <span class="n">randomR</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="n">g</span> <span class="ow">=</span>
+</span><span class='line'>      <span class="kr">case</span> <span class="n">randomR</span> <span class="p">(</span><span class="n">fromEnum</span> <span class="n">a</span><span class="p">,</span> <span class="n">fromEnum</span> <span class="n">b</span><span class="p">)</span> <span class="n">g</span> <span class="kr">of</span>
+</span><span class='line'>              <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g&#39;</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">toEnum</span> <span class="n">x</span><span class="p">,</span> <span class="n">g&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">random</span> <span class="n">g</span> <span class="ow">=</span> <span class="n">randomR</span> <span class="p">(</span><span class="kt">One</span><span class="p">,</span> <span class="kt">Six</span><span class="p">)</span> <span class="n">g</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">-- 2) - more general solution making use of Bounded</span>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">Random</span> <span class="kt">Number</span> <span class="kr">where</span>
+</span><span class='line'>  <span class="n">randomR</span> <span class="ow">=</span> <span class="n">enumRandomR</span>
+</span><span class='line'>  <span class="n">random</span> <span class="n">g</span> <span class="ow">=</span> <span class="n">randomR</span> <span class="p">(</span><span class="n">minBound</span><span class="p">,</span> <span class="n">maxBound</span><span class="p">)</span> <span class="n">g</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">enumRandomR</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="n">g</span> <span class="ow">=</span>
+</span><span class='line'>  <span class="kr">case</span> <span class="n">randomR</span> <span class="p">(</span><span class="n">fromEnum</span> <span class="n">a</span><span class="p">,</span> <span class="n">fromEnum</span> <span class="n">b</span><span class="p">)</span> <span class="n">g</span> <span class="kr">of</span>
+</span><span class='line'>      <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g&#39;</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">toEnum</span> <span class="n">x</span><span class="p">,</span> <span class="n">g&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>While we still used the explicit <code>Number</code> interval values in <strong>1)</strong>, we get a more general solution in <strong>2)</strong> using the fact that we had auto-derived an instance of <code>Bounded</code> for <code>Number</code> and thus have <code>minBound</code> and <code>maxBound</code> at our disposal.</p>
+
+<p>At last, we can generate a random <code>Number</code> value:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="err">λ</span><span class="o">&gt;</span> <span class="n">getRandom</span> <span class="ow">::</span> <span class="kt">IO</span> <span class="kt">Number</span>
+</span><span class='line'><span class="kt">Two</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Anyway, our generated <code>Number</code> values are uniformly distributed, every value occurs with equal probability. What if you want to tamper with the die at little, e.g.
+when your opponent throws the dice they should not get a <code>Six</code> quite so often. You could do that providing a respective <code>Random</code> instance for a newtype wrapper:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="c1">-- you need GeneralizedNewtypeDeriving pragma to derive Enum</span>
+</span><span class='line'><span class="kr">newtype</span> <span class="kt">MaxBoundLessLikely</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">MaxLessLikely</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">getValue</span> <span class="ow">::</span> <span class="n">a</span> <span class="p">}</span> <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Bounded</span><span class="p">,</span> <span class="kt">Eq</span><span class="p">,</span> <span class="kt">Enum</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">instance</span> <span class="p">(</span><span class="kt">Enum</span> <span class="n">a</span><span class="p">,</span> <span class="kt">Eq</span> <span class="n">a</span><span class="p">,</span> <span class="kt">Bounded</span> <span class="n">a</span><span class="p">)</span> <span class="ow">=&gt;</span> <span class="kt">Random</span> <span class="p">(</span><span class="kt">MaxBoundLessLikely</span> <span class="n">a</span><span class="p">)</span> <span class="kr">where</span>
+</span><span class='line'>  <span class="n">randomR</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="n">g</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">enumRandomR</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="n">g</span> <span class="kr">of</span>
+</span><span class='line'>      <span class="n">result</span><span class="o">@</span><span class="p">(</span><span class="kt">MaxLessLikely</span> <span class="n">value</span><span class="p">,</span> <span class="n">g&#39;</span><span class="p">)</span> <span class="ow">-&gt;</span>
+</span><span class='line'>           <span class="kr">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">maxBound</span> <span class="kr">then</span>
+</span><span class='line'>               <span class="n">enumRandomR</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="n">g&#39;</span>
+</span><span class='line'>           <span class="kr">else</span> <span class="n">result</span>
+</span><span class='line'>  <span class="n">random</span> <span class="n">g</span> <span class="ow">=</span> <span class="n">randomR</span> <span class="p">(</span><span class="n">minBound</span><span class="p">,</span> <span class="n">maxBound</span><span class="p">)</span> <span class="n">g</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Your <code>rollDice</code> function then looks so inconspicuous, your opponent might not even notice:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">data</span> <span class="kt">Player</span> <span class="ow">=</span> <span class="kt">Me</span> <span class="o">|</span> <span class="kt">Opponent</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">rollDice</span> <span class="kt">Me</span> <span class="ow">=</span> <span class="n">getRandom</span>
+</span><span class='line'><span class="nf">rollDice</span> <span class="kt">Opponent</span> <span class="ow">=</span> <span class="n">fmap</span> <span class="n">getValue</span> <span class="n">getRandom</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">howManySixes</span> <span class="ow">::</span> <span class="kt">MonadRandom</span> <span class="n">m</span> <span class="ow">=&gt;</span> <span class="kt">Player</span> <span class="ow">-&gt;</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="n">m</span> <span class="kt">Int</span>
+</span><span class='line'><span class="nf">howManySixes</span> <span class="n">player</span> <span class="n">nrThrows</span> <span class="ow">=</span> <span class="kr">do</span>
+</span><span class='line'>  <span class="n">results</span> <span class="ow">&lt;-</span> <span class="n">replicateM</span> <span class="n">nrThrows</span> <span class="p">(</span><span class="n">rollDice</span> <span class="n">player</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">return</span> <span class="o">$</span> <span class="n">length</span> <span class="o">.</span> <span class="n">filter</span> <span class="p">(</span><span class="o">==</span> <span class="kt">Six</span><span class="p">)</span> <span class="o">$</span> <span class="n">results</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>They might actually think that they are just unlucky:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="err">λ</span><span class="o">&gt;</span> <span class="n">howManySixes</span> <span class="kt">Me</span> <span class="mi">1000</span>
+</span><span class='line'><span class="mi">170</span>
+</span><span class='line'><span class="err">λ</span><span class="o">&gt;</span> <span class="n">howManySixes</span> <span class="kt">Opponent</span> <span class="mi">1000</span>
+</span><span class='line'><span class="mi">46</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can find the source <a href="http://sleepomeno.github.io/enum/RandomEnum.hs" target="_blank">here</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Toying with Racket]]></title>
@@ -53,17 +220,17 @@ color of the US Open hard court ;)</p>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>(let* ([color "blue"]
-</span><span class='line'>      [blue (lambda (pict) (colorize pict color))]
-</span><span class='line'>      [double (blue (filled-rectangle 203 30))]
-</span><span class='line'>      [base (blue (filled-rectangle 90 133))]
-</span><span class='line'>      [margin 3]
-</span><span class='line'>      [doubles (hc-append margin double double)]
-</span><span class='line'>      [service (blue (filled-rectangle 110 65))]
-</span><span class='line'>      [services (vc-append margin service service)]
-</span><span class='line'>      [middle1 (hc-append margin base services)]
-</span><span class='line'>      [middle2 (hc-append margin services base)]
-</span><span class='line'>      [middles (hc-append margin middle1 middle2)])
-</span><span class='line'>    (frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>          [blue (lambda (pict) (colorize pict color))]
+</span><span class='line'>          [double (blue (filled-rectangle 203 30))]
+</span><span class='line'>          [base (blue (filled-rectangle 90 133))]
+</span><span class='line'>          [margin 3]
+</span><span class='line'>          [doubles (hc-append margin double double)]
+</span><span class='line'>          [service (blue (filled-rectangle 110 65))]
+</span><span class='line'>          [services (vc-append margin service service)]
+</span><span class='line'>          [middle1 (hc-append margin base services)]
+</span><span class='line'>          [middle2 (hc-append margin services base)]
+</span><span class='line'>          [middles (hc-append margin middle1 middle2)])
+</span><span class='line'>      (frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The code can also be found in that <a href="https://gist.github.com/sleepomeno/f8f0af59b19324166619" target="_blank">gist</a>.</p>
@@ -336,13 +503,13 @@ used to define complex event handling.</p>
 </span><span class='line'>  <span class="n">triangles</span> <span class="ow">&lt;-</span> <span class="n">select</span> <span class="s">&quot;#triangles&quot;</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="kr">let</span> <span class="n">updateUI</span> <span class="n">num</span> <span class="n">showTriangles</span> <span class="ow">=</span> <span class="kr">do</span>
-</span><span class='line'>      <span class="p">{</span> <span class="n">pArea</span> <span class="kt">:</span> <span class="n">polygonAreaPercent</span><span class="p">,</span> <span class="n">pi</span> <span class="kt">:</span> <span class="n">piApprox</span> <span class="p">}</span> <span class="ow">&lt;-</span> <span class="n">showPolygon</span> <span class="n">canvas</span> <span class="n">context</span> <span class="n">num</span> <span class="n">showTriangles</span>
-</span><span class='line'>      <span class="n">setText</span> <span class="p">(</span><span class="n">show</span> <span class="n">polygonAreaPercent</span> <span class="o">&lt;&gt;</span> <span class="s">&quot;%&quot;</span><span class="p">)</span> <span class="n">polygonArea</span>
-</span><span class='line'>      <span class="n">setText</span> <span class="p">(</span><span class="n">show</span> <span class="n">piApprox</span><span class="p">)</span> <span class="n">pi</span>
+</span><span class='line'>          <span class="p">{</span> <span class="n">pArea</span> <span class="kt">:</span> <span class="n">polygonAreaPercent</span><span class="p">,</span> <span class="n">pi</span> <span class="kt">:</span> <span class="n">piApprox</span> <span class="p">}</span> <span class="ow">&lt;-</span> <span class="n">showPolygon</span> <span class="n">canvas</span> <span class="n">context</span> <span class="n">num</span> <span class="n">showTriangles</span>
+</span><span class='line'>          <span class="n">setText</span> <span class="p">(</span><span class="n">show</span> <span class="n">polygonAreaPercent</span> <span class="o">&lt;&gt;</span> <span class="s">&quot;%&quot;</span><span class="p">)</span> <span class="n">polygonArea</span>
+</span><span class='line'>          <span class="n">setText</span> <span class="p">(</span><span class="n">show</span> <span class="n">piApprox</span><span class="p">)</span> <span class="n">pi</span>
 </span><span class='line'>  <span class="kr">let</span> <span class="n">updateUI&#39;</span> <span class="ow">=</span> <span class="kr">do</span>
-</span><span class='line'>        <span class="n">showTriangles</span> <span class="ow">&lt;-</span> <span class="p">((</span><span class="o">==</span> <span class="s">&quot;true&quot;</span><span class="p">)</span> <span class="o">&lt;&lt;&lt;</span> <span class="n">stringify</span><span class="p">)</span> <span class="o">&lt;$&gt;</span> <span class="n">getProp</span> <span class="s">&quot;checked&quot;</span> <span class="n">triangles</span>
-</span><span class='line'>        <span class="n">num</span> <span class="ow">&lt;-</span> <span class="p">(</span><span class="n">stringify</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">readInt</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&lt;$&gt;</span> <span class="n">getValue</span> <span class="n">verticesInput</span>
-</span><span class='line'>        <span class="n">updateUI</span> <span class="n">num</span> <span class="n">showTriangles</span>
+</span><span class='line'>              <span class="n">showTriangles</span> <span class="ow">&lt;-</span> <span class="p">((</span><span class="o">==</span> <span class="s">&quot;true&quot;</span><span class="p">)</span> <span class="o">&lt;&lt;&lt;</span> <span class="n">stringify</span><span class="p">)</span> <span class="o">&lt;$&gt;</span> <span class="n">getProp</span> <span class="s">&quot;checked&quot;</span> <span class="n">triangles</span>
+</span><span class='line'>              <span class="n">num</span> <span class="ow">&lt;-</span> <span class="p">(</span><span class="n">stringify</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">readInt</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&lt;$&gt;</span> <span class="n">getValue</span> <span class="n">verticesInput</span>
+</span><span class='line'>              <span class="n">updateUI</span> <span class="n">num</span> <span class="n">showTriangles</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="n">trianglesChange</span> <span class="ow">&lt;-</span> <span class="s">&quot;click&quot;</span> <span class="p">`</span><span class="n">onAsObservable</span><span class="p">`</span> <span class="n">triangles</span>
 </span><span class='line'>  <span class="n">trianglesChange</span> <span class="p">`</span><span class="n">subscribe</span><span class="p">`</span> <span class="nf">\</span><span class="kr">_</span> <span class="ow">-&gt;</span> <span class="n">void</span> <span class="n">updateUI&#39;</span>
@@ -371,8 +538,8 @@ incoming Javascript value to a <code>String</code>.</p>
 <span class='line-number'>4</span>
 </pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">foreign</span> <span class="kr">import</span> <span class="nn">stringify</span>
 </span><span class='line'>  <span class="s">&quot;function stringify(x) {</span><span class="se">\</span>
-</span><span class='line'><span class="se">  \</span><span class="s">  return x+</span><span class="se">\&quot;\&quot;</span><span class="s">;</span><span class="se">\</span>
-</span><span class='line'><span class="se">  \</span><span class="s">}&quot;</span> <span class="ow">::</span> <span class="kt">Foreign</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+</span><span class='line'><span class="se"> \</span><span class="s">  return x+</span><span class="se">\&quot;\&quot;</span><span class="s">;</span><span class="se">\</span>
+</span><span class='line'><span class="se"> \</span><span class="s">}&quot;</span> <span class="ow">::</span> <span class="kt">Foreign</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -454,7 +621,7 @@ partial matching is not unique?</p>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 </pre></td><td class='code'><pre><code class='r'><span class='line'>x <span class="o">&lt;-</span> list<span class="p">(</span>a_is_the_first_letter <span class="o">=</span> <span class="m">1</span> <span class="o">:</span> <span class="m">5</span><span class="p">,</span>
-</span><span class='line'>          a_is_my_first_letter_too <span class="o">=</span> <span class="m">6</span> <span class="o">:</span> <span class="m">10</span><span class="p">)</span>
+</span><span class='line'>                  a_is_my_first_letter_too <span class="o">=</span> <span class="m">6</span> <span class="o">:</span> <span class="m">10</span><span class="p">)</span>
 </span><span class='line'>x<span class="o">$</span>a
 </span><span class='line'><span class="c1"># NULL</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -467,7 +634,7 @@ partial matching is not unique?</p>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 </pre></td><td class='code'><pre><code class='r'><span class='line'>x <span class="o">&lt;-</span> list<span class="p">(</span>a_is_the_first_letter <span class="o">=</span> <span class="m">1</span> <span class="o">:</span> <span class="m">5</span><span class="p">,</span>
-</span><span class='line'>          a_is_my_first_letter_too <span class="o">=</span> <span class="m">6</span> <span class="o">:</span> <span class="m">10</span><span class="p">)</span>
+</span><span class='line'>                  a_is_my_first_letter_too <span class="o">=</span> <span class="m">6</span> <span class="o">:</span> <span class="m">10</span><span class="p">)</span>
 </span><span class='line'>x<span class="o">$</span>a_is_m
 </span><span class='line'><span class="c1"># 6 7 8 9 10</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -520,8 +687,8 @@ future of programming:</p>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 </pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">interface</span> <span class="nc">God</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="nf">killMankind</span><span class="o">();</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="nf">keepUpTheGoodWork</span><span class="o">();</span>
+</span><span class='line'>      <span class="kt">void</span> <span class="nf">killMankind</span><span class="o">();</span>
+</span><span class='line'>      <span class="kt">void</span> <span class="nf">keepUpTheGoodWork</span><span class="o">();</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="c1">// ...</span>
@@ -883,10 +1050,10 @@ Well, first have a look at why <code>coolSolution</code> did not type-check at a
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>Couldn't match type ‘Int’ with ‘String -> Int’
-</span><span class='line'>    Expected type: Int -> String -> Int
-</span><span class='line'>      Actual type: Int -> Int
-</span><span class='line'>    In the first argument of ‘(.)’, namely ‘plusOne’
-</span><span class='line'>    In the expression: plusOne . readTwoArgs :: String -> String -> Int</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>Expected type: Int -> String -> Int
+</span><span class='line'>  Actual type: Int -> Int
+</span><span class='line'>In the first argument of ‘(.)’, namely ‘plusOne’
+</span><span class='line'>In the expression: plusOne . readTwoArgs :: String -> String -> Int</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Essentially, this tells us that <code>plusOne</code> does not have the right type
@@ -908,11 +1075,11 @@ that you are happy?</p>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>Found hole ‘_’
-</span><span class='line'>      with type: (Int -> Int) -> (String -> Int) -> [Char] -> Int
-</span><span class='line'>    Relevant bindings include it :: Int (bound at &lt;interactive>:88:1)
-</span><span class='line'>    In the expression: _
-</span><span class='line'>    In the first argument of ‘(.)’, namely ‘(_ plusOne)’
-</span><span class='line'>    In the expression: (_ plusOne) . readTwoArgs</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>  with type: (Int -> Int) -> (String -> Int) -> [Char] -> Int
+</span><span class='line'>Relevant bindings include it :: Int (bound at &lt;interactive>:88:1)
+</span><span class='line'>In the expression: _
+</span><span class='line'>In the first argument of ‘(.)’, namely ‘(_ plusOne)’
+</span><span class='line'>In the expression: (_ plusOne) . readTwoArgs</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Okay, this help us. Our &ldquo;hole function&rdquo;&rsquo;s type is <code>(Int -&gt; Int) -&gt;
@@ -1212,17 +1379,17 @@ topics of <em>laziness</em> and <em>mutation</em>.</p>
 </span><span class='line'><span class="cm">/* puts all combinations into the array of its first argument */</span>
 </span><span class='line'><span class="kt">void</span> <span class="nf">combinationsWithoutRepetition</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">combinations</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">feld</span><span class="p">,</span><span class="kt">int</span> <span class="n">bound</span><span class="p">,</span><span class="kt">int</span> <span class="n">length</span><span class="p">,</span><span class="kt">int</span> <span class="n">pos</span><span class="p">,</span><span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
 </span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">pos</span><span class="o">==</span><span class="n">length</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="n">combinations</span><span class="p">[</span><span class="n">idx</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">feld</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>      <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="n">combinations</span><span class="p">[</span><span class="n">idx</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">feld</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'>      <span class="p">}</span>
 </span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span><span class="o">*</span> <span class="n">feldPos</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">feld</span><span class="p">[</span><span class="n">pos</span><span class="p">];</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">val</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">bound</span><span class="p">;</span><span class="o">++</span><span class="n">i</span><span class="p">){</span>
-</span><span class='line'>      <span class="o">*</span><span class="n">feldPos</span><span class="o">=</span><span class="n">i</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">combinationsWithoutRepetition</span><span class="p">(</span><span class="n">combinations</span><span class="p">,</span><span class="n">feld</span><span class="p">,</span><span class="n">bound</span><span class="p">,</span><span class="n">length</span><span class="p">,</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>      <span class="kt">int</span><span class="o">*</span> <span class="n">feldPos</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">feld</span><span class="p">[</span><span class="n">pos</span><span class="p">];</span>
+</span><span class='line'>      <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">val</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">bound</span><span class="p">;</span><span class="o">++</span><span class="n">i</span><span class="p">){</span>
+</span><span class='line'>          <span class="o">*</span><span class="n">feldPos</span><span class="o">=</span><span class="n">i</span><span class="p">;</span>
+</span><span class='line'>          <span class="n">combinationsWithoutRepetition</span><span class="p">(</span><span class="n">combinations</span><span class="p">,</span><span class="n">feld</span><span class="p">,</span><span class="n">bound</span><span class="p">,</span><span class="n">length</span><span class="p">,</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
 </span><span class='line'>  <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
@@ -1238,7 +1405,7 @@ topics of <em>laziness</em> and <em>mutation</em>.</p>
 </span><span class='line'>  <span class="n">combinationsWithoutRepetition</span><span class="p">(</span><span class="n">combinations</span><span class="p">,</span><span class="n">singleCombination</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
 </span><span class='line'>  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'>  <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">;</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">5</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d %d %d %d %d </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">4</span><span class="p">]);</span>
+</span><span class='line'>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d %d %d %d %d </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">],</span><span class="n">combinations</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">4</span><span class="p">]);</span>
 </span><span class='line'>  <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -1287,16 +1454,16 @@ get a value out of the <code>ST</code> monad like below.</p>
 </pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">comb1</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
 </span><span class='line'><span class="nf">comb1</span> <span class="n">k</span> <span class="n">elements</span> <span class="ow">=</span> <span class="n">runST</span> <span class="o">$</span> <span class="kr">do</span>
 </span><span class='line'>  <span class="kr">let</span> <span class="n">bound</span> <span class="ow">=</span> <span class="n">length</span> <span class="n">elements</span>
-</span><span class='line'>      <span class="n">boundMinus1</span> <span class="ow">=</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span>
-</span><span class='line'>      <span class="n">elementArray</span> <span class="ow">=</span> <span class="n">listArray</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">elements</span>
+</span><span class='line'>          <span class="n">boundMinus1</span> <span class="ow">=</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>          <span class="n">elementArray</span> <span class="ow">=</span> <span class="n">listArray</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">elements</span>
 </span><span class='line'>
-</span><span class='line'>      <span class="n">comb1&#39;</span> <span class="ow">::</span> <span class="kt">STRef</span> <span class="n">s</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">Int</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">ST</span> <span class="n">s</span> <span class="nb">()</span>
-</span><span class='line'>      <span class="n">comb1&#39;</span> <span class="n">combos</span>  <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">=</span>
-</span><span class='line'>        <span class="kr">let</span> <span class="n">comb1&#39;&#39;</span> <span class="n">currentCombo</span> <span class="p">(</span><span class="o">!</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
-</span><span class='line'>              <span class="o">|</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">k</span>  <span class="ow">=</span> <span class="n">modifySTRef</span> <span class="n">combos</span> <span class="p">((</span><span class="kt">:</span><span class="p">)</span> <span class="n">currentCombo</span><span class="p">)</span>
-</span><span class='line'>              <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="n">forM_</span> <span class="p">[</span><span class="n">val</span><span class="o">..</span><span class="n">boundMinus1</span><span class="p">]</span> <span class="o">$</span> <span class="nf">\</span><span class="n">x</span> <span class="ow">-&gt;</span> <span class="n">comb1&#39;&#39;</span> <span class="p">(</span><span class="n">elementArray</span><span class="o">!</span><span class="n">x</span> <span class="kt">:</span> <span class="n">currentCombo</span><span class="p">)</span> <span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>        <span class="kr">in</span>
-</span><span class='line'>         <span class="n">comb1&#39;&#39;</span> <span class="kt">[]</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">comb1&#39;</span> <span class="ow">::</span> <span class="kt">STRef</span> <span class="n">s</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">Int</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">ST</span> <span class="n">s</span> <span class="nb">()</span>
+</span><span class='line'>          <span class="n">comb1&#39;</span> <span class="n">combos</span>  <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">=</span>
+</span><span class='line'>              <span class="kr">let</span> <span class="n">comb1&#39;&#39;</span> <span class="n">currentCombo</span> <span class="p">(</span><span class="o">!</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>                          <span class="o">|</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">k</span>  <span class="ow">=</span> <span class="n">modifySTRef</span> <span class="n">combos</span> <span class="p">((</span><span class="kt">:</span><span class="p">)</span> <span class="n">currentCombo</span><span class="p">)</span>
+</span><span class='line'>                          <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="n">forM_</span> <span class="p">[</span><span class="n">val</span><span class="o">..</span><span class="n">boundMinus1</span><span class="p">]</span> <span class="o">$</span> <span class="nf">\</span><span class="n">x</span> <span class="ow">-&gt;</span> <span class="n">comb1&#39;&#39;</span> <span class="p">(</span><span class="n">elementArray</span><span class="o">!</span><span class="n">x</span> <span class="kt">:</span> <span class="n">currentCombo</span><span class="p">)</span> <span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>              <span class="kr">in</span>
+</span><span class='line'>               <span class="n">comb1&#39;&#39;</span> <span class="kt">[]</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 </span><span class='line'>  <span class="n">combos</span> <span class="ow">&lt;-</span> <span class="n">newSTRef</span> <span class="kt">[]</span>
 </span><span class='line'>  <span class="n">comb1&#39;</span> <span class="n">combos</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 </span><span class='line'>  <span class="n">readSTRef</span> <span class="n">combos</span>
@@ -1338,16 +1505,16 @@ the lazy <code>ST</code> monad to the rescue!</p>
 </pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">comb2</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
 </span><span class='line'><span class="nf">comb2</span> <span class="n">k</span> <span class="n">elements</span> <span class="ow">=</span> <span class="kt">L</span><span class="o">.</span><span class="n">runST</span> <span class="o">$</span> <span class="kr">do</span>
 </span><span class='line'>  <span class="kr">let</span> <span class="n">bound</span> <span class="ow">=</span> <span class="n">length</span> <span class="n">elements</span>
-</span><span class='line'>      <span class="n">boundMinus1</span> <span class="ow">=</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span>
-</span><span class='line'>      <span class="n">elementArray</span> <span class="ow">=</span> <span class="n">listArray</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">elements</span>
+</span><span class='line'>          <span class="n">boundMinus1</span> <span class="ow">=</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>          <span class="n">elementArray</span> <span class="ow">=</span> <span class="n">listArray</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">elements</span>
 </span><span class='line'>
-</span><span class='line'>      <span class="n">comb2&#39;</span> <span class="ow">::</span> <span class="kt">STRef</span> <span class="n">s</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">Int</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ST</span> <span class="n">s</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
-</span><span class='line'>      <span class="n">comb2&#39;</span> <span class="n">combos</span>  <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">=</span>
-</span><span class='line'>        <span class="kr">let</span> <span class="n">comb2&#39;&#39;</span> <span class="n">currentCombo</span> <span class="p">(</span><span class="o">!</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
-</span><span class='line'>              <span class="o">|</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">k</span>  <span class="ow">=</span> <span class="kr">do</span> <span class="p">{</span> <span class="kt">L</span><span class="o">.</span><span class="n">strictToLazyST</span> <span class="o">$</span> <span class="n">modifySTRef</span> <span class="n">combos</span> <span class="p">((</span><span class="kt">:</span><span class="p">)</span> <span class="n">currentCombo</span><span class="p">);</span> <span class="n">return</span> <span class="p">[</span><span class="n">currentCombo</span><span class="p">]</span> <span class="p">}</span>
-</span><span class='line'>              <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="n">fmap</span> <span class="n">concat</span> <span class="o">$</span> <span class="n">forM</span> <span class="p">[</span><span class="n">val</span><span class="o">..</span><span class="n">boundMinus1</span><span class="p">]</span> <span class="o">$</span> <span class="nf">\</span><span class="n">x</span> <span class="ow">-&gt;</span> <span class="n">comb2&#39;&#39;</span> <span class="p">(</span><span class="n">elementArray</span><span class="o">!</span><span class="n">x</span> <span class="kt">:</span> <span class="n">currentCombo</span><span class="p">)</span> <span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>        <span class="kr">in</span>
-</span><span class='line'>         <span class="n">comb2&#39;&#39;</span> <span class="kt">[]</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">comb2&#39;</span> <span class="ow">::</span> <span class="kt">STRef</span> <span class="n">s</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">Int</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ST</span> <span class="n">s</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
+</span><span class='line'>          <span class="n">comb2&#39;</span> <span class="n">combos</span>  <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">=</span>
+</span><span class='line'>              <span class="kr">let</span> <span class="n">comb2&#39;&#39;</span> <span class="n">currentCombo</span> <span class="p">(</span><span class="o">!</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>                          <span class="o">|</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">k</span>  <span class="ow">=</span> <span class="kr">do</span> <span class="p">{</span> <span class="kt">L</span><span class="o">.</span><span class="n">strictToLazyST</span> <span class="o">$</span> <span class="n">modifySTRef</span> <span class="n">combos</span> <span class="p">((</span><span class="kt">:</span><span class="p">)</span> <span class="n">currentCombo</span><span class="p">);</span> <span class="n">return</span> <span class="p">[</span><span class="n">currentCombo</span><span class="p">]</span> <span class="p">}</span>
+</span><span class='line'>                          <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="n">fmap</span> <span class="n">concat</span> <span class="o">$</span> <span class="n">forM</span> <span class="p">[</span><span class="n">val</span><span class="o">..</span><span class="n">boundMinus1</span><span class="p">]</span> <span class="o">$</span> <span class="nf">\</span><span class="n">x</span> <span class="ow">-&gt;</span> <span class="n">comb2&#39;&#39;</span> <span class="p">(</span><span class="n">elementArray</span><span class="o">!</span><span class="n">x</span> <span class="kt">:</span> <span class="n">currentCombo</span><span class="p">)</span> <span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>              <span class="kr">in</span>
+</span><span class='line'>               <span class="n">comb2&#39;&#39;</span> <span class="kt">[]</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 </span><span class='line'>  <span class="n">combos</span> <span class="ow">&lt;-</span> <span class="kt">L</span><span class="o">.</span><span class="n">strictToLazyST</span> <span class="o">$</span> <span class="n">newSTRef</span> <span class="kt">[]</span>
 </span><span class='line'>  <span class="n">comb2&#39;</span> <span class="n">combos</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -1378,14 +1545,14 @@ version resulting from throwing the <code>ST</code> monad into the garbage can:<
 </pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="nf">comb3</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
 </span><span class='line'><span class="nf">comb3</span> <span class="n">k</span> <span class="n">elements</span> <span class="ow">=</span>
 </span><span class='line'>  <span class="kr">let</span> <span class="n">bound</span> <span class="ow">=</span> <span class="n">length</span> <span class="n">elements</span>
-</span><span class='line'>      <span class="n">boundMinus1</span> <span class="ow">=</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span>
-</span><span class='line'>      <span class="n">elementArray</span> <span class="ow">=</span> <span class="n">listArray</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">elements</span>
-</span><span class='line'>      <span class="n">comb3&#39;</span>  <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">=</span> <span class="n">comb3&#39;&#39;</span> <span class="kt">[]</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
-</span><span class='line'>        <span class="kr">where</span>
-</span><span class='line'>        <span class="n">comb3&#39;&#39;</span> <span class="n">currentCombo</span> <span class="p">(</span><span class="o">!</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
-</span><span class='line'>          <span class="o">|</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">k</span>  <span class="ow">=</span> <span class="p">[</span><span class="n">currentCombo</span><span class="p">]</span>
-</span><span class='line'>          <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="n">concat</span> <span class="p">[</span><span class="n">comb3&#39;&#39;</span> <span class="p">(</span><span class="n">elementArray</span><span class="o">!</span><span class="n">x</span> <span class="kt">:</span> <span class="n">currentCombo</span><span class="p">)</span> <span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">x</span> <span class="ow">&lt;-</span> <span class="p">[</span><span class="n">val</span><span class="o">..</span><span class="n">boundMinus1</span><span class="p">]]</span>
-</span><span class='line'>      <span class="kr">in</span>
+</span><span class='line'>          <span class="n">boundMinus1</span> <span class="ow">=</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>          <span class="n">elementArray</span> <span class="ow">=</span> <span class="n">listArray</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="n">elements</span>
+</span><span class='line'>          <span class="n">comb3&#39;</span>  <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">=</span> <span class="n">comb3&#39;&#39;</span> <span class="kt">[]</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>              <span class="kr">where</span>
+</span><span class='line'>              <span class="n">comb3&#39;&#39;</span> <span class="n">currentCombo</span> <span class="p">(</span><span class="o">!</span><span class="n">pos</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'>                  <span class="o">|</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">k</span>  <span class="ow">=</span> <span class="p">[</span><span class="n">currentCombo</span><span class="p">]</span>
+</span><span class='line'>                  <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="n">concat</span> <span class="p">[</span><span class="n">comb3&#39;&#39;</span> <span class="p">(</span><span class="n">elementArray</span><span class="o">!</span><span class="n">x</span> <span class="kt">:</span> <span class="n">currentCombo</span><span class="p">)</span> <span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">x</span> <span class="ow">&lt;-</span> <span class="p">[</span><span class="n">val</span><span class="o">..</span><span class="n">boundMinus1</span><span class="p">]]</span>
+</span><span class='line'>          <span class="kr">in</span>
 </span><span class='line'>  <span class="n">comb3&#39;</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -1436,8 +1603,8 @@ eats up your memory, though.)</p>
 </span><span class='line'><span class="nf">comb5</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
 </span><span class='line'><span class="nf">comb5</span> <span class="mi">0</span> <span class="kr">_</span>      <span class="ow">=</span> <span class="p">[</span><span class="kt">[]</span><span class="p">]</span>
 </span><span class='line'><span class="nf">comb5</span> <span class="n">k</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">xs</span><span class="p">)</span> <span class="ow">=</span> <span class="n">map</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="p">)</span> <span class="p">(</span><span class="n">combTable</span> <span class="o">!!</span> <span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!!</span> <span class="n">newlength</span><span class="p">)</span> <span class="o">++</span> <span class="p">(</span><span class="n">combTable</span> <span class="o">!!</span> <span class="n">k</span> <span class="o">!!</span> <span class="n">newlength</span><span class="p">)</span>
-</span><span class='line'>                <span class="kr">where</span>
-</span><span class='line'>                    <span class="n">newlength</span> <span class="ow">=</span> <span class="n">n</span><span class="o">-</span><span class="n">length</span> <span class="n">xs</span>
+</span><span class='line'>                              <span class="kr">where</span>
+</span><span class='line'>                                      <span class="n">newlength</span> <span class="ow">=</span> <span class="n">n</span><span class="o">-</span><span class="n">length</span> <span class="n">xs</span>
 </span><span class='line'><span class="nf">comb5</span> <span class="kr">_</span> <span class="kr">_</span>      <span class="ow">=</span> <span class="kt">[]</span>
 </span></code></pre></td></tr></table></div></figure>
 

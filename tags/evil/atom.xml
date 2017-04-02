@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: evil | while true live]]></title>
+  <link href="http://sleepomeno.github.io/tags/evil/atom.xml" rel="self"/>
+  <link href="http://sleepomeno.github.io/"/>
+  <updated>2017-04-02T17:19:56+02:00</updated>
+  <id>http://sleepomeno.github.io/</id>
+  <author>
+    <name><![CDATA[Gregor Riegler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Rolling the dice using random Enum values]]></title>
+    <link href="http://sleepomeno.github.io/blog/2017/04/02/Generating-random-Enum-values/"/>
+    <updated>2017-04-02T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2017/04/02/Generating-random-Enum-values</id>
+    <content type="html"><![CDATA[<p>Every wanted to roll the dice in Haskell? Let&rsquo;s say you have a data type like</p>
+
+<p>``` haskell
+data Number = One | Two | Three | Four | Five | Six</p>
+
+<pre><code> deriving (Enum, Bounded, Eq, Show)
+</code></pre>
+
+<p>```</p>
+
+<p>How do you generate a random <code>Number</code> value? There are several ways to do it, usually in an <code>IO</code> context, obviously. In order to use it in a
+common monad transformer stack, the primitives of the <code>MonadRandom</code> type class come to my mind. So it would be most convenient to get a
+ random value using <code>getRandom</code>. Anyway, as much fun as rolling the dice is, let&rsquo;s derive a solution working for all bounded Enums.</p>
+
+<!-- more -->
+
+
+<p>Anyway, import <strong>Control.Monad.Random</strong> as we want to use <code>getRandom</code> of the <code>MonadRandom</code> class which looks like:</p>
+
+<p>``` haskell
+class Monad m => MonadRandom (m :: * &ndash;> *) where</p>
+
+<pre><code>getRandom :: Random a =&gt; m a
+</code></pre>
+
+<p>&mdash; other functions we don&rsquo;t need</p>
+
+<p>class Random a where
+&mdash; needs to provide:</p>
+
+<pre><code>randomR :: RandomGen g =&gt; (a, a) -&gt; g -&gt; (a, g)
+random :: RandomGen g =&gt; g -&gt; (a, g)
+</code></pre>
+
+<p>```</p>
+
+<p>Shortly, <code>randomR</code> needs to be able to provide a random <code>Number</code> value in the specified interval, given a random number generator. So the idea is about mapping the Enum values to <code>Int</code> values
+and deriving a random Enum value from a randomly generated number.</p>
+
+<p>``` haskell
+&mdash; :t fromEnum
+&mdash; fromEnum :: Enum a => a &ndash;> Int
+&mdash; :t toEnum
+&mdash; toEnum :: Enum a => Int &ndash;> a</p>
+
+<p>&mdash; 1)
+instance Random Number where</p>
+
+<pre><code>randomR (a,b) g = 
+    case randomR (fromEnum a, fromEnum b) g of
+            (x, g') -&gt; (toEnum x, g')
+random g = randomR (One, Six) g
+</code></pre>
+
+<p>&mdash; 2) &ndash; more general solution making use of Bounded
+instance Random Number where</p>
+
+<pre><code>randomR = enumRandomR
+random g = randomR (minBound, maxBound) g
+</code></pre>
+
+<p>enumRandomR (a, b) g =</p>
+
+<pre><code>case randomR (fromEnum a, fromEnum b) g of
+    (x, g') -&gt; (toEnum x, g')
+</code></pre>
+
+<p>```</p>
+
+<p>While we still used the explicit <code>Number</code> interval values in <strong>1)</strong>, we get a more general solution in <strong>2)</strong> using the fact that we had auto-derived an instance of <code>Bounded</code> for <code>Number</code> and thus have <code>minBound</code> and <code>maxBound</code> at our disposal.</p>
+
+<p>At last, we can generate a random <code>Number</code> value:</p>
+
+<p><code>haskell
+λ&gt; getRandom :: IO Number
+Two
+</code></p>
+
+<p>Anyway, our generated <code>Number</code> values are uniformly distributed, every value occurs with equal probability. What if you want to tamper with the die at little, e.g.
+when your opponent throws the dice they should not get a <code>Six</code> quite so often. You could do that providing a respective <code>Random</code> instance for a newtype wrapper:</p>
+
+<p>``` haskell
+&mdash; you need GeneralizedNewtypeDeriving pragma to derive Enum
+newtype MaxBoundLessLikely a = MaxLessLikely {</p>
+
+<pre><code>getValue :: a } deriving (Bounded, Eq, Enum, Show)
+</code></pre>
+
+<p>instance (Enum a, Eq a, Bounded a) => Random (MaxBoundLessLikely a) where</p>
+
+<pre><code>randomR (a,b) g = case enumRandomR (a,b) g of
+    result@(MaxLessLikely value, g') -&gt; 
+         if value == maxBound then
+             enumRandomR (a,b) g'
+         else result
+random g = randomR (minBound, maxBound) g
+</code></pre>
+
+<p>```</p>
+
+<p>Your <code>rollDice</code> function then looks so inconspicuous, your opponent might not even notice:</p>
+
+<p>``` haskell
+data Player = Me | Opponent</p>
+
+<p>rollDice Me = getRandom
+rollDice Opponent = fmap getValue getRandom</p>
+
+<p>howManySixes :: MonadRandom m => Player &ndash;> Int &ndash;> m Int
+howManySixes player nrThrows = do</p>
+
+<pre><code>results &lt;- replicateM nrThrows (rollDice player)
+return $ length . filter (== Six) $ results
+</code></pre>
+
+<p>```</p>
+
+<p>They might actually think that they are just unlucky:</p>
+
+<p><code>haskell
+λ&gt; howManySixes Me 1000
+170
+λ&gt; howManySixes Opponent 1000
+46
+</code></p>
+
+<p>You can find the source <a href="http://sleepomeno.github.io/enum/RandomEnum.hs" target="_blank">here</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

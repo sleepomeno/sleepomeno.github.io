@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: maybe | while true live]]></title>
   <link href="http://sleepomeno.github.io/tags/maybe/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2015-11-16T15:15:39+01:00</updated>
+  <updated>2017-04-02T17:19:56+02:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -35,16 +35,24 @@ famous <code>else return null</code> idiom.</p>
 
 <p>``` java
 // Version 1
-if (password == &ldquo;12345&rdquo;)
-   return valuableTreasure;
-else
-   return null;</p>
+if (password == &ldquo;12345&rdquo;)</p>
+
+<pre><code> return valuableTreasure;
+</code></pre>
+
+<p>else</p>
+
+<pre><code> return null;
+</code></pre>
 
 <p>// or, equivalently
 // Version 2
-if (password == &ldquo;12345&rdquo;)
-   return valuableTreasure;
-return null;
+if (password == &ldquo;12345&rdquo;)</p>
+
+<pre><code> return valuableTreasure;
+</code></pre>
+
+<p>return null;
 ```</p>
 
 <p>To make things more familiar, in Version 2 you could imagine multiple <code>return null</code> lines hidden in
@@ -64,14 +72,17 @@ corresponding Nullpointer exception. In Haskell, there is the <a href="https://w
 the risk of a Nullpointer exception. Here is the snippet of that code
 (obviously, only the <code>else Nothing</code> is &lsquo;important&rsquo;).</p>
 
-<p><code>haskell
-newState =
-  if not shouldBeCompiled &amp;&amp; w' == view T.word W.immediate' then
-   (oldState ^. lastColonDefinition ) &gt;&gt;=
-   (\x -&gt; return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True))
-  else
-   Nothing
-</code></p>
+<p>``` haskell
+newState =</p>
+
+<pre><code>if not shouldBeCompiled &amp;&amp; w' == view T.word W.immediate' then
+ (oldState ^. lastColonDefinition ) &gt;&gt;=
+ (\x -&gt; return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True))
+else 
+ Nothing
+</code></pre>
+
+<p>```</p>
 
 <p>Anyway, believe me, if you ever write such an <code>else Nothing</code> in Haskell, that should
 be the trigger &ndash; take a deep breath, take a coffee and think about your
@@ -87,12 +98,15 @@ how would it be &lsquo;better&rsquo;? In my opinion, it conveys much
 more the impression that the programmer actually knows what they are doing.</p>
 
 <p>``` haskell
-newState = do
-  guard $ not shouldBeCompiled &amp;&amp; w' == (view T.word W.immediate')</p>
+newState = do</p>
 
-<p>  x &lt;&ndash; oldState ^. lastColonDefinition
-  return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True)
-```</p>
+<pre><code>guard $ not shouldBeCompiled &amp;&amp; w' == (view T.word W.immediate')
+
+x &lt;- oldState ^. lastColonDefinition
+return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True)
+</code></pre>
+
+<p>```</p>
 
 <p>Essentially, the <code>guard</code> function does the trick. <code>guard</code>, which has the type
 <em>guard :: MonadPlus m => Bool &ndash;> m ()</em>, makes the containing <em>do</em>

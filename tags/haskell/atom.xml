@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: haskell | while true live]]></title>
   <link href="http://sleepomeno.github.io/tags/haskell/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2015-11-16T15:15:39+01:00</updated>
+  <updated>2017-04-02T17:19:56+02:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -12,6 +12,141 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Rolling the dice using random Enum values]]></title>
+    <link href="http://sleepomeno.github.io/blog/2017/04/02/Generating-random-Enum-values/"/>
+    <updated>2017-04-02T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2017/04/02/Generating-random-Enum-values</id>
+    <content type="html"><![CDATA[<p>Every wanted to roll the dice in Haskell? Let&rsquo;s say you have a data type like</p>
+
+<p>``` haskell
+data Number = One | Two | Three | Four | Five | Six</p>
+
+<pre><code> deriving (Enum, Bounded, Eq, Show)
+</code></pre>
+
+<p>```</p>
+
+<p>How do you generate a random <code>Number</code> value? There are several ways to do it, usually in an <code>IO</code> context, obviously. In order to use it in a
+common monad transformer stack, the primitives of the <code>MonadRandom</code> type class come to my mind. So it would be most convenient to get a
+ random value using <code>getRandom</code>. Anyway, as much fun as rolling the dice is, let&rsquo;s derive a solution working for all bounded Enums.</p>
+
+<!-- more -->
+
+
+<p>Anyway, import <strong>Control.Monad.Random</strong> as we want to use <code>getRandom</code> of the <code>MonadRandom</code> class which looks like:</p>
+
+<p>``` haskell
+class Monad m => MonadRandom (m :: * &ndash;> *) where</p>
+
+<pre><code>getRandom :: Random a =&gt; m a
+</code></pre>
+
+<p>&mdash; other functions we don&rsquo;t need</p>
+
+<p>class Random a where
+&mdash; needs to provide:</p>
+
+<pre><code>randomR :: RandomGen g =&gt; (a, a) -&gt; g -&gt; (a, g)
+random :: RandomGen g =&gt; g -&gt; (a, g)
+</code></pre>
+
+<p>```</p>
+
+<p>Shortly, <code>randomR</code> needs to be able to provide a random <code>Number</code> value in the specified interval, given a random number generator. So the idea is about mapping the Enum values to <code>Int</code> values
+and deriving a random Enum value from a randomly generated number.</p>
+
+<p>``` haskell
+&mdash; :t fromEnum
+&mdash; fromEnum :: Enum a => a &ndash;> Int
+&mdash; :t toEnum
+&mdash; toEnum :: Enum a => Int &ndash;> a</p>
+
+<p>&mdash; 1)
+instance Random Number where</p>
+
+<pre><code>randomR (a,b) g = 
+    case randomR (fromEnum a, fromEnum b) g of
+            (x, g') -&gt; (toEnum x, g')
+random g = randomR (One, Six) g
+</code></pre>
+
+<p>&mdash; 2) &ndash; more general solution making use of Bounded
+instance Random Number where</p>
+
+<pre><code>randomR = enumRandomR
+random g = randomR (minBound, maxBound) g
+</code></pre>
+
+<p>enumRandomR (a, b) g =</p>
+
+<pre><code>case randomR (fromEnum a, fromEnum b) g of
+    (x, g') -&gt; (toEnum x, g')
+</code></pre>
+
+<p>```</p>
+
+<p>While we still used the explicit <code>Number</code> interval values in <strong>1)</strong>, we get a more general solution in <strong>2)</strong> using the fact that we had auto-derived an instance of <code>Bounded</code> for <code>Number</code> and thus have <code>minBound</code> and <code>maxBound</code> at our disposal.</p>
+
+<p>At last, we can generate a random <code>Number</code> value:</p>
+
+<p><code>haskell
+λ&gt; getRandom :: IO Number
+Two
+</code></p>
+
+<p>Anyway, our generated <code>Number</code> values are uniformly distributed, every value occurs with equal probability. What if you want to tamper with the die at little, e.g.
+when your opponent throws the dice they should not get a <code>Six</code> quite so often. You could do that providing a respective <code>Random</code> instance for a newtype wrapper:</p>
+
+<p>``` haskell
+&mdash; you need GeneralizedNewtypeDeriving pragma to derive Enum
+newtype MaxBoundLessLikely a = MaxLessLikely {</p>
+
+<pre><code>getValue :: a } deriving (Bounded, Eq, Enum, Show)
+</code></pre>
+
+<p>instance (Enum a, Eq a, Bounded a) => Random (MaxBoundLessLikely a) where</p>
+
+<pre><code>randomR (a,b) g = case enumRandomR (a,b) g of
+    result@(MaxLessLikely value, g') -&gt; 
+         if value == maxBound then
+             enumRandomR (a,b) g'
+         else result
+random g = randomR (minBound, maxBound) g
+</code></pre>
+
+<p>```</p>
+
+<p>Your <code>rollDice</code> function then looks so inconspicuous, your opponent might not even notice:</p>
+
+<p>``` haskell
+data Player = Me | Opponent</p>
+
+<p>rollDice Me = getRandom
+rollDice Opponent = fmap getValue getRandom</p>
+
+<p>howManySixes :: MonadRandom m => Player &ndash;> Int &ndash;> m Int
+howManySixes player nrThrows = do</p>
+
+<pre><code>results &lt;- replicateM nrThrows (rollDice player)
+return $ length . filter (== Six) $ results
+</code></pre>
+
+<p>```</p>
+
+<p>They might actually think that they are just unlucky:</p>
+
+<p><code>haskell
+λ&gt; howManySixes Me 1000
+170
+λ&gt; howManySixes Opponent 1000
+46
+</code></p>
+
+<p>You can find the source <a href="http://sleepomeno.github.io/enum/RandomEnum.hs" target="_blank">here</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[else return null]]></title>
@@ -35,16 +170,24 @@ famous <code>else return null</code> idiom.</p>
 
 <p>``` java
 // Version 1
-if (password == &ldquo;12345&rdquo;)
-   return valuableTreasure;
-else
-   return null;</p>
+if (password == &ldquo;12345&rdquo;)</p>
+
+<pre><code> return valuableTreasure;
+</code></pre>
+
+<p>else</p>
+
+<pre><code> return null;
+</code></pre>
 
 <p>// or, equivalently
 // Version 2
-if (password == &ldquo;12345&rdquo;)
-   return valuableTreasure;
-return null;
+if (password == &ldquo;12345&rdquo;)</p>
+
+<pre><code> return valuableTreasure;
+</code></pre>
+
+<p>return null;
 ```</p>
 
 <p>To make things more familiar, in Version 2 you could imagine multiple <code>return null</code> lines hidden in
@@ -64,14 +207,17 @@ corresponding Nullpointer exception. In Haskell, there is the <a href="https://w
 the risk of a Nullpointer exception. Here is the snippet of that code
 (obviously, only the <code>else Nothing</code> is &lsquo;important&rsquo;).</p>
 
-<p><code>haskell
-newState =
-  if not shouldBeCompiled &amp;&amp; w' == view T.word W.immediate' then
-   (oldState ^. lastColonDefinition ) &gt;&gt;=
-   (\x -&gt; return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True))
-  else
-   Nothing
-</code></p>
+<p>``` haskell
+newState =</p>
+
+<pre><code>if not shouldBeCompiled &amp;&amp; w' == view T.word W.immediate' then
+ (oldState ^. lastColonDefinition ) &gt;&gt;=
+ (\x -&gt; return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True))
+else 
+ Nothing
+</code></pre>
+
+<p>```</p>
 
 <p>Anyway, believe me, if you ever write such an <code>else Nothing</code> in Haskell, that should
 be the trigger &ndash; take a deep breath, take a coffee and think about your
@@ -87,12 +233,15 @@ how would it be &lsquo;better&rsquo;? In my opinion, it conveys much
 more the impression that the programmer actually knows what they are doing.</p>
 
 <p>``` haskell
-newState = do
-  guard $ not shouldBeCompiled &amp;&amp; w' == (view T.word W.immediate')</p>
+newState = do</p>
 
-<p>  x &lt;&ndash; oldState ^. lastColonDefinition
-  return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True)
-```</p>
+<pre><code>guard $ not shouldBeCompiled &amp;&amp; w' == (view T.word W.immediate')
+
+x &lt;- oldState ^. lastColonDefinition
+return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True)
+</code></pre>
+
+<p>```</p>
 
 <p>Essentially, the <code>guard</code> function does the trick. <code>guard</code>, which has the type
 <em>guard :: MonadPlus m => Bool &ndash;> m ()</em>, makes the containing <em>do</em>
@@ -229,21 +378,11 @@ Well, first have a look at why <code>coolSolution</code> did not type-check at a
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>Couldn't match type ‘Int’ with ‘String -&gt; Int’
-</span><span class='line'>Expected type: Int -&gt; String -&gt; Int
-</span><span class='line'>  Actual type: Int -&gt; Int
+</pre></td><td class='code'><pre><code class=''><span class='line'>Couldn&rsquo;t match type ‘Int’ with ‘String &ndash;> Int’
+</span><span class='line'>Expected type: Int &ndash;> String &ndash;> Int
+</span><span class='line'>  Actual type: Int &ndash;> Int
 </span><span class='line'>In the first argument of ‘(.)’, namely ‘plusOne’
-</span><span class='line'>In the expression: plusOne . readTwoArgs :: String -&gt; String -&gt; Int
-</span><span class='line'>&lt;/code>&lt;/pre>
-</span><span class='line'>
-</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'>In the expression: plusOne . readTwoArgs :: String &ndash;> String &ndash;> Int</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Essentially, this tells us that <code>plusOne</code> does not have the right type
 to be used together with <code>(. readTwoArgs)</code>. Now let&rsquo;s ask this
@@ -262,22 +401,12 @@ that you are happy?</p>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>Found hole ‘_’
-</span><span class='line'>  with type: (Int -&gt; Int) -&gt; (String -&gt; Int) -&gt; [Char] -&gt; Int
-</span><span class='line'>Relevant bindings include it :: Int (bound at &lt;interactive&gt;:88:1)
+</pre></td><td class='code'><pre><code class=''><span class='line'>Found hole ‘&lt;em>’
+</span><span class='line'>  with type: (Int &ndash;> Int) &ndash;> (String &ndash;> Int) &ndash;> [Char] &ndash;> Int
+</span><span class='line'>Relevant bindings include it :: Int (bound at &lt;interactive>:88:1)
 </span><span class='line'>In the expression: _
-</span><span class='line'>In the first argument of ‘(.)’, namely ‘(_ plusOne)’
-</span><span class='line'>In the expression: (_ plusOne) . readTwoArgs
-</span><span class='line'>&lt;/code>&lt;/pre>
-</span><span class='line'>
-</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'>In the first argument of ‘(.)’, namely ‘(&lt;/em> plusOne)’
+</span><span class='line'>In the expression: (_ plusOne) . readTwoArgs</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Okay, this help us. Our &ldquo;hole function&rdquo;&rsquo;s type is <code>(Int -&gt; Int) -&gt;
 (String -&gt; Int) -&gt; [Char] -&gt; Int</code>. Now we just write that
@@ -466,248 +595,6 @@ always get a lexicographically correct ordering of all <em>n</em>-ary combinatio
 
 <p>We have seen how an innocent-looking function like <em>replicateM</em> can &ndash;
 when it is used with the List monad &ndash; produce a &ldquo;magical&rdquo; result, only to then discover that there is no magic involved ;)</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Migrating a mutating algorithm from C to Haskell]]></title>
-    <link href="http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell/"/>
-    <updated>2014-03-11T00:00:00+01:00</updated>
-    <id>http://sleepomeno.github.io/blog/2014/03/11/Case-Study---From-C-to-Haskell</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve recently stumbled on a C implementation of an algorithm computing
-the <em>combinations without repetition</em> (of a certain size <strong>k</strong>) of the first <strong>n</strong> natural
-numbers. So the wanted result is a list of combinations like for
-example <code>0 1 2 3 4</code> or <code>11 13 20 33 49</code> in the case of <code>k=5</code> and
-<code>n=50</code> (<em>without repetition</em> means that no number occurs twice in the
-same combination). As a matter of fact, I wanted to migrate that
-function to Haskell; so this post is about the evolution of the
-solution I came up with. I guess this case study is somehow kind of exemplary for
-the thought process which you need to undergo whenever you migrate a
-not-so-trivial algorithm from C to Haskell as it touches upon the
-topics of <em>laziness</em> and <em>mutation</em>.</p>
-
-<!-- more -->
-
-
-<h1>The C Version</h1>
-
-<p>So let&rsquo;s start with the C Version:</p>
-
-<p>``` c</p>
-
-<h1>include &lt;stdio.h></h1>
-
-<p>int idx = 0;
-/<em> puts all combinations into the array of its first argument </em>/
-void combinationsWithoutRepetition(int <em>combinations, int </em>feld,int bound,int length,int pos,int val){
-  if(pos==length) {</p>
-
-<pre><code>int i;
-for(i=0; i&lt;length; i++) {
-  combinations[idx++] = feld[i];
-}
-</code></pre>
-
-<p>  } else {</p>
-
-<pre><code>int* feldPos = &amp;feld[pos];
-int i;
-for(i=val;i&lt;bound;++i){ 
-  *feldPos=i; 
-  combinationsWithoutRepetition(combinations,feld,bound,length,pos+1,i+1); 
-}
-</code></pre>
-
-<p>  }
-}
-int main(int argc, char <em><em>argv) {
-  int n=50;
-  int k=5;
-  int nrOfCombinations = 2118760; // assume that&rsquo;s correct for n=50,k=5
-  int </em>combinations;
-  combinations = malloc(nrOfCombinations</em>k*sizeof(int));</p>
-
-<p>  int <em>singleCombination;
-  singleCombination = malloc(k</em>sizeof(int));</p>
-
-<p>  combinationsWithoutRepetition(combinations,singleCombination,n,k,0,0);
-  int i = 0;
-  for (i=0; i &lt; 50; i=i+5) {</p>
-
-<pre><code>printf("%d %d %d %d %d \n", combinations[i],combinations[i+1],combinations[i+2],combinations[i+3],combinations[i+4]);
-</code></pre>
-
-<p>  }
-}
-```</p>
-
-<p>So <code>combinationsWithoutRepetition</code> does all the work, however, memory
-needs to be allocated for the two pointers to int first. (Surely, in a
-real program <code>nrOfCombinations</code> would call a subroutine computing the
-necessary number of computations, I omitted it for brevity&rsquo;s sake.) In
-the end, the computed combinations can be accessed through the pointer
-<code>combinations</code>.</p>
-
-<p>Anyway, <code>combinationsWithoutRepetition</code> didn&rsquo;t look straightforward to
-me, I didn&rsquo;t really understand how it worked and above all, I couldn&rsquo;t
-see how I could tweak the algorithm so that I could do without the mutation
-of <code>combinations</code> and <code>idx</code> in the Haskell solution. Consequently, I decided to
-translate the C version more or less directly to Haskell, using the
-<code>ST</code> monad.</p>
-
-<p>The <code>ST</code> monad makes it possible to have references pointing to
-mutable memory in Haskell. This comes in handy when you want to solve
-a problem for which there is no efficient algorithm known doing
-without mutation. In our case it gives us the power to create a first
-running Haskell version without fully understanding the underlying
-algorithm of the C implementation. Bear in mind that you always need to run <code>runST</code> to
-get a value out of the <code>ST</code> monad like below.</p>
-
-<h2>The ST Version</h2>
-
-<p>``` haskell
-comb1 :: Int &ndash;> [Int] &ndash;> [[Int]]
-comb1 k elements = runST $ do
-  let bound = length elements</p>
-
-<pre><code>  boundMinus1 = bound-1
-  elementArray = listArray (0, bound-1) elements
-
-  comb1' :: STRef s [[Int]] -&gt; (Int, Int) -&gt; ST s ()
-  comb1' combos  (pos, val) = 
-    let comb1'' currentCombo (!pos, val)
-          | pos == k  = modifySTRef combos ((:) currentCombo)
-          | otherwise = forM_ [val..boundMinus1] $ \x -&gt; comb1'' (elementArray!x : currentCombo) (pos+1,x+1)
-    in
-     comb1'' [] (pos, val)
-</code></pre>
-
-<p>  combos &lt;&ndash; newSTRef []
-  comb1' combos (0,0)
-  readSTRef combos
-```</p>
-
-<p>This version already has two conceptual advantages: It can use an arbitrary list
-of <code>Int</code> s as its second parameter (actually it could even be polymorphic
-in the type of the list) and returns a list of lists which is
-semantically more correct than the C implementation which implicitly
-returned a long concatenation of the combination lists. Moreover, I
-didn&rsquo;t need any mutable equivalent of <code>idx</code>.</p>
-
-<p>Obviously, I wasn&rsquo;t too satisfied with this implementation, though.
-Above all, the lack of <em>laziness</em> proves to be really annoying &ndash; the
-whole list of combinations needs to be computed before you can access
-the first element of it! This is devastating as in every real word
-scenario of a decently large <code>n</code> and <code>k</code> the resulting list of
-combinations is unlikely to fit into your available memory. So comes
-the lazy <code>ST</code> monad to the rescue!</p>
-
-<h2>The Lazy ST Version</h2>
-
-<p>``` haskell
-comb2 :: Int &ndash;> [Int] &ndash;> [[Int]]
-comb2 k elements = L.runST $ do
-  let bound = length elements</p>
-
-<pre><code>  boundMinus1 = bound-1
-  elementArray = listArray (0, bound-1) elements
-
-  comb2' :: STRef s [[Int]] -&gt; (Int, Int) -&gt; L.ST s [[Int]]
-  comb2' combos  (pos, val) = 
-    let comb2'' currentCombo (!pos, val)
-          | pos == k  = do { L.strictToLazyST $ modifySTRef combos ((:) currentCombo); return [currentCombo] }
-          | otherwise = fmap concat $ forM [val..boundMinus1] $ \x -&gt; comb2'' (elementArray!x : currentCombo) (pos+1,x+1)
-    in
-     comb2'' [] (pos, val)
-</code></pre>
-
-<p>  combos &lt;&ndash; L.strictToLazyST $ newSTRef []
-  comb2' combos (0,0)
-```</p>
-
-<p>Anyway, that&rsquo;s the first lazy <code>ST</code> implementation I could come up with
-and luckily, it gave me the intuition how I could get completely rid of the <code>ST</code>
-monad. It is obvious that the <code>modifySTRef</code> calls are absolutely
-pointless as <code>fmap concat</code> just concatenates the <code>[currentCombo]</code>
-lists returned by the base cases of the recursion and <code>combos</code> is not
-even considered in the result of the computation. So let&rsquo;s see the
-version resulting from throwing the <code>ST</code> monad into the garbage can:</p>
-
-<h2>The No ST Version</h2>
-
-<p>``` haskell
-comb3 :: Int &ndash;> [Int] &ndash;> [[Int]]
-comb3 k elements =
-  let bound = length elements</p>
-
-<pre><code>  boundMinus1 = bound-1
-  elementArray = listArray (0, bound-1) elements
-  comb3'  (pos, val) = comb3'' [] (pos, val)
-    where
-    comb3'' currentCombo (!pos, val)
-      | pos == k  = [currentCombo]
-      | otherwise = concat [comb3'' (elementArray!x : currentCombo) (pos+1, x+1) | x &lt;- [val..boundMinus1]]
-  in
-</code></pre>
-
-<p>  comb3' (0,0)
-```</p>
-
-<p>That&rsquo;s much better but still a little obscure. In the end, I found a nice
-declarative solution at last:</p>
-
-<h2>The Declarative Version</h2>
-
-<p><code>haskell
-comb4 :: Int -&gt; [Int] -&gt; [[Int]]
-comb4 0 _      = [[]]
-comb4 n (x:xs) = map (x:) (comb4 (n-1) xs) ++ comb4 n xs
-comb4 _ _      = []
-</code></p>
-
-<p>It just reads as: &ldquo;In order to get all <em>k</em>-combinations of a <em>n</em>
-length list take the first element of the list, prepend it to all
-combinations of size <em>k-1</em> of the tail of the list and then add all
-those <em>k</em>-combations of the tail of the list!&rdquo; It finally makes sense
-when you think about it for a long time ;) In addition, that approach
-can be made a little bit more efficient for certain <em>n</em> and <em>k</em> using
-a very simple memoization strategy. (This simple strategy very quickly
-eats up your memory, though.)</p>
-
-<h2>The memoized Declarative Version</h2>
-
-<p>``` haskell
-&mdash; Version with very simple memoization (&ldquo;memo table&rdquo;)
-combTable = [[ comb5 n (drop elementNr numbers) | elementNr &lt;&ndash; zeroToLength] | n &lt;&ndash; zeroToLength]
-   where
-   zeroToLength = [0..length numbers]</p>
-
-<p>comb5 :: Int &ndash;> [Int] &ndash;> [[Int]]
-comb5 0 _      = [[]]
-comb5 k (x:xs) = map (x:) (combTable !! (k-1) !! newlength) ++ (combTable !! k !! newlength)</p>
-
-<pre><code>            where
-                newlength = n-length xs
-</code></pre>
-
-<p>comb5 _ _      = []
-```</p>
-
-<h1>Conclusion</h1>
-
-<p>Originally, I planned to examine each version&rsquo;s performance in detail,
-however, that soon felt too cumbersome to me. Anyway, the <em>lazy</em>
-versions do have a significant practical advantage as they do not need
-to compute all combinations in order to get the first 10 combinations!
-Judging from a few tests I have made, it also turns out that <code>comb3</code> (not using mutation) performs better
-than both versions using <code>ST</code> even when all combinations are
-requested so this seems to be a case where mutation does not buy you
-anything in Haskell. If things look differently on your machine, feel
-free to tell me ;)</p>
-
-<p>You can find all solution versions <a href="http://sleepomeno.github.io/combinations/haskell-all.hs" target="_blank">here</a>, ready for GHCi. Anyway, feel
-free to post other solutions to the problem which may score better in
-terms of laziness/time performance/space performance/etc.</p>
 ]]></content>
   </entry>
   

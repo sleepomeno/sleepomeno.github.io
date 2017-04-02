@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: racket | while true live]]></title>
   <link href="http://sleepomeno.github.io/tags/racket/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2015-11-16T15:15:39+01:00</updated>
+  <updated>2017-04-02T17:19:56+02:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -58,17 +58,17 @@ color of the US Open hard court ;)</p>
 <span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>(let* ([color &ldquo;blue&rdquo;]&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>  [blue (lambda (pict) (colorize pict color))]
-</span><span class='line'>  [double (blue (filled-rectangle 203 30))]
-</span><span class='line'>  [base (blue (filled-rectangle 90 133))]
-</span><span class='line'>  [margin 3]
-</span><span class='line'>  [doubles (hc-append margin double double)]
-</span><span class='line'>  [service (blue (filled-rectangle 110 65))]
-</span><span class='line'>  [services (vc-append margin service service)]
-</span><span class='line'>  [middle1 (hc-append margin base services)]
-</span><span class='line'>  [middle2 (hc-append margin services base)]
-</span><span class='line'>  [middles (hc-append margin middle1 middle2)])
-</span><span class='line'>(frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
+</span><span class='line'>&lt;pre>&lt;code>        [blue (lambda (pict) (colorize pict color))]
+</span><span class='line'>        [double (blue (filled-rectangle 203 30))]
+</span><span class='line'>        [base (blue (filled-rectangle 90 133))]
+</span><span class='line'>        [margin 3]
+</span><span class='line'>        [doubles (hc-append margin double double)]
+</span><span class='line'>        [service (blue (filled-rectangle 110 65))]
+</span><span class='line'>        [services (vc-append margin service service)]
+</span><span class='line'>        [middle1 (hc-append margin base services)]
+</span><span class='line'>        [middle2 (hc-append margin services base)]
+</span><span class='line'>        [middles (hc-append margin middle1 middle2)])
+</span><span class='line'>    (frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
 </span><span class='line'>&lt;/code>&lt;/pre>
 </span><span class='line'>
 </span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>

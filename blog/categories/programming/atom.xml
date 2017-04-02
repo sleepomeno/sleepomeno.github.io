@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | while true live]]></title>
   <link href="http://sleepomeno.github.io/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://sleepomeno.github.io/"/>
-  <updated>2015-11-16T15:15:39+01:00</updated>
+  <updated>2017-04-02T17:19:56+02:00</updated>
   <id>http://sleepomeno.github.io/</id>
   <author>
     <name><![CDATA[Gregor Riegler]]></name>
@@ -12,6 +12,141 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Rolling the dice using random Enum values]]></title>
+    <link href="http://sleepomeno.github.io/blog/2017/04/02/Generating-random-Enum-values/"/>
+    <updated>2017-04-02T00:00:00+02:00</updated>
+    <id>http://sleepomeno.github.io/blog/2017/04/02/Generating-random-Enum-values</id>
+    <content type="html"><![CDATA[<p>Every wanted to roll the dice in Haskell? Let&rsquo;s say you have a data type like</p>
+
+<p>``` haskell
+data Number = One | Two | Three | Four | Five | Six</p>
+
+<pre><code> deriving (Enum, Bounded, Eq, Show)
+</code></pre>
+
+<p>```</p>
+
+<p>How do you generate a random <code>Number</code> value? There are several ways to do it, usually in an <code>IO</code> context, obviously. In order to use it in a
+common monad transformer stack, the primitives of the <code>MonadRandom</code> type class come to my mind. So it would be most convenient to get a
+ random value using <code>getRandom</code>. Anyway, as much fun as rolling the dice is, let&rsquo;s derive a solution working for all bounded Enums.</p>
+
+<!-- more -->
+
+
+<p>Anyway, import <strong>Control.Monad.Random</strong> as we want to use <code>getRandom</code> of the <code>MonadRandom</code> class which looks like:</p>
+
+<p>``` haskell
+class Monad m => MonadRandom (m :: * &ndash;> *) where</p>
+
+<pre><code>getRandom :: Random a =&gt; m a
+</code></pre>
+
+<p>&mdash; other functions we don&rsquo;t need</p>
+
+<p>class Random a where
+&mdash; needs to provide:</p>
+
+<pre><code>randomR :: RandomGen g =&gt; (a, a) -&gt; g -&gt; (a, g)
+random :: RandomGen g =&gt; g -&gt; (a, g)
+</code></pre>
+
+<p>```</p>
+
+<p>Shortly, <code>randomR</code> needs to be able to provide a random <code>Number</code> value in the specified interval, given a random number generator. So the idea is about mapping the Enum values to <code>Int</code> values
+and deriving a random Enum value from a randomly generated number.</p>
+
+<p>``` haskell
+&mdash; :t fromEnum
+&mdash; fromEnum :: Enum a => a &ndash;> Int
+&mdash; :t toEnum
+&mdash; toEnum :: Enum a => Int &ndash;> a</p>
+
+<p>&mdash; 1)
+instance Random Number where</p>
+
+<pre><code>randomR (a,b) g = 
+    case randomR (fromEnum a, fromEnum b) g of
+            (x, g') -&gt; (toEnum x, g')
+random g = randomR (One, Six) g
+</code></pre>
+
+<p>&mdash; 2) &ndash; more general solution making use of Bounded
+instance Random Number where</p>
+
+<pre><code>randomR = enumRandomR
+random g = randomR (minBound, maxBound) g
+</code></pre>
+
+<p>enumRandomR (a, b) g =</p>
+
+<pre><code>case randomR (fromEnum a, fromEnum b) g of
+    (x, g') -&gt; (toEnum x, g')
+</code></pre>
+
+<p>```</p>
+
+<p>While we still used the explicit <code>Number</code> interval values in <strong>1)</strong>, we get a more general solution in <strong>2)</strong> using the fact that we had auto-derived an instance of <code>Bounded</code> for <code>Number</code> and thus have <code>minBound</code> and <code>maxBound</code> at our disposal.</p>
+
+<p>At last, we can generate a random <code>Number</code> value:</p>
+
+<p><code>haskell
+λ&gt; getRandom :: IO Number
+Two
+</code></p>
+
+<p>Anyway, our generated <code>Number</code> values are uniformly distributed, every value occurs with equal probability. What if you want to tamper with the die at little, e.g.
+when your opponent throws the dice they should not get a <code>Six</code> quite so often. You could do that providing a respective <code>Random</code> instance for a newtype wrapper:</p>
+
+<p>``` haskell
+&mdash; you need GeneralizedNewtypeDeriving pragma to derive Enum
+newtype MaxBoundLessLikely a = MaxLessLikely {</p>
+
+<pre><code>getValue :: a } deriving (Bounded, Eq, Enum, Show)
+</code></pre>
+
+<p>instance (Enum a, Eq a, Bounded a) => Random (MaxBoundLessLikely a) where</p>
+
+<pre><code>randomR (a,b) g = case enumRandomR (a,b) g of
+    result@(MaxLessLikely value, g') -&gt; 
+         if value == maxBound then
+             enumRandomR (a,b) g'
+         else result
+random g = randomR (minBound, maxBound) g
+</code></pre>
+
+<p>```</p>
+
+<p>Your <code>rollDice</code> function then looks so inconspicuous, your opponent might not even notice:</p>
+
+<p>``` haskell
+data Player = Me | Opponent</p>
+
+<p>rollDice Me = getRandom
+rollDice Opponent = fmap getValue getRandom</p>
+
+<p>howManySixes :: MonadRandom m => Player &ndash;> Int &ndash;> m Int
+howManySixes player nrThrows = do</p>
+
+<pre><code>results &lt;- replicateM nrThrows (rollDice player)
+return $ length . filter (== Six) $ results
+</code></pre>
+
+<p>```</p>
+
+<p>They might actually think that they are just unlucky:</p>
+
+<p><code>haskell
+λ&gt; howManySixes Me 1000
+170
+λ&gt; howManySixes Opponent 1000
+46
+</code></p>
+
+<p>You can find the source <a href="http://sleepomeno.github.io/enum/RandomEnum.hs" target="_blank">here</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Toying with Racket]]></title>
@@ -58,17 +193,17 @@ color of the US Open hard court ;)</p>
 <span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>(let* ([color &ldquo;blue&rdquo;]&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>  [blue (lambda (pict) (colorize pict color))]
-</span><span class='line'>  [double (blue (filled-rectangle 203 30))]
-</span><span class='line'>  [base (blue (filled-rectangle 90 133))]
-</span><span class='line'>  [margin 3]
-</span><span class='line'>  [doubles (hc-append margin double double)]
-</span><span class='line'>  [service (blue (filled-rectangle 110 65))]
-</span><span class='line'>  [services (vc-append margin service service)]
-</span><span class='line'>  [middle1 (hc-append margin base services)]
-</span><span class='line'>  [middle2 (hc-append margin services base)]
-</span><span class='line'>  [middles (hc-append margin middle1 middle2)])
-</span><span class='line'>(frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
+</span><span class='line'>&lt;pre>&lt;code>        [blue (lambda (pict) (colorize pict color))]
+</span><span class='line'>        [double (blue (filled-rectangle 203 30))]
+</span><span class='line'>        [base (blue (filled-rectangle 90 133))]
+</span><span class='line'>        [margin 3]
+</span><span class='line'>        [doubles (hc-append margin double double)]
+</span><span class='line'>        [service (blue (filled-rectangle 110 65))]
+</span><span class='line'>        [services (vc-append margin service service)]
+</span><span class='line'>        [middle1 (hc-append margin base services)]
+</span><span class='line'>        [middle2 (hc-append margin services base)]
+</span><span class='line'>        [middles (hc-append margin middle1 middle2)])
+</span><span class='line'>    (frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
 </span><span class='line'>&lt;/code>&lt;/pre>
 </span><span class='line'>
 </span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
@@ -266,13 +401,16 @@ integration worked like a charm!</p>
 of <code>purescript-canvas</code> and <code>purescript-free-canvas</code>. Obviously, I made
 heavy use of those to get the circle and the polygon drawn.</p>
 
-<p><code>haskell
+<p>``` haskell
 center = { x : 210, y : 210 }
-drawCircle = do
-  arc { x: center.x, y: center.y, r: radius, start: 0, end: Math.pi * 2 }
-  setFillStyle "#000000"
-  fill
-</code></p>
+drawCircle = do</p>
+
+<pre><code>arc { x: center.x, y: center.y, r: radius, start: 0, end: Math.pi * 2 }
+setFillStyle "#000000"
+fill
+</code></pre>
+
+<p>```</p>
 
 <p>As an argument to <code>arc</code> we actually have an example of the <em>Object</em>
 syntax of PureScript which is just like native JavaScript.</p>
@@ -306,36 +444,34 @@ show/hide the triangles. <code>onAsObservable</code> actually is from the
 used to define complex event handling.</p>
 
 <p>``` haskell
-main = do
-  canvas &lt;&ndash; getCanvasElementById &ldquo;canvas&rdquo;
-  context &lt;&ndash; getContext2D canvas
-  verticesInput &lt;&ndash; select &ldquo;#vertices&rdquo;
-  polygonArea &lt;&ndash; select &ldquo;#polygonArea&rdquo;
-  pi &lt;&ndash; select &ldquo;#pi&rdquo;
-  triangles &lt;&ndash; select &ldquo;#triangles&rdquo;</p>
+main = do</p>
 
-<p>  let updateUI num showTriangles = do</p>
+<pre><code>canvas &lt;- getCanvasElementById "canvas"
+context &lt;- getContext2D canvas
+verticesInput &lt;- select "#vertices"
+polygonArea &lt;- select "#polygonArea"
+pi &lt;- select "#pi"
+triangles &lt;- select "#triangles"
 
-<pre><code>  { pArea : polygonAreaPercent, pi : piApprox } &lt;- showPolygon canvas context num showTriangles
-  setText (show polygonAreaPercent &lt;&gt; "%") polygonArea
-  setText (show piApprox) pi
+let updateUI num showTriangles = do 
+        { pArea : polygonAreaPercent, pi : piApprox } &lt;- showPolygon canvas context num showTriangles
+        setText (show polygonAreaPercent &lt;&gt; "%") polygonArea
+        setText (show piApprox) pi
+let updateUI' = do 
+            showTriangles &lt;- ((== "true") &lt;&lt;&lt; stringify) &lt;$&gt; getProp "checked" triangles
+            num &lt;- (stringify &gt;&gt;&gt; readInt 10) &lt;$&gt; getValue verticesInput
+            updateUI num showTriangles
+
+trianglesChange &lt;- "click" `onAsObservable` triangles
+trianglesChange `subscribe` \_ -&gt; void updateUI'
+
+verticesChange &lt;- "focus" `onAsObservable` verticesInput
+verticesChange `subscribe` \_ -&gt; void updateUI'
+
+updateUI defaultVertices defaultShowTriangles
 </code></pre>
 
-<p>  let updateUI' = do</p>
-
-<pre><code>    showTriangles &lt;- ((== "true") &lt;&lt;&lt; stringify) &lt;$&gt; getProp "checked" triangles
-    num &lt;- (stringify &gt;&gt;&gt; readInt 10) &lt;$&gt; getValue verticesInput
-    updateUI num showTriangles
-</code></pre>
-
-<p>  trianglesChange &lt;&ndash; &ldquo;click&rdquo; <code>onAsObservable</code> triangles
-  trianglesChange <code>subscribe</code> _ &ndash;> void updateUI'</p>
-
-<p>  verticesChange &lt;&ndash; &ldquo;focus&rdquo; <code>onAsObservable</code> verticesInput
-  verticesChange <code>subscribe</code> _ &ndash;> void updateUI'</p>
-
-<p>  updateUI defaultVertices defaultShowTriangles
-```</p>
+<p>```</p>
 
 <h2>The Foreign Function Interface</h2>
 
@@ -348,12 +484,15 @@ communicating with JavaScript code. Anyway, after some digging in I
 ended up writing the function <code>stringify</code> which trivially transforms the
 incoming Javascript value to a <code>String</code>.</p>
 
-<p><code>haskell
-foreign import stringify
-  "function stringify(x) {\
-  \  return x+\"\";\
-  \}" :: Foreign -&gt; String
-</code></p>
+<p>``` haskell
+foreign import stringify</p>
+
+<pre><code>"function stringify(x) {\
+\  return x+\"\";\
+\}" :: Foreign -&gt; String
+</code></pre>
+
+<p>```</p>
 
 <p>That&rsquo;s an example of how you can integrate JavaScript functions in
 PureScript. It is a little bit of a joke as of now sice you need to add all
@@ -428,7 +567,7 @@ partial matching is not unique?</p>
 <p>``` r
 x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
 
-<pre><code>      a_is_my_first_letter_too = 6 : 10)
+<pre><code>                a_is_my_first_letter_too = 6 : 10)
 </code></pre>
 
 <p>x$a</p>
@@ -442,7 +581,7 @@ x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
 <p>``` r
 x &lt;&ndash; list(a_is_the_first_letter = 1 : 5,</p>
 
-<pre><code>      a_is_my_first_letter_too = 6 : 10)
+<pre><code>                a_is_my_first_letter_too = 6 : 10)
 </code></pre>
 
 <p>x$a_is_m</p>
@@ -492,8 +631,8 @@ future of programming:</p>
 <p>``` java
 interface God {</p>
 
-<pre><code>void killMankind();
-void keepUpTheGoodWork();
+<pre><code>    void killMankind();
+    void keepUpTheGoodWork();
 </code></pre>
 
 <p>}</p>
@@ -501,103 +640,6 @@ void keepUpTheGoodWork();
 <p>// &hellip;
 god.k() // What the hell happens? Who cares.
 ```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[else return null]]></title>
-    <link href="http://sleepomeno.github.io/blog/2015/01/05/else-return-null/"/>
-    <updated>2015-01-05T00:00:00+01:00</updated>
-    <id>http://sleepomeno.github.io/blog/2015/01/05/else-return-null</id>
-    <content type="html"><![CDATA[<p>I guess everybody has a story or two in store about Nullpointer
-exceptions in Java (or in any language with nullable values). Sooner or later you will make the acquaintance of the dreaded stacktrace line
-denoting that you did something terribly wrong, demanding a value
-where none exists, and you just wonder <em>why, how the hell can that
-object be null?!</em> during an hour of painful debugging&#x2026; you know
-that? Good. Well, I won&rsquo;t ponder over how to avoid it, how to apply
-proper error handling etc. (that&rsquo;s way too complicated, I&rsquo;m tired) but I&rsquo;d just like to point out my personal
-favourite, the
-famous <code>else return null</code> idiom.</p>
-
-<!-- more -->
-
-
-<p>Anyway, the below snippet shows what I actually mean by that.</p>
-
-<p>``` java
-// Version 1
-if (password == &ldquo;12345&rdquo;)
-   return valuableTreasure;
-else
-   return null;</p>
-
-<p>// or, equivalently
-// Version 2
-if (password == &ldquo;12345&rdquo;)
-   return valuableTreasure;
-return null;
-```</p>
-
-<p>To make things more familiar, in Version 2 you could imagine multiple <code>return null</code> lines hidden in
-various control structures in an endless method and you surely get an idea
-how people feel when they try to reason about an object being <em>null</em>
-or not.
-Anyway, spotting an <code>else return null</code> I always get a bad gut feeling
-saying that things are not what they are supposed to be. I&rsquo;m aware
-that this obviously touches upon the question if you should avoid
-<em>null</em> values altogether. Anyway, I can&rsquo;t help my bad gut feeling
-whenever I see it ;)</p>
-
-<p>The funny thing is that I recently wrote similar code myself; that
-alone would not be a surprise yet, but I actually wrote it in
-Haskell which does not have that notion of <em>null</em> values and the
-corresponding Nullpointer exception. In Haskell, there is the <a href="https://www.haskell.org/haskellwiki/Maybe" target="_blank">Maybe monad</a> which facilitates chaining &ldquo;partial&rdquo; computations together without
-the risk of a Nullpointer exception. Here is the snippet of that code
-(obviously, only the <code>else Nothing</code> is &lsquo;important&rsquo;).</p>
-
-<p><code>haskell
-newState =
-  if not shouldBeCompiled &amp;&amp; w' == view T.word W.immediate' then
-   (oldState ^. lastColonDefinition ) &gt;&gt;=
-   (\x -&gt; return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True))
-  else
-   Nothing
-</code></p>
-
-<p>Anyway, believe me, if you ever write such an <code>else Nothing</code> in Haskell, that should
-be the trigger &ndash; take a deep breath, take a coffee and think about your
-problem again. At the least, you are overcomplicating things as using
-the <em>Monad</em> or <em>MonadPlus</em> nature of <em>Maybe</em> would make life easier
-but probably it&rsquo;s an indication that your thoughts are about to go
-astray and you get lost in old <code>else return null</code> habits or worse &ndash; so better
-stop it and take a break!</p>
-
-<p>How would the <em>MonadPlus</em> and <em>Monad</em> instances make life better? Look
-at the below version. In any case, it&rsquo;s functionally equivalent, so
-how would it be &lsquo;better&rsquo;? In my opinion, it conveys much
-more the impression that the programmer actually knows what they are doing.</p>
-
-<p>``` haskell
-newState = do
-  guard $ not shouldBeCompiled &amp;&amp; w' == (view T.word W.immediate')</p>
-
-<p>  x &lt;&ndash; oldState ^. lastColonDefinition
-  return $ oldState &amp; definedWords %~ (ix x %~ set isImmediate True)
-```</p>
-
-<p>Essentially, the <code>guard</code> function does the trick. <code>guard</code>, which has the type
-<em>guard :: MonadPlus m => Bool &ndash;> m ()</em>, makes the containing <em>do</em>
-block evaluate to <code>Nothing</code> if the <code>Bool</code> argument evaluates to
-<code>False</code>. In that sense, the <code>guard</code> expression actually looks like an
-assertion! The whole <em>MonadPlus</em> magic can be further explored <a href="http://en.wikibooks.org/wiki/Haskell/MonadPlus" target="_blank">here</a>.</p>
-
-<p>In my case, I finally ended up removing those lines altogether. As suspected, the
-good old <code>else Nothing</code> was the symptom that I had lost track of
-what I was coding at all &ndash; completely lost in nothingness &ndash; and I really needed a
-break.</p>
-
-<p>So what is your typical &lsquo;silly code&rsquo; that you typically start writing when
-you should rather take a break?</p>
 ]]></content>
   </entry>
   
