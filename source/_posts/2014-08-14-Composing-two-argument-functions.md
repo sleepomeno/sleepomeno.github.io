@@ -1,7 +1,7 @@
 ---
 layout: post
 title: The notoriously point-free "((x.).)" trick
-date: 2014-08-14 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-08-14 Don&gt;</span></span> 
 comments: true
 external-url:
 categories: [programming]
@@ -50,11 +50,11 @@ In the following I will use
 Well, first have a look at why `coolSolution` did not type-check at all.
 
 {% codeblock %}
-    Couldn't match type ‘Int’ with ‘String -> Int’
-    Expected type: Int -> String -> Int
-      Actual type: Int -> Int
-    In the first argument of ‘(.)’, namely ‘plusOne’
-    In the expression: plusOne . readTwoArgs :: String -> String -> Int
+Couldn't match type ‘Int’ with ‘String -> Int’
+Expected type: Int -> String -> Int
+  Actual type: Int -> Int
+In the first argument of ‘(.)’, namely ‘plusOne’
+In the expression: plusOne . readTwoArgs :: String -> String -> Int
 {% endcodeblock %}
 
 Essentially, this tells us that `plusOne` does not have the right type
@@ -69,12 +69,12 @@ that you are happy?
 The answer we get is: 
 
 {% codeblock %}
-    Found hole ‘_’
-      with type: (Int -> Int) -> (String -> Int) -> [Char] -> Int
-    Relevant bindings include it :: Int (bound at <interactive>:88:1)
-    In the expression: _
-    In the first argument of ‘(.)’, namely ‘(_ plusOne)’
-    In the expression: (_ plusOne) . readTwoArgs
+Found hole ‘_’
+  with type: (Int -> Int) -> (String -> Int) -> [Char] -> Int
+Relevant bindings include it :: Int (bound at <interactive>:88:1)
+In the expression: _
+In the first argument of ‘(.)’, namely ‘(_ plusOne)’
+In the expression: (_ plusOne) . readTwoArgs
 {% endcodeblock %}
 
 Okay, this help us. Our "hole function"'s type is `(Int -> Int) ->

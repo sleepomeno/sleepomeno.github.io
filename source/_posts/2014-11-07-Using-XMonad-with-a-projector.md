@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Using XMonad with a projector
-date: 2014-11-07 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-11-07 Fre&gt;</span></span> 
 comments: true
 external-url:
 categories: [productivity,setup]

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Migrating a mutating algorithm from C to Haskell
-date: 2014-03-11 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-03-11 Die&gt;</span></span> 
 comments: true
 external-url:
 categories: [programming]
@@ -32,35 +32,35 @@ So let's start with the C Version:
 int idx = 0;
 /* puts all combinations into the array of its first argument */
 void combinationsWithoutRepetition(int *combinations, int *feld,int bound,int length,int pos,int val){ 
-  if(pos==length) {
-    int i;
-    for(i=0; i<length; i++) {
-      combinations[idx++] = feld[i];
-    }
-  } else {
-    int* feldPos = &feld[pos];
-    int i;
-    for(i=val;i<bound;++i){ 
-      *feldPos=i; 
-      combinationsWithoutRepetition(combinations,feld,bound,length,pos+1,i+1); 
-    }
-  }
+	if(pos==length) {
+		int i;
+		for(i=0; i<length; i++) {
+			combinations[idx++] = feld[i];
+		}
+	} else {
+		int* feldPos = &feld[pos];
+		int i;
+		for(i=val;i<bound;++i){ 
+			*feldPos=i; 
+			combinationsWithoutRepetition(combinations,feld,bound,length,pos+1,i+1); 
+		}
+	}
 } 
 int main(int argc, char **argv) {
-  int n=50;
-  int k=5;
-  int nrOfCombinations = 2118760; // assume that's correct for n=50,k=5
-  int *combinations;
-  combinations = malloc(nrOfCombinations*k*sizeof(int));
+	int n=50;
+	int k=5;
+	int nrOfCombinations = 2118760; // assume that's correct for n=50,k=5
+	int *combinations;
+	combinations = malloc(nrOfCombinations*k*sizeof(int));
 
-  int *singleCombination;
-  singleCombination = malloc(k*sizeof(int));
+	int *singleCombination;
+	singleCombination = malloc(k*sizeof(int));
 
-  combinationsWithoutRepetition(combinations,singleCombination,n,k,0,0); 
-  int i = 0;
-  for (i=0; i < 50; i=i+5) {
-    printf("%d %d %d %d %d \n", combinations[i],combinations[i+1],combinations[i+2],combinations[i+3],combinations[i+4]);
-  }
+	combinationsWithoutRepetition(combinations,singleCombination,n,k,0,0); 
+	int i = 0;
+	for (i=0; i < 50; i=i+5) {
+		printf("%d %d %d %d %d \n", combinations[i],combinations[i+1],combinations[i+2],combinations[i+3],combinations[i+4]);
+	}
 }
 ```
 
@@ -90,20 +90,20 @@ get a value out of the `ST` monad like below.
 ``` haskell
 comb1 :: Int -> [Int] -> [[Int]]
 comb1 k elements = runST $ do
-  let bound = length elements
-      boundMinus1 = bound-1
-      elementArray = listArray (0, bound-1) elements
+	let bound = length elements
+			boundMinus1 = bound-1
+			elementArray = listArray (0, bound-1) elements
 
-      comb1' :: STRef s [[Int]] -> (Int, Int) -> ST s ()
-      comb1' combos  (pos, val) = 
-        let comb1'' currentCombo (!pos, val)
-              | pos == k  = modifySTRef combos ((:) currentCombo)
-              | otherwise = forM_ [val..boundMinus1] $ \x -> comb1'' (elementArray!x : currentCombo) (pos+1,x+1)
-        in
-         comb1'' [] (pos, val)
-  combos <- newSTRef []
-  comb1' combos (0,0)
-  readSTRef combos
+			comb1' :: STRef s [[Int]] -> (Int, Int) -> ST s ()
+			comb1' combos  (pos, val) = 
+				let comb1'' currentCombo (!pos, val)
+							| pos == k  = modifySTRef combos ((:) currentCombo)
+							| otherwise = forM_ [val..boundMinus1] $ \x -> comb1'' (elementArray!x : currentCombo) (pos+1,x+1)
+				in
+				 comb1'' [] (pos, val)
+	combos <- newSTRef []
+	comb1' combos (0,0)
+	readSTRef combos
 ```
 
 This version already has two conceptual advantages: It can use an arbitrary list
@@ -125,19 +125,19 @@ the lazy `ST` monad to the rescue!
 ``` haskell
 comb2 :: Int -> [Int] -> [[Int]]
 comb2 k elements = L.runST $ do
-  let bound = length elements
-      boundMinus1 = bound-1
-      elementArray = listArray (0, bound-1) elements
+	let bound = length elements
+			boundMinus1 = bound-1
+			elementArray = listArray (0, bound-1) elements
 
-      comb2' :: STRef s [[Int]] -> (Int, Int) -> L.ST s [[Int]]
-      comb2' combos  (pos, val) = 
-        let comb2'' currentCombo (!pos, val)
-              | pos == k  = do { L.strictToLazyST $ modifySTRef combos ((:) currentCombo); return [currentCombo] }
-              | otherwise = fmap concat $ forM [val..boundMinus1] $ \x -> comb2'' (elementArray!x : currentCombo) (pos+1,x+1)
-        in
-         comb2'' [] (pos, val)
-  combos <- L.strictToLazyST $ newSTRef []
-  comb2' combos (0,0)
+			comb2' :: STRef s [[Int]] -> (Int, Int) -> L.ST s [[Int]]
+			comb2' combos  (pos, val) = 
+				let comb2'' currentCombo (!pos, val)
+							| pos == k  = do { L.strictToLazyST $ modifySTRef combos ((:) currentCombo); return [currentCombo] }
+							| otherwise = fmap concat $ forM [val..boundMinus1] $ \x -> comb2'' (elementArray!x : currentCombo) (pos+1,x+1)
+				in
+				 comb2'' [] (pos, val)
+	combos <- L.strictToLazyST $ newSTRef []
+	comb2' combos (0,0)
 ```
 
 Anyway, that's the first lazy `ST` implementation I could come up with
@@ -152,16 +152,16 @@ version resulting from throwing the `ST` monad into the garbage can:
 ``` haskell
 comb3 :: Int -> [Int] -> [[Int]]
 comb3 k elements = 
-  let bound = length elements
-      boundMinus1 = bound-1
-      elementArray = listArray (0, bound-1) elements
-      comb3'  (pos, val) = comb3'' [] (pos, val)
-        where
-        comb3'' currentCombo (!pos, val)
-          | pos == k  = [currentCombo]
-          | otherwise = concat [comb3'' (elementArray!x : currentCombo) (pos+1, x+1) | x <- [val..boundMinus1]]
-      in
-  comb3' (0,0)
+	let bound = length elements
+			boundMinus1 = bound-1
+			elementArray = listArray (0, bound-1) elements
+			comb3'  (pos, val) = comb3'' [] (pos, val)
+				where
+				comb3'' currentCombo (!pos, val)
+					| pos == k  = [currentCombo]
+					| otherwise = concat [comb3'' (elementArray!x : currentCombo) (pos+1, x+1) | x <- [val..boundMinus1]]
+			in
+	comb3' (0,0)
 ```
 
 That's much better but still a little obscure. In the end, I found a nice
@@ -188,14 +188,14 @@ eats up your memory, though.)
 ``` haskell
 -- Version with very simple memoization ("memo table")
 combTable = [[ comb5 n (drop elementNr numbers) | elementNr <- zeroToLength] | n <- zeroToLength]
-   where
-   zeroToLength = [0..length numbers]
+	 where
+	 zeroToLength = [0..length numbers]
 
 comb5 :: Int -> [Int] -> [[Int]]
 comb5 0 _      = [[]]
 comb5 k (x:xs) = map (x:) (combTable !! (k-1) !! newlength) ++ (combTable !! k !! newlength)
-                where
-                    newlength = n-length xs
+								where
+										newlength = n-length xs
 comb5 _ _      = []
 ```
 

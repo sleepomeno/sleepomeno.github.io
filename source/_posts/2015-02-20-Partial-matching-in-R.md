@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Partial matching in R
-date: 2015-02-20 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2015-02-20 Fre&gt;</span></span> 
 comments: true
 external-url:
 categories: [programming]
@@ -52,7 +52,7 @@ partial matching is not unique?
 
 ``` r
 x <- list(a_is_the_first_letter = 1 : 5,
-          a_is_my_first_letter_too = 6 : 10)
+					a_is_my_first_letter_too = 6 : 10)
 x$a
 # NULL
 ```
@@ -61,7 +61,7 @@ The result is `NULL`!
 
 ``` r
 x <- list(a_is_the_first_letter = 1 : 5,
-          a_is_my_first_letter_too = 6 : 10)
+					a_is_my_first_letter_too = 6 : 10)
 x$a_is_m
 # 6 7 8 9 10
 ```
@@ -102,8 +102,8 @@ future of programming:
 
 ``` java
 interface God { 
-    void killMankind();
-    void keepUpTheGoodWork();
+		void killMankind();
+		void keepUpTheGoodWork();
 }
 
 // ...

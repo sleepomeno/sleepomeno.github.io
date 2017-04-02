@@ -1,7 +1,7 @@
 ---
 layout: post
 title: else return null
-date: 2015-01-05 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2015-01-05 Mon&gt;</span></span> 
 comments: true
 external-url:
 categories: [programming]
@@ -26,14 +26,14 @@ Anyway, the below snippet shows what I actually mean by that.
 ``` java
 // Version 1
 if (password == "12345")
-   return valuableTreasure;
+	 return valuableTreasure;
 else 
-   return null;
+	 return null;
 
 // or, equivalently
 // Version 2
 if (password == "12345")
-   return valuableTreasure;
+	 return valuableTreasure;
 return null;
 ```
 
@@ -56,11 +56,11 @@ the risk of a Nullpointer exception. Here is the snippet of that code
 
 ``` haskell
 newState =
-  if not shouldBeCompiled && w' == view T.word W.immediate' then
-   (oldState ^. lastColonDefinition ) >>=
-   (\x -> return $ oldState & definedWords %~ (ix x %~ set isImmediate True))
-  else 
-   Nothing
+	if not shouldBeCompiled && w' == view T.word W.immediate' then
+	 (oldState ^. lastColonDefinition ) >>=
+	 (\x -> return $ oldState & definedWords %~ (ix x %~ set isImmediate True))
+	else 
+	 Nothing
 ```
 
 Anyway, believe me, if you ever write such an `else Nothing` in Haskell, that should
@@ -78,10 +78,10 @@ more the impression that the programmer actually knows what they are doing.
 
 ``` haskell
 newState = do 
-  guard $ not shouldBeCompiled && w' == (view T.word W.immediate')
+	guard $ not shouldBeCompiled && w' == (view T.word W.immediate')
 
-  x <- oldState ^. lastColonDefinition
-  return $ oldState & definedWords %~ (ix x %~ set isImmediate True)
+	x <- oldState ^. lastColonDefinition
+	return $ oldState & definedWords %~ (ix x %~ set isImmediate True)
 ```
 
 Essentially, the `guard` function does the trick. `guard`, which has the type

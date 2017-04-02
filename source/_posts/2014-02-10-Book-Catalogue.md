@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Book Catalogue
-date: 2014-02-10 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-02-10 Mon&gt;</span></span> 
 comments: true
 external-url:
 categories: [tech]

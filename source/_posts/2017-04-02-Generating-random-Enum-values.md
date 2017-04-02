@@ -1,0 +1,113 @@
+---
+layout: post
+title: Rolling the dice using random Enum values
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2017-04-02 Son&gt;</span></span> 
+comments: true
+external-url:
+categories: [programming]
+tags: [haskell,random,enum,evil]
+published: true
+sidebar: collapse
+---
+Every wanted to roll the dice in Haskell? Let's say you have a data type like
+
+``` haskell
+data Number = One | Two | Three | Four | Five | Six 
+	 deriving (Enum, Bounded, Eq, Show)
+```
+
+How do you generate a random `Number` value? There are several ways to do it, usually in an `IO` context, obviously. In order to use it in a 
+common monad transformer stack, the primitives of the `MonadRandom` type class come to my mind. So it would be most convenient to get a
+ random value using `getRandom`. Anyway, as much fun as rolling the dice is, let's derive a solution working for all bounded Enums.
+
+<!-- more -->
+
+Anyway, import **Control.Monad.Random** as we want to use `getRandom` of the `MonadRandom` class which looks like:
+
+``` haskell
+class Monad m => MonadRandom (m :: * -> *) where
+	getRandom :: Random a => m a
+-- other functions we don't need
+
+class Random a where
+-- needs to provide:
+	randomR :: RandomGen g => (a, a) -> g -> (a, g)
+	random :: RandomGen g => g -> (a, g)
+```
+
+Shortly, `randomR` needs to be able to provide a random `Number` value in the specified interval, given a random number generator. So the idea is about mapping the Enum values to `Int` values
+and deriving a random Enum value from a randomly generated number. 
+
+``` haskell
+-- :t fromEnum
+-- fromEnum :: Enum a => a -> Int
+-- :t toEnum
+-- toEnum :: Enum a => Int -> a
+
+-- 1)
+instance Random Number where
+	randomR (a,b) g = 
+		case randomR (fromEnum a, fromEnum b) g of
+				(x, g') -> (toEnum x, g')
+	random g = randomR (One, Six) g
+
+-- 2) - more general solution making use of Bounded
+instance Random Number where
+	randomR = enumRandomR
+	random g = randomR (minBound, maxBound) g
+
+enumRandomR (a, b) g =
+	case randomR (fromEnum a, fromEnum b) g of
+		(x, g') -> (toEnum x, g')
+```
+
+While we still used the explicit `Number` interval values in **1)**, we get a more general solution in **2)** using the fact that we had auto-derived an instance of `Bounded` for `Number` and thus have `minBound` and `maxBound` at our disposal.
+
+At last, we can generate a random `Number` value:
+
+``` haskell
+λ> getRandom :: IO Number
+Two
+```
+
+Anyway, our generated `Number` values are uniformly distributed, every value occurs with equal probability. What if you want to tamper with the die at little, e.g.
+when your opponent throws the dice they should not get a `Six` quite so often. You could do that providing a respective `Random` instance for a newtype wrapper:
+
+``` haskell
+-- you need GeneralizedNewtypeDeriving pragma to derive Enum
+newtype MaxBoundLessLikely a = MaxLessLikely {
+	getValue :: a } deriving (Bounded, Eq, Enum, Show)
+
+instance (Enum a, Eq a, Bounded a) => Random (MaxBoundLessLikely a) where
+	randomR (a,b) g = case enumRandomR (a,b) g of
+		result@(MaxLessLikely value, g') -> 
+			 if value == maxBound then
+				 enumRandomR (a,b) g'
+			 else result
+	random g = randomR (minBound, maxBound) g
+```
+
+Your `rollDice` function then looks so inconspicuous, your opponent might not even notice:
+
+``` haskell
+data Player = Me | Opponent
+
+rollDice Me = getRandom
+rollDice Opponent = fmap getValue getRandom
+
+howManySixes :: MonadRandom m => Player -> Int -> m Int
+howManySixes player nrThrows = do
+	results <- replicateM nrThrows (rollDice player)
+	return $ length . filter (== Six) $ results
+```
+
+They might actually think that they are just unlucky:
+
+``` haskell
+λ> howManySixes Me 1000
+170
+λ> howManySixes Opponent 1000
+46
+```
+
+You can find the source <a href="/enum/RandomEnum.hs" target="_blank">here</a>.

@@ -32,17 +32,17 @@ color of the US Open hard court ;)
 
 {% codeblock %}
 (let* ([color "blue"]
-      [blue (lambda (pict) (colorize pict color))]
-      [double (blue (filled-rectangle 203 30))]
-      [base (blue (filled-rectangle 90 133))]
-      [margin 3]
-      [doubles (hc-append margin double double)]
-      [service (blue (filled-rectangle 110 65))]
-      [services (vc-append margin service service)]
-      [middle1 (hc-append margin base services)]
-      [middle2 (hc-append margin services base)]
-      [middles (hc-append margin middle1 middle2)])
-    (frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
+			[blue (lambda (pict) (colorize pict color))]
+			[double (blue (filled-rectangle 203 30))]
+			[base (blue (filled-rectangle 90 133))]
+			[margin 3]
+			[doubles (hc-append margin double double)]
+			[service (blue (filled-rectangle 110 65))]
+			[services (vc-append margin service service)]
+			[middle1 (hc-append margin base services)]
+			[middle2 (hc-append margin services base)]
+			[middles (hc-append margin middle1 middle2)])
+		(frame (frame (vc-append margin doubles middles doubles) #:color "white" #:line-width 18) #:color color #:line-width 12))
 {% endcodeblock %}
 
 The code can also be found in that <a href="https://gist.github.com/sleepomeno/f8f0af59b19324166619" target="_blank">gist</a>.

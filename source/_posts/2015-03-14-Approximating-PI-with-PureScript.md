@@ -78,9 +78,9 @@ heavy use of those to get the circle and the polygon drawn.
 ``` haskell
 center = { x : 210, y : 210 }
 drawCircle = do 
-  arc { x: center.x, y: center.y, r: radius, start: 0, end: Math.pi * 2 }
-  setFillStyle "#000000"
-  fill
+	arc { x: center.x, y: center.y, r: radius, start: 0, end: Math.pi * 2 }
+	setFillStyle "#000000"
+	fill
 ```
 
 As an argument to `arc` we actually have an example of the *Object*
@@ -113,29 +113,29 @@ used to define complex event handling.
 
 ``` haskell
 main = do
-  canvas <- getCanvasElementById "canvas"
-  context <- getContext2D canvas
-  verticesInput <- select "#vertices"
-  polygonArea <- select "#polygonArea"
-  pi <- select "#pi"
-  triangles <- select "#triangles"
+	canvas <- getCanvasElementById "canvas"
+	context <- getContext2D canvas
+	verticesInput <- select "#vertices"
+	polygonArea <- select "#polygonArea"
+	pi <- select "#pi"
+	triangles <- select "#triangles"
 
-  let updateUI num showTriangles = do 
-      { pArea : polygonAreaPercent, pi : piApprox } <- showPolygon canvas context num showTriangles
-      setText (show polygonAreaPercent <> "%") polygonArea
-      setText (show piApprox) pi
-  let updateUI' = do 
-        showTriangles <- ((== "true") <<< stringify) <$> getProp "checked" triangles
-        num <- (stringify >>> readInt 10) <$> getValue verticesInput
-        updateUI num showTriangles
+	let updateUI num showTriangles = do 
+			{ pArea : polygonAreaPercent, pi : piApprox } <- showPolygon canvas context num showTriangles
+			setText (show polygonAreaPercent <> "%") polygonArea
+			setText (show piApprox) pi
+	let updateUI' = do 
+				showTriangles <- ((== "true") <<< stringify) <$> getProp "checked" triangles
+				num <- (stringify >>> readInt 10) <$> getValue verticesInput
+				updateUI num showTriangles
 
-  trianglesChange <- "click" `onAsObservable` triangles
-  trianglesChange `subscribe` \_ -> void updateUI'
+	trianglesChange <- "click" `onAsObservable` triangles
+	trianglesChange `subscribe` \_ -> void updateUI'
 
-  verticesChange <- "focus" `onAsObservable` verticesInput
-  verticesChange `subscribe` \_ -> void updateUI'
+	verticesChange <- "focus" `onAsObservable` verticesInput
+	verticesChange `subscribe` \_ -> void updateUI'
 
-  updateUI defaultVertices defaultShowTriangles
+	updateUI defaultVertices defaultShowTriangles
 ```
 
 ## The Foreign Function Interface
@@ -150,9 +150,9 @@ incoming Javascript value to a `String`.
 
 ``` haskell
 foreign import stringify
-  "function stringify(x) {\
-  \  return x+\"\";\
-  \}" :: Foreign -> String
+	"function stringify(x) {\
+	\  return x+\"\";\
+	\}" :: Foreign -> String
 ```
 
 That's an example of how you can integrate JavaScript functions in

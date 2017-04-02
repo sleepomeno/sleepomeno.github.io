@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Using Google Universal Analytics with Octopress
-date: 2014-08-16 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2014-08-16 Sam&gt;</span></span> 
 comments: true
 external-url:
 categories: [octopress]

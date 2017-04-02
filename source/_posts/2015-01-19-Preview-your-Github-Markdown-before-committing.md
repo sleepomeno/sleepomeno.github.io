@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Preview your Github Markdown before committing!
-date: 2015-01-19 
+date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2015-01-19 Mon&gt;</span></span> 
 comments: true
 external-url:
 categories: [emacs]
