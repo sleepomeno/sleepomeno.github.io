@@ -376,6 +376,19 @@ under severe time pressure ;)</p>
         var disqus_identifier = 'http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket/';
         var disqus_url = 'http://sleepomeno.github.io/blog/2015/09/13/Toying-with-Racket/';
         var disqus_script = 'embed.js';
+				var disqus_config = function () {
+					// Replace PAGE_URL with your page's canonical URL variable
+					this.page.url = disqus_url;
+
+					// Replace PAGE_IDENTIFIER with your page's unique identifier variable
+					this.page.identifier = disqus_identifier;
+					this.page.script = disqus_script;
+					this.callbacks.onIdentify.push(function(name) { 
+						if (!(name.length === 0 || !name.trim()) && typeof dtrum != 'undefined') {
+							dtrum.identifyUser(name);
+						}
+					});
+				};
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
